@@ -187,8 +187,12 @@
     align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 24px; transition: opacity .45s;
   }
   #avvio.via { opacity: 0; pointer-events: none; }
-  #avvio .marchio { width: 190px; height: 190px; filter: drop-shadow(0 8px 18px rgba(11,58,74,.18)); margin-bottom: 14px; }
-  #avvio h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -.3px; }
+  /* Il logo è identico a quello di Android (res/screen/android/splash-icon.png): stessa misura
+     (179 = 288 x 715/1152) e stesso punto (centro dello schermo). Così il passaggio non si vede. */
+  #avvio .marchio { position: absolute; left: 50%; top: 50%; width: 179px; height: 179px; margin: -89.5px 0 0 -89.5px; }
+  #avvio .avvio-testi { position: absolute; left: 16px; right: 16px; top: calc(50% + 108px); opacity: 0; transition: opacity .6s .2s; }
+  #avvio.pronto .avvio-testi { opacity: 1; }
+  #avvio h1 { margin: 0 0 4px; font-size: 32px; font-weight: 800; letter-spacing: -.3px; }
   #avvio p { margin: 0; color: #647580; font-size: 16px; }
   .bv h1 { margin: 12px 0 4px; font-size: 32px; font-weight: 800; text-align: center; line-height: 1.15; }
   .bv-sotto { margin: 0 0 26px; text-align: center; color: var(--tenue); font-size: 17px; }
@@ -350,7 +354,7 @@
   </div>
 </div>
 
-<div id="avvio" onclick="chiudiAvvio()" aria-hidden="true"><div id="avvio-logo"></div><h1>MedTranslator</h1><p>Frasi pronte per comunicare con i pazienti</p></div>
+<div id="avvio" onclick="chiudiAvvio()" aria-hidden="true"><div id="avvio-logo"></div><div class="avvio-testi"><h1>MedTranslator</h1><p>Frasi pronte per comunicare con i pazienti</p></div></div>
 <div class="avviso" id="avviso" role="status"></div>
 <div id="grande" role="dialog" aria-modal="true">
   <div class="barra">
@@ -2116,6 +2120,7 @@
     var partito = false;
     function parti() {
       if (partito) return; partito = true;
+      document.getElementById('avvio').classList.add('pronto');   // compare la scritta sotto il logo
       // Toglie il logo di Android solo adesso che l'avvio è disegnato: i saluti si vedono tutti dall'inizio.
       requestAnimationFrame(function () {
         if (navigator.splashscreen && navigator.splashscreen.hide) { try { navigator.splashscreen.hide(); } catch (e) {} }
