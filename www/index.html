@@ -24,25 +24,25 @@
 <!-- Font dentro l'app (funziona anche senza internet) -->
 <link rel="stylesheet" href="fonts/fonts.css">
 <style>
-  /* Stile di Doko: sfondo chiaro, testo verde scuro, verde del logo come
-     colore principale, schede bianche con bordo verdino e angoli tondi. */
+  /* Colori scelti da Massi: giorno "Menta e cielo" (sfondo verdino chiarissimo,
+     azzurro per i bottoni), notte "Blu notte". */
   :root {
-    --blu: #34a847; --blu-chiaro: #eef8ec; --rosso: #E53935; --verde: #34a847;
-    --sfondo: #f7f9fa; --carta: #ffffff; --bordo: rgba(7,72,38,0.15); --testo: #12331d; --tenue: rgba(18,51,29,0.65);
-    --ombra: 0 2px 6px rgba(18,51,29,0.08);
+    --blu: #3a9ed6; --blu-chiaro: #dcecf5; --chip: #dcecf5; --rosso: #E53935; --verde: #34a847;
+    --sfondo: #eef8f2; --carta: #ffffff; --bordo: #d3e6dc; --testo: #24323a; --tenue: #647580; --testata: #f6fbf8;
+    --ombra: 0 2px 6px rgba(36,50,58,0.07);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --blu: #4cc25f; --blu-chiaro: #173021; --rosso: #f0474e; --verde: #45b85a;
-      --sfondo: #0e1511; --carta: #16211a; --bordo: rgba(140,220,160,0.18); --testo: #e3f1e6; --tenue: rgba(227,241,230,0.65);
+      --blu: #5cb2ec; --blu-chiaro: #1c2c3d; --chip: #1c2c3d; --rosso: #f0474e; --verde: #45b85a;
+      --sfondo: #0e1620; --carta: #16222f; --bordo: #24364a; --testo: #e4edf5; --tenue: #98a9ba; --testata: #111b27;
       --ombra: none;
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --blu: #4cc25f; --blu-chiaro: #173021; --rosso: #f0474e; --verde: #45b85a;
-    --sfondo: #0e1511; --carta: #16211a; --bordo: rgba(140,220,160,0.18); --testo: #e3f1e6; --tenue: rgba(227,241,230,0.65);
+    --blu: #5cb2ec; --blu-chiaro: #1c2c3d; --chip: #1c2c3d; --rosso: #f0474e; --verde: #45b85a;
+    --sfondo: #0e1620; --carta: #16222f; --bordo: #24364a; --testo: #e4edf5; --tenue: #98a9ba; --testata: #111b27;
     --ombra: none;
   }
   * { box-sizing: border-box; }
@@ -57,38 +57,35 @@
     /* La barra parte dal bordo in alto e copre anche la zona dell'ora e della
        batteria: così le frasi non si vedono scorrere dietro. */
     position: sticky; top: 0; z-index: 5;
-    background: var(--testata, var(--carta)); border-bottom: 1px solid var(--bordo); border-top: 5px solid var(--blu);
+    background: var(--testata, var(--carta)); border-bottom: 1px solid var(--bordo); border-top: 6px solid var(--ruolo);
     padding: calc(8px + env(safe-area-inset-top, 0px)) 0 6px;
   }
-  /* Colore per ruolo (divise): Medico azzurro chiaro istituzionale, OA
-     viola-azzurro, OSS bianco e verde scuro, Infermiere bianco candido. */
-  body[data-ruolo="M"] { --blu: #3a9ed6; --blu-chiaro: #e3f2fb; --testata: #eaf5fc; }
-  body[data-ruolo="A"] { --blu: #5b5bc9; --blu-chiaro: #ebebfb; --testata: #f3f2fe; }
-  body[data-ruolo="S"] { --blu: #1f5b3b; --blu-chiaro: #e2eee6; --testata: #ffffff; }
-  body[data-ruolo="I"] { --blu: #5f7f9c; --blu-chiaro: #eef3f7; --testata: #ffffff; }
+  /* Colore del ruolo (divise): solo la barra in alto e il bottone del ruolo.
+     Medico blu istituzionale, OA viola-azzurro, OSS verde, Infermiere grigio-azzurro. */
+  body { --ruolo: var(--blu); --ruolo-testo: #ffffff; }
+  body[data-ruolo="M"] { --ruolo: #1f4e8c; } body[data-ruolo="A"] { --ruolo: #5b5bc9; }
+  body[data-ruolo="S"] { --ruolo: #2e7d4f; } body[data-ruolo="I"] { --ruolo: #5f7f9c; }
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) body[data-ruolo="M"] { --blu: #5cb2ec; --blu-chiaro: #16303f; --testata: var(--carta); }
-    :root:not([data-theme="light"]) body[data-ruolo="A"] { --blu: #9d9cf2; --blu-chiaro: #26254a; --testata: var(--carta); }
-    :root:not([data-theme="light"]) body[data-ruolo="S"] { --blu: #6cc793; --blu-chiaro: #17301f; --testata: var(--carta); }
-    :root:not([data-theme="light"]) body[data-ruolo="I"] { --blu: #b9cadb; --blu-chiaro: #243039; --testata: var(--carta); }
+    :root:not([data-theme="light"]) body { --ruolo-testo: #0e1620; }
+    :root:not([data-theme="light"]) body[data-ruolo="M"] { --ruolo: #7fa8e6; } :root:not([data-theme="light"]) body[data-ruolo="A"] { --ruolo: #9d9cf2; }
+    :root:not([data-theme="light"]) body[data-ruolo="S"] { --ruolo: #6cc793; } :root:not([data-theme="light"]) body[data-ruolo="I"] { --ruolo: #b9cadb; }
   }
-  :root[data-theme="dark"] body[data-ruolo="M"] { --blu: #5cb2ec; --blu-chiaro: #16303f; --testata: var(--carta); }
-  :root[data-theme="dark"] body[data-ruolo="A"] { --blu: #9d9cf2; --blu-chiaro: #26254a; --testata: var(--carta); }
-  :root[data-theme="dark"] body[data-ruolo="S"] { --blu: #6cc793; --blu-chiaro: #17301f; --testata: var(--carta); }
-  :root[data-theme="dark"] body[data-ruolo="I"] { --blu: #b9cadb; --blu-chiaro: #243039; --testata: var(--carta); }
-  .testata { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; padding: 0 16px; }
+  :root[data-theme="dark"] body { --ruolo-testo: #0e1620; }
+  :root[data-theme="dark"] body[data-ruolo="M"] { --ruolo: #7fa8e6; } :root[data-theme="dark"] body[data-ruolo="A"] { --ruolo: #9d9cf2; }
+  :root[data-theme="dark"] body[data-ruolo="S"] { --ruolo: #6cc793; } :root[data-theme="dark"] body[data-ruolo="I"] { --ruolo: #b9cadb; }
+  .testata { display: flex; align-items: center; gap: 6px; margin: 0 0 6px; padding: 0 16px; }
   .marchio { width: 28px; height: 28px; flex: none; }
-  header h1 { margin: 0; font-size: 19px; font-weight: 800; line-height: 1.1; flex: 1; min-width: 0; white-space: nowrap; }
+  header h1 { margin: 0; font-size: 17px; font-weight: 800; line-height: 1.1; flex: 1; min-width: 0; white-space: nowrap; }
   /* Bottone del ruolo scelto: toccandolo si torna alla schermata di benvenuto */
   .btn-ruolo {
-    flex: none; border: 1.5px solid var(--blu); background: var(--blu-chiaro); color: var(--blu);
-    border-radius: 999px; padding: 5px 12px; font: inherit; font-size: 14px; font-weight: 700; white-space: nowrap;
+    flex: none; border: 0; background: var(--ruolo); color: var(--ruolo-testo);
+    border-radius: 999px; padding: 6px 11px; font: inherit; font-size: 14px; font-weight: 700; white-space: nowrap;
   }
   .btn-ruolo span { font-weight: 400; opacity: .8; }
   /* Lente di ricerca e barra di ricerca (prende il posto della riga del titolo) */
   .btn-lente {
     flex: none; width: 36px; height: 36px; padding: 7px; border: 0; border-radius: 50%;
-    background: rgba(7,72,38,0.08); color: var(--testo);
+    background: var(--chip); color: var(--testo);
   }
   .btn-lente svg { width: 100%; height: 100%; display: block; }
   .cerca { display: none; gap: 8px; align-items: center; margin: 0 0 6px; padding: 0 16px; }
@@ -99,7 +96,7 @@
     background: var(--carta); color: var(--testo); font: inherit; font-size: 17px;
   }
   .cerca button {
-    flex: none; width: 42px; height: 42px; border: 0; border-radius: 50%; background: rgba(7,72,38,0.08);
+    flex: none; width: 42px; height: 42px; border: 0; border-radius: 50%; background: var(--chip);
     color: var(--testo); font: inherit; font-size: 18px; font-weight: 700;
   }
   .cerca input::-webkit-search-cancel-button { display: none; }
@@ -119,10 +116,10 @@
   .lingue button.attiva { background: var(--blu); color: #fff; }
   .gruppi { margin-top: 6px; }
   .gruppi button {
-    flex: none; border: 0; background: rgba(7,72,38,0.08); color: var(--testo); border-radius: 999px;
+    flex: none; border: 0; background: var(--chip); color: var(--testo); border-radius: 999px;
     padding: 4px 10px; font: inherit; font-size: 13.5px; font-weight: 700; white-space: nowrap;
   }
-  .gruppi button.attiva { background: var(--testo); color: var(--sfondo); }
+  .gruppi button.attiva { background: var(--blu); color: #fff; }
   main { padding: 8px 16px 32px; max-width: 640px; margin: 0 auto; }
   h2 { font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; color: var(--tenue); margin: 20px 4px 8px; }
   /* Frase + stella dei preferiti sulla stessa riga */
@@ -180,16 +177,16 @@
     border-radius: 18px; box-shadow: var(--ombra); font: inherit; cursor: pointer;
   }
   .bv-ruolo:active { transform: scale(.97); }
-  .bv-ruolo.ultimo { border-color: var(--verde); background: var(--blu-chiaro); }
+  .bv-ruolo.ultimo { border-color: var(--blu); background: var(--blu-chiaro); }
   .bv-ruolo .simbolo { font-size: 40px; line-height: 1.1; }
   .bv-ruolo b { font-size: 19px; line-height: 1.2; }
   .bv-ruolo small { font-size: 13.5px; color: var(--tenue); line-height: 1.3; }
-  .bv-ruolo.r-M { --c: #3a9ed6; } .bv-ruolo.r-A { --c: #5b5bc9; } .bv-ruolo.r-S { --c: #1f5b3b; } .bv-ruolo.r-I { --c: #5f7f9c; }
+  .bv-ruolo.r-M { --c: #1f4e8c; } .bv-ruolo.r-A { --c: #5b5bc9; } .bv-ruolo.r-S { --c: #2e7d4f; } .bv-ruolo.r-I { --c: #5f7f9c; }
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .bv-ruolo.r-M { --c: #5cb2ec; } :root:not([data-theme="light"]) .bv-ruolo.r-A { --c: #9d9cf2; }
+    :root:not([data-theme="light"]) .bv-ruolo.r-M { --c: #7fa8e6; } :root:not([data-theme="light"]) .bv-ruolo.r-A { --c: #9d9cf2; }
     :root:not([data-theme="light"]) .bv-ruolo.r-S { --c: #6cc793; } :root:not([data-theme="light"]) .bv-ruolo.r-I { --c: #b9cadb; }
   }
-  :root[data-theme="dark"] .bv-ruolo.r-M { --c: #5cb2ec; } :root[data-theme="dark"] .bv-ruolo.r-A { --c: #9d9cf2; }
+  :root[data-theme="dark"] .bv-ruolo.r-M { --c: #7fa8e6; } :root[data-theme="dark"] .bv-ruolo.r-A { --c: #9d9cf2; }
   :root[data-theme="dark"] .bv-ruolo.r-S { --c: #6cc793; } :root[data-theme="dark"] .bv-ruolo.r-I { --c: #b9cadb; }
   .bv-tutti {
     display: block; margin: 16px auto 0; border: 0; background: transparent; color: var(--blu);
