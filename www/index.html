@@ -8,7 +8,7 @@
   Traduttore di reparto — frasi pronte per parlare con pazienti stranieri.
   © 2026 Massimiliano Previtali. Tutti i diritti riservati.
 
-  COME SI USA: all'avvio scegli il tuo lavoro (infermiere, OSS, OA, medico),
+  COME SI USA: all'avvio scegli la tua lingua e il tuo lavoro (infermiere, OSS, OA, medico),
   poi la lingua in alto e tocca una frase. Compare grande nella
   lingua del paziente (giri il telefono e la legge) e il telefono la dice a
   voce. Se è una domanda, il paziente risponde toccando i bottoni grandi e tu
@@ -154,6 +154,8 @@
     background: var(--carta); color: var(--testo); border: 2px solid var(--bordo); border-radius: 14px;
     box-shadow: var(--ombra); font: inherit; font-size: 18px; font-weight: 700; cursor: pointer;
   }
+  .frase > span { display: block; }
+  .frase [dir="rtl"] { text-align: right; }
   .frase small { display: block; font-weight: 400; font-size: 16px; color: var(--tenue); margin-top: 3px; }
   .frase:active { background: var(--blu-chiaro); }
 
@@ -169,6 +171,12 @@
   .bv h1 { margin: 12px 0 4px; font-size: 32px; font-weight: 800; text-align: center; line-height: 1.15; }
   .bv-sotto { margin: 0 0 26px; text-align: center; color: var(--tenue); font-size: 17px; }
   .bv h2 { text-align: center; margin: 0 0 12px; font-size: 15px; }
+  .bv-lingue { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0 0 26px; }
+  .bv-lingue button {
+    border: 1.5px solid var(--blu); background: var(--carta); color: var(--blu); border-radius: 999px;
+    padding: 7px 13px; font: inherit; font-size: 15px; font-weight: 700;
+  }
+  .bv-lingue button.attiva { background: var(--blu); color: #fff; }
   .bv-ruoli { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .bv-ruolo {
     --c: #1b86c2;
@@ -296,6 +304,8 @@
     <div class="bv-logo"><svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg></div>
     <h1 id="bv-titolo">Benvenuto in MedTranslator</h1>
     <p class="bv-sotto">Frasi pronte per parlare con i pazienti stranieri</p>
+    <h2>🌐 La tua lingua · Your language</h2>
+    <div class="bv-lingue" id="bv-lingue"></div>
     <h2>Che lavoro fai?</h2>
     <div class="bv-ruoli" id="bv-ruoli"></div>
     <button type="button" class="bv-tutti" onclick="scegliRuolo('')">Vedi tutte le frasi</button>
@@ -331,6 +341,9 @@
     { id: 'uk', nome: 'Українська', voce: 'uk-UA' },
     { id: 'ru', nome: 'Русский', voce: 'ru-RU' }
   ];
+  // Tutte le 13 lingue: la posizione è la colonna nelle frasi (0 = italiano).
+  // L'operatore sceglie la sua; il paziente una qualsiasi delle altre.
+  var TUTTE = [{ id: 'it', nome: 'Italiano', voce: 'it-IT' }].concat(LINGUE);
   // Risposte Sì / No
   var SI = ['Sì', 'Yes', 'Sí', 'Oui', 'نعم', '是', 'はい'];
   var NO = ['No', 'No', 'No', 'Non', 'لا', '否', 'いいえ'];
@@ -1161,8 +1174,13 @@
     }
   })();
 
-  var lingua = 1;   // posizione nella riga delle frasi (1 = English)
-  try { var s = +localStorage.getItem('trad_lingua'); if (s >= 1 && s <= LINGUE.length) lingua = s; } catch (e) {}
+  var lingua = 1;   // lingua del paziente: colonna nelle frasi (1 = English)
+  var op = 0;       // lingua dell'operatore: colonna nelle frasi (0 = italiano)
+  try {
+    var s0 = localStorage.getItem('trad_lingua'), s = +s0; if (s0 !== null && s >= 0 && s < TUTTE.length) lingua = s;
+    var o0 = localStorage.getItem('trad_operatore'), o = +o0; if (o0 !== null && o >= 0 && o < TUTTE.length) op = o;
+  } catch (e) {}
+  if (lingua === op) lingua = op === 0 ? 1 : 0;
   var aperta = null;
   var FIRMA;   // firma dell'ideatore (sotto le frasi e nella schermata di benvenuto)
   var MARCHIO_SVG = '<svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg>';
@@ -1186,11 +1204,21 @@
       return '<button type="button" class="bv-ruolo r-' + r[0] + (r[0] === ruolo ? ' ultimo' : '') + '" onclick="scegliRuolo(\'' + r[0] + '\')">' +
         '<span class="simbolo" aria-hidden="true">' + r[3] + '</span><b>' + r[2] + '</b><small>' + r[4] + '</small></button>';
     }).join('');
+    document.getElementById('bv-lingue').innerHTML = TUTTE.map(function (l, n) {
+      return '<button type="button" class="' + (n === op ? 'attiva' : '') + '" lang="' + l.id + '" onclick="scegliOperatore(' + n + ')">' + l.nome + '</button>';
+    }).join('');
     document.getElementById('bv-firma').innerHTML = FIRMA;
     var b = document.getElementById('benvenuto');
     b.classList.add('aperto'); b.scrollTop = 0;
     document.body.setAttribute('data-ruolo', '');   // benvenuto sempre nel verde di Doko
     benvenutoAperto = true;
+  }
+  // Lingua dell'operatore (le frasi compaiono in questa lingua; il paziente ne sceglie un'altra)
+  function scegliOperatore(n) {
+    op = n;
+    if (lingua === op) lingua = op === 0 ? 1 : 0;
+    try { localStorage.setItem('trad_operatore', String(op)); localStorage.setItem('trad_lingua', String(lingua)); } catch (e) {}
+    apriBenvenuto();
   }
   function scegliRuolo(r) {
     ruolo = r;
@@ -1210,7 +1238,9 @@
   }
 
   function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function info() { return LINGUE[lingua - 1]; }
+  function info() { return TUTTE[lingua]; }        // lingua del paziente
+  function infoOp() { return TUTTE[op]; }          // lingua dell'operatore
+  function attrOp() { return ' lang="' + infoOp().id + '"' + (infoOp().rtl ? ' dir="rtl"' : ''); }
 
   // Ordine personale di lingue, ruoli e argomenti + frasi preferite.
   // Tutto salvato sul telefono di chi lo usa.
@@ -1253,16 +1283,16 @@
   }
   function rigaFrase(f, i) {
     var stella = preferite.indexOf(f.t[0]) !== -1;
-    return '<div class="riga-frase"><button type="button" class="frase" onclick="apri(' + i + ')">' + esc(f.t[0]) +
+    return '<div class="riga-frase"><button type="button" class="frase" onclick="apri(' + i + ')"><span' + attrOp() + '>' + esc(f.t[op]) + '</span>' +
       '<small lang="' + info().id + '"' + (info().rtl ? ' dir="rtl"' : '') + '>' + esc(f.t[lingua]) + '</small></button>' +
       '<button type="button" class="stella' + (stella ? ' piena' : '') + '" aria-pressed="' + stella + '" aria-label="' + (stella ? 'Togli dai preferiti' : 'Aggiungi ai preferiti') + '" onclick="alternaPreferita(' + i + ')">' + (stella ? '★' : '☆') + '</button></div>';
   }
 
   function disegna() {
     // Lingue
-    viste.lingue = ordinaSecondo(LINGUE.map(function (l, i) { return i + 1; }), ordLingue);
+    viste.lingue = ordinaSecondo(TUTTE.map(function (l, i) { return i; }).filter(function (i) { return i !== op; }), ordLingue);
     document.getElementById('lingue').innerHTML = viste.lingue.map(function (n, k) {
-      var l = LINGUE[n - 1];
+      var l = TUTTE[n];
       return chip('lingue', k, '<button type="button" class="' + (n === lingua ? 'attiva' : '') + '" lang="' + l.id + '" onclick="scegliLingua(' + n + ')">' + l.nome + '</button>');
     }).join('');
     // Chi sei: il ruolo scelto nella schermata di benvenuto
@@ -1294,7 +1324,7 @@
       FRASI.forEach(function (f, i) {
         if (f.gruppo) { rgc = f.ruoli; return; }
         if (ruolo && (f.ruoli || rgc).indexOf(ruolo) === -1) return;
-        var testo = normalizza(f.t[0] + ' ' + f.t[lingua]);
+        var testo = normalizza(f.t[0] + ' ' + f.t[op] + ' ' + f.t[lingua]);
         if (!parole.some(function (p) { return testo.indexOf(p) !== -1; })) return;
         trovate += rigaFrase(f, i); n++;
       });
@@ -1414,27 +1444,28 @@
     t.textContent = f.t[lingua];
     t.setAttribute('lang', info().id);
     t.setAttribute('dir', info().rtl ? 'rtl' : 'ltr');
-    document.getElementById('g-it').textContent = f.t[0];
+    var gi = document.getElementById('g-it');
+    gi.textContent = f.t[op]; gi.setAttribute('lang', infoOp().id); gi.setAttribute('dir', infoOp().rtl ? 'rtl' : 'ltr');
     var r = document.getElementById('g-risposte');
     var rtl = info().rtl ? ' dir="rtl"' : '';
     if (f.tipo === 'sn') {
       r.innerHTML = '<div class="risposte due"' + rtl + '>' +
-        '<button type="button" onclick="risposta(\'Sì\')">✓ ' + SI[lingua] + '</button>' +
-        '<button type="button" class="no" onclick="risposta(\'No\')">✕ ' + NO[lingua] + '</button></div>';
+        '<button type="button" onclick="risposta(SI[op])">✓ ' + SI[lingua] + '</button>' +
+        '<button type="button" class="no" onclick="risposta(NO[op])">✕ ' + NO[lingua] + '</button></div>';
     } else if (f.scelte) {
       r.innerHTML = '<div class="risposte"' + rtl + '>' + f.scelte.map(function (s, k) {
-        return '<button type="button" class="' + (k === f.scelte.length - 1 ? 'altra' : '') + '" onclick="risposta(\'' + s[0].replace(/'/g, "\\'") + '\')">' + (FIGURE[s[0]] ? '<span class="riquadro">' + FIGURE[s[0]] + '</span>' : '') + '<span>' + esc(s[lingua]) + '</span></button>';
+        return '<button type="button" class="' + (k === f.scelte.length - 1 ? 'altra' : '') + '" onclick="risposta(aperta.scelte[' + k + '][op])">' + (FIGURE[s[0]] ? '<span class="riquadro">' + FIGURE[s[0]] + '</span>' : '') + '<span>' + esc(s[lingua]) + '</span></button>';
       }).join('') + '</div>';
     } else if (f.tipo === 'dolore') {
       var colori = ['#2e9e44', '#4fa83d', '#79b236', '#a3b92f', '#c9b82a', '#e0a526', '#e58a24', '#e36c22', '#d9501f', '#c9351f', '#b01c1c'];
       var b = '';
-      for (var n = 0; n <= 10; n++) b += '<button type="button" style="background:' + colori[n] + '" onclick="risposta(\'Dolore ' + n + ' su 10\')">' + n + '</button>';
+      for (var n = 0; n <= 10; n++) b += '<button type="button" style="background:' + colori[n] + '" onclick="risposta(\'' + n + ' / 10\')">' + n + '</button>';
       r.innerHTML = '<div class="scala" dir="ltr">' + b + '</div><div class="scala-etichette" dir="ltr"><span>0 = ' + esc(DOLORE_0[lingua]) + '</span><span>10 = ' + esc(DOLORE_10[lingua]) + '</span></div>';
     } else if (f.tipo === 'calde') {
       calda = -1; aggiunte = [];
       var voce = function (riga, k, cosa) {
         return '<button type="button" id="' + cosa + '-' + k + '" onclick="' + (cosa === 'calda' ? 'scegliCalda' : 'alternaAggiunta') + '(' + k + ')">' + (FIGURE[riga[0]] || '') +
-          '<b lang="' + info().id + '">' + esc(riga[lingua]) + '</b><small>' + esc(riga[0]) + '</small></button>';
+          '<b lang="' + info().id + '">' + esc(riga[lingua]) + '</b><small' + attrOp() + '>' + esc(riga[op]) + '</small></button>';
       };
       r.innerHTML = '<div class="tre"' + rtl + '>' + CALDE.map(function (c, k) { return voce(c, k, 'calda'); }).join('') + '</div>' +
         '<p class="domanda2" lang="' + info().id + '"' + rtl + '>' + esc(DOMANDA_AGGIUNTE[lingua]) + '</p>' +
@@ -1444,7 +1475,7 @@
       tabAttiva = TABELLE[f.tab || 'base'];
       r.innerHTML = '<div class="tabella"' + rtl + '>' + tabAttiva.map(function (c, k) {
         return '<button type="button" id="casella-' + k + '" onclick="scegliCasella(' + k + ')">' + (FIGURE[c[1]] || '<span class="simbolo" aria-hidden="true">' + c[0] + '</span>') +
-          '<b lang="' + info().id + '">' + esc(c[lingua + 1]) + '</b><small>' + esc(c[1]) + '</small></button>';
+          '<b lang="' + info().id + '">' + esc(c[lingua + 1]) + '</b><small' + attrOp() + '>' + esc(c[op + 1]) + '</small></button>';
       }).join('') + '</div>' +
         '<div class="scorri"><button type="button" onclick="avantiCasella()">▶ Avanti</button><button type="button" class="questa" onclick="scegliCasella(casella)">✓ Questa!</button></div>' +
         '<p class="aiuto-tabella">Tocca <b>Avanti</b>: le caselle si accendono una alla volta e il telefono le legge nella lingua del paziente. Quando il paziente chiude gli occhi, tocca <b>Questa!</b> Se il paziente può indicare, indica col dito <b>senza toccare il telefono</b>: la casella la tocchi tu.</p>';
@@ -1459,9 +1490,10 @@
   }
 
   // Risposta del paziente: grande, in italiano, per chi assiste.
-  function risposta(it) {
+  var HA_RISPOSTO = ['Il paziente ha risposto:', 'The patient answered:', 'El paciente ha respondido:', 'Le patient a répondu :', 'أجاب المريض:', '患者的回答：', '患者さんの答え：', 'مریض کا جواب:', 'Pacientul a răspuns:', 'Pacienti u përgjigj:', 'ਮਰੀਜ਼ ਦਾ ਜਵਾਬ:', 'Пацієнт відповів:', 'Пациент ответил:'];
+  function risposta(it) {   // "it" = la risposta, già nella lingua dell'operatore
     var g = document.getElementById('g-risposta');
-    g.innerHTML = '<small>Il paziente ha risposto:</small>' + esc(it);
+    g.innerHTML = '<small' + attrOp() + '>' + HA_RISPOSTO[op] + '</small><span' + attrOp() + '>' + esc(it) + '</span>';
     g.style.display = 'block';
     g.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }
@@ -1480,8 +1512,10 @@
     rispostaCalde();
   }
   function rispostaCalde() {
-    var extra = aggiunte.slice().sort().map(function (k) { return AGGIUNTE[k][0].toLowerCase(); });
-    var testo = (calda >= 0 ? CALDE[calda][0] : '') + (extra.length ? (calda >= 0 ? ' con ' : 'Con ') + extra.join(' e ') : '');
+    var extra = aggiunte.slice().sort().map(function (k) { return AGGIUNTE[k][op]; });
+    var testo = op === 0   // in italiano: "Tè con limone e zucchero"; nelle altre lingue: "Tea + Lemon + Sugar"
+      ? (calda >= 0 ? CALDE[calda][0] : '') + (extra.length ? (calda >= 0 ? ' con ' : 'Con ') + extra.map(function (x) { return x.toLowerCase(); }).join(' e ') : '')
+      : (calda >= 0 ? [CALDE[calda][op]] : []).concat(extra).join(' + ');
     if (testo) risposta(testo); else document.getElementById('g-risposta').style.display = 'none';
   }
 
@@ -1499,7 +1533,7 @@
     if (casella >= 0) document.getElementById('casella-' + casella).classList.remove('accesa');
     casella = k;
     document.getElementById('casella-' + k).classList.add('accesa');
-    risposta(tabAttiva[k][1]);
+    risposta(tabAttiva[k][op + 1]);
   }
 
   function chiudi() {
