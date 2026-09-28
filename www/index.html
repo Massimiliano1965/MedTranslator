@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Traduttore reparto</title>
+<title>MedTranslator</title>
 <!--
-  Traduttore di reparto — frasi pronte per parlare con pazienti stranieri.
+  MedTranslator — frasi pronte per parlare con pazienti stranieri.
   © 2026 Massimiliano Previtali. Tutti i diritti riservati.
 
   COME SI USA: scegli la lingua in alto, tocca una frase. Compare grande nella
@@ -201,13 +201,64 @@
   .firma-nome { font-family: "Caveat", "Segoe Script", "Brush Script MT", cursive; font-size: 36px; font-weight: 600; line-height: 1.1; color: var(--blu); }
   .firma-nota { font-size: 13px; color: var(--tenue); max-width: 34ch; }
   @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+  /* Avvio: logo su verdino (come quello di Android), poi il fumetto con i
+     saluti nelle 13 lingue, poi "Benvenuto". Toccando lo schermo si salta. */
+  #avvio {
+    position: fixed; inset: 0; z-index: 50; background: #e4f5e8; overflow: hidden;
+    display: flex; align-items: center; justify-content: center; transition: opacity .35s;
+  }
+  #avvio.via { opacity: 0; pointer-events: none; }
+  #avvio .scena { position: relative; width: 320px; height: 320px; flex: none; }
+  #avvio .logo { position: absolute; left: 85px; top: 85px; width: 150px; height: 150px; transition: all .5s cubic-bezier(.3,1.3,.5,1); z-index: 2; }
+  #avvio.fase2 .logo { left: 0; top: 214px; width: 96px; height: 96px; }
+  #avvio .fumetto {
+    position: absolute; left: 36px; top: 16px; width: 284px; height: 172px; background: #fff; border-radius: 36px;
+    box-shadow: 0 10px 30px rgba(31, 90, 50, 0.18); transform: scale(0); transform-origin: 20% 110%;
+    transition: transform .45s cubic-bezier(.3,1.4,.5,1) .15s; display: flex; align-items: center; justify-content: center; overflow: visible;
+  }
+  #avvio .fumetto::after {   /* la punta del fumetto, verso il logo */
+    content: ""; position: absolute; left: 34px; bottom: -30px; width: 44px; height: 40px; background: #fff;
+    clip-path: polygon(0 0, 100% 0, 8% 100%);
+  }
+  #avvio.fase2 .fumetto { transform: scale(1); }
+  #avvio .saluti { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 36px; }
+  #avvio .saluti span {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center;
+    padding: 0 16px; font-size: 46px; font-weight: 700; line-height: 1.15; color: #1f7a33;
+    font-family: "Atkinson Hyperlegible", system-ui, "Noto Sans", "Noto Sans Arabic", "Noto Sans SC", "Noto Sans JP", "Noto Sans Gurmukhi", sans-serif;
+    transform: translateY(70%); opacity: 0; transition: transform .22s ease-out, opacity .22s ease-out;
+  }
+  #avvio .saluti span.lungo { font-size: 34px; }
+  #avvio .saluti span.dentro { transform: none; opacity: 1; }
+  #avvio .saluti span.fuori { transform: translateY(-70%); opacity: 0; }
+  #avvio .saluti span.benvenuto { flex-direction: column; font-size: 38px; }
+  #avvio .saluti span.benvenuto small { font-size: 17px; font-weight: 400; color: #4d6b55; margin-top: 4px; }
+  #avvio .nome {
+    position: absolute; left: 0; right: 0; bottom: calc(44px + env(safe-area-inset-bottom, 0px)); text-align: center;
+    opacity: 0; transition: opacity .5s .3s; color: #1f7a33;
+  }
+  #avvio.fase2 .nome { opacity: 1; }
+  #avvio .nome b { display: block; font-size: 28px; }
+  #avvio .nome small { display: block; font-size: 14px; color: #4d6b55; margin-top: 4px; }
+  @media (max-width: 352px) { #avvio .scena { transform: scale(.88); } }
+  @media (prefers-reduced-motion: reduce) {
+    #avvio .logo, #avvio .fumetto, #avvio .saluti span { transition: none; }
+    #avvio .saluti span, #avvio .saluti span.fuori { transform: none; }
+  }
 </style>
 </head>
 <body>
+<div id="avvio" aria-label="MedTranslator">
+  <div class="scena">
+    <div class="fumetto"><div class="saluti" id="saluti"></div></div>
+    <svg class="logo" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="24" fill="#2f9e43"/><path d="M26 40H50A10 10 0 0 1 60 50V62A10 10 0 0 1 50 72H36L18 84L26 72A10 10 0 0 1 16 62V50A10 10 0 0 1 26 40Z" fill="#fff" fill-opacity=".55"/><path d="M49 20H73A11 11 0 0 1 84 31V47A11 11 0 0 1 73 58L82 70L63 58H49A11 11 0 0 1 38 47V31A11 11 0 0 1 49 20Z" fill="#fff"/><path d="M57.5 29h7v6.5h6.5v7h-6.5v6.5h-7v-6.5h-6.5v-7h6.5z" fill="#2f9e43"/></svg>
+  </div>
+  <div class="nome"><b>MedTranslator</b><small>Tocca lo schermo per saltare</small></div>
+</div>
 <header>
   <div class="testata">
     <svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg>
-    <h1>Traduttore reparto<small>Frasi pronte per parlare con i pazienti</small></h1>
+    <h1>MedTranslator<small>Frasi pronte per parlare con i pazienti</small></h1>
   </div>
   <div class="lingue" id="lingue"></div>
   <div class="ruoli" id="ruoli"></div>
@@ -1197,12 +1248,51 @@
   }
   if ('speechSynthesis' in window) speechSynthesis.getVoices();
 
+
+  // Avvio: logo, poi i saluti nelle 13 lingue che scorrono nel fumetto, poi
+  // "Benvenuto" e si apre l'app. Toccando lo schermo si salta.
+  var avvio = (function () {
+    var el = document.getElementById('avvio'), box = document.getElementById('saluti');
+    var SALUTI = [['it', 'Ciao'], ['en', 'Hello'], ['es', 'Hola'], ['fr', 'Bonjour'], ['ar', 'مرحبا', 1],
+      ['zh', '你好'], ['ja', 'こんにちは'], ['ur', 'السلام علیکم', 1], ['ro', 'Bună'], ['sq', 'Përshëndetje'],
+      ['pa', 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ'], ['uk', 'Вітаю'], ['ru', 'Здравствуйте']];
+    var timer = [], finito = false, prima = null;
+    function dopo(ms, f) { timer.push(setTimeout(f, ms)); }
+    function mostra(lang, html, rtl, classe) {
+      var sp = document.createElement('span');
+      sp.lang = lang; sp.dir = rtl ? 'rtl' : 'ltr'; sp.className = classe || '';
+      sp.innerHTML = html; box.appendChild(sp);
+      sp.offsetWidth;   // fa partire l'animazione
+      sp.classList.add('dentro');
+      if (prima) { var p = prima; p.classList.add('fuori'); setTimeout(function () { p.remove(); }, 300); }
+      prima = sp;
+    }
+    function fine() {
+      if (finito) return; finito = true;
+      timer.forEach(clearTimeout);
+      el.classList.add('via');
+      setTimeout(function () { el.remove(); }, 400);
+    }
+    // Il primo tempo lo fa Android (logo su verdino): qui il logo resta fermo
+    // un attimo nello stesso punto, poi arriva il fumetto.
+    dopo(900, function () { el.classList.add('fase2'); });
+    SALUTI.forEach(function (x, k) {
+      dopo(1400 + k * 360, function () { mostra(x[0], esc(x[1]), x[2], x[1].length > 8 ? 'lungo' : ''); });
+    });
+    var t = 1400 + SALUTI.length * 360;
+    dopo(t, function () { mostra('it', 'Benvenuto<small>in MedTranslator</small>', 0, 'benvenuto'); });
+    dopo(t + 1300, fine);
+    el.addEventListener('pointerdown', fine);
+    return { aperto: function () { return !finito; }, fine: fine };
+  })();
+
   // Tasto Indietro di Android: chiude la frase aperta invece di uscire.
   window.addEventListener('popstate', function () { if (aperta) chiudi(); });
   // App Android: il tasto Indietro chiude la frase aperta; se non c'è niente di aperto, esce.
   document.addEventListener('backbutton', function (e) {
     e.preventDefault();
-    if (aperta) chiudi(); else if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
+    if (avvio.aperto()) avvio.fine();
+    else if (aperta) chiudi(); else if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
   }, false);
   var apriOriginale = apri;
   apri = function (i) { apriOriginale(i); try { history.pushState({ f: i }, ''); } catch (e) {} };

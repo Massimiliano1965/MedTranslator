@@ -12,8 +12,21 @@
     <!-- Solo verticale: il traduttore si usa col telefono in mano, girato verso il paziente. -->
     <preference name="Orientation" value="portrait" />
     <preference name="DisallowOverscroll" value="true" />
-    <preference name="AndroidWindowSplashScreenBackground" value="#ffffff" />
+    <!-- Avvio in due tempi. 1) Android: logo su sfondo verdino appena tocchi l'icona.
+         2) L'app: nel fumetto scorrono i saluti nelle 13 lingue (vedi "avvio" in www/index.html). -->
+    <preference name="AndroidWindowSplashScreenBackground" value="#e4f5e8" />
+    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/screen/android/splash-logo.xml" />
+    <preference name="AutoHideSplashScreen" value="true" />
+    <preference name="SplashScreenDelay" value="700" />
+    <preference name="FadeSplashScreen" value="true" />
+    <preference name="FadeSplashScreenDuration" value="250" />
     <platform name="android">
         <allow-intent href="market:*" />
+        <!-- Icona: due fumetti bianchi (con la croce) su verde -->
+        <icon density="mdpi" src="res/icon/android/mdpi.png" foreground="res/icon/android/mdpi-foreground.png" background="res/icon/android/mdpi-background.png" />
+        <icon density="hdpi" src="res/icon/android/hdpi.png" foreground="res/icon/android/hdpi-foreground.png" background="res/icon/android/hdpi-background.png" />
+        <icon density="xhdpi" src="res/icon/android/xhdpi.png" foreground="res/icon/android/xhdpi-foreground.png" background="res/icon/android/xhdpi-background.png" />
+        <icon density="xxhdpi" src="res/icon/android/xxhdpi.png" foreground="res/icon/android/xxhdpi-foreground.png" background="res/icon/android/xxhdpi-background.png" />
+        <icon density="xxxhdpi" src="res/icon/android/xxxhdpi.png" foreground="res/icon/android/xxxhdpi-foreground.png" background="res/icon/android/xxxhdpi-background.png" />
     </platform>
 </widget>
