@@ -85,6 +85,26 @@
     border-radius: 999px; padding: 5px 12px; font: inherit; font-size: 14px; font-weight: 700; white-space: nowrap;
   }
   .btn-ruolo span { font-weight: 400; opacity: .8; }
+  /* Lente di ricerca e barra di ricerca (prende il posto della riga del titolo) */
+  .btn-lente {
+    flex: none; width: 36px; height: 36px; padding: 7px; border: 0; border-radius: 50%;
+    background: rgba(7,72,38,0.08); color: var(--testo);
+  }
+  .btn-lente svg { width: 100%; height: 100%; display: block; }
+  .cerca { display: none; gap: 8px; align-items: center; margin: 0 0 6px; padding: 0 16px; }
+  body.cercando .cerca { display: flex; }
+  body.cercando .testata, body.cercando .gruppi { display: none; }
+  .cerca input {
+    flex: 1; min-width: 0; height: 42px; padding: 0 16px; border-radius: 21px; border: 1.5px solid var(--blu);
+    background: var(--carta); color: var(--testo); font: inherit; font-size: 17px;
+  }
+  .cerca button {
+    flex: none; width: 42px; height: 42px; border: 0; border-radius: 50%; background: rgba(7,72,38,0.08);
+    color: var(--testo); font: inherit; font-size: 18px; font-weight: 700;
+  }
+  .cerca input::-webkit-search-cancel-button { display: none; }
+  .cerca input:focus { outline: none; border-width: 2px; }
+  .nessuna { text-align: center; color: var(--tenue); margin: 32px 16px; font-size: 17px; }
   /* Lingue e argomenti: UNA riga sola ciascuno, che scorre di lato col dito.
      Così la testata resta bassa e lo schermo resta alle frasi. */
   .lingue, .gruppi {
@@ -251,7 +271,12 @@
   <div class="testata">
     <svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg>
     <h1>MedTranslator</h1>
+    <button type="button" class="btn-lente" onclick="apriCerca()" aria-label="Cerca una frase"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M15.5 15.5 L21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
     <button type="button" class="btn-ruolo" id="btn-ruolo" onclick="apriBenvenuto()"></button>
+  </div>
+  <div class="cerca" id="cerca">
+    <input type="search" id="cerca-testo" placeholder="Cerca: flebo, cuscino, dolore…" autocomplete="off" enterkeyhint="search" oninput="cercaFrasi(this.value)">
+    <button type="button" onclick="chiudiCerca()" aria-label="Chiudi la ricerca">✕</button>
   </div>
   <div class="lingue" id="lingue"></div>
   <div class="gruppi" id="gruppi"></div>
@@ -991,6 +1016,14 @@
   // (it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru).
   var GRUPPI_NUOVI = {"Pronto soccorso": "ISAM", "Igiene e movimento": "IS", "Prima e dopo l'operazione": "ISM", "Dimissione": "ISAM", "Mamme e bambini": "ISM", "Medicine": "ISM"};
   var FRASI_NUOVE = [
+    {"g": "Esami e cure", "ruoli": "IM", "t": ["Dobbiamo fare le analisi delle urine.", "We need to do a urine test.", "Tenemos que hacerle un análisis de orina.", "Nous devons faire une analyse d'urine.", "يجب أن نجري تحليل بول.", "我们需要给您做尿检。", "尿検査をします。", "ہمیں پیشاب کا ٹیسٹ کرنا ہے۔", "Trebuie să vă facem o analiză de urină.", "Duhet t'ju bëjmë analizën e urinës.", "ਸਾਨੂੰ ਪਿਸ਼ਾਬ ਦਾ ਟੈਸਟ ਕਰਨਾ ਪਵੇਗਾ।", "Нам потрібно зробити аналіз сечі.", "Нам нужно сделать анализ мочи."]},
+    {"g": "Esami e cure", "ruoli": "IM", "t": ["Le analisi sono buone.", "Your test results are good.", "Los resultados de los análisis son buenos.", "Vos résultats d'analyses sont bons.", "نتائج التحاليل جيدة.", "您的检查结果很好。", "検査の結果は良好です。", "آپ کے ٹیسٹ کے نتائج ٹھیک ہیں۔", "Analizele sunt bune.", "Analizat janë në rregull.", "ਤੁਹਾਡੇ ਟੈਸਟਾਂ ਦੇ ਨਤੀਜੇ ਠੀਕ ਹਨ।", "Ваші аналізи добрі.", "Ваши анализы хорошие."]},
+    {"g": "Esami e cure", "ruoli": "IM", "t": ["Dobbiamo ripetere le analisi.", "We need to repeat the tests.", "Tenemos que repetir los análisis.", "Nous devons refaire les analyses.", "يجب أن نعيد التحاليل.", "我们需要重新检查一次。", "検査をもう一度します。", "ہمیں ٹیسٹ دوبارہ کرنے ہیں۔", "Trebuie să repetăm analizele.", "Duhet t'i përsërisim analizat.", "ਸਾਨੂੰ ਟੈਸਟ ਦੁਬਾਰਾ ਕਰਨੇ ਪੈਣਗੇ।", "Нам потрібно повторити аналізи.", "Нам нужно повторить анализы."]},
+    {"g": "Esami e cure", "ruoli": "IM", "t": ["Il medico le spiegherà i risultati delle analisi.", "The doctor will explain your test results.", "El médico le explicará los resultados de los análisis.", "Le médecin vous expliquera les résultats des analyses.", "سيشرح لك الطبيب نتائج التحاليل.", "医生会向您解释检查结果。", "検査の結果は医師が説明します。", "ڈاکٹر آپ کو ٹیسٹ کے نتائج سمجھائیں گے۔", "Medicul vă va explica rezultatele analizelor.", "Mjeku do t'jua shpjegojë rezultatet e analizave.", "ਡਾਕਟਰ ਤੁਹਾਨੂੰ ਟੈਸਟਾਂ ਦੇ ਨਤੀਜੇ ਸਮਝਾਉਣਗੇ।", "Лікар пояснить вам результати аналізів.", "Врач объяснит вам результаты анализов."]},
+    {"g": "Medicine", "ruoli": "IM", "t": ["Queste sono vitamine.", "These are vitamins.", "Estas son vitaminas.", "Ce sont des vitamines.", "هذه فيتامينات.", "这是维生素。", "これはビタミン剤です。", "یہ وٹامنز ہیں۔", "Acestea sunt vitamine.", "Këto janë vitamina.", "ਇਹ ਵਿਟਾਮਿਨ ਹਨ।", "Це вітаміни.", "Это витамины."]},
+    {"g": "Medicine", "ruoli": "IM", "t": ["Nella flebo ci sono vitamine e sali minerali.", "The drip contains vitamins and minerals.", "El suero lleva vitaminas y sales minerales.", "La perfusion contient des vitamines et des sels minéraux.", "يحتوي المحلول الوريدي على فيتامينات وأملاح معدنية.", "输液里有维生素和矿物质。", "点滴にはビタミンとミネラルが入っています。", "ڈرپ میں وٹامنز اور نمکیات ہیں۔", "Perfuzia conține vitamine și săruri minerale.", "Seruma përmban vitamina dhe kripëra minerale.", "ਡ੍ਰਿਪ ਵਿੱਚ ਵਿਟਾਮਿਨ ਅਤੇ ਖਣਿਜ ਹਨ।", "У крапельниці є вітаміни та мінерали.", "В капельнице витамины и минералы."]},
+    {"g": "Pasti e bevande", "ruoli": "IM", "t": ["Deve mangiare più proteine: carne, pesce, uova, formaggio, legumi.", "You need to eat more protein: meat, fish, eggs, cheese, beans.", "Debe comer más proteínas: carne, pescado, huevos, queso, legumbres.", "Vous devez manger plus de protéines : viande, poisson, œufs, fromage, légumineuses.", "يجب أن تأكل المزيد من البروتين: لحم، سمك، بيض، جبن، بقوليات.", "您需要多吃蛋白质：肉、鱼、蛋、奶酪、豆类。", "たんぱく質をもっととってください。肉、魚、卵、チーズ、豆類などです。", "آپ کو زیادہ پروٹین کھانی چاہیے: گوشت، مچھلی، انڈے، پنیر، دالیں۔", "Trebuie să mâncați mai multe proteine: carne, pește, ouă, brânză, leguminoase.", "Duhet të hani më shumë proteina: mish, peshk, vezë, djathë, bishtajore.", "ਤੁਹਾਨੂੰ ਵੱਧ ਪ੍ਰੋਟੀਨ ਖਾਣੀ ਚਾਹੀਦੀ ਹੈ: ਮੀਟ, ਮੱਛੀ, ਆਂਡੇ, ਪਨੀਰ, ਦਾਲਾਂ।", "Вам потрібно їсти більше білка: м'ясо, рибу, яйця, сир, бобові.", "Вам нужно есть больше белка: мясо, рыбу, яйца, сыр, бобовые."]},
+    {"g": "Pasti e bevande", "ruoli": "ISA", "t": ["Questo è un integratore di proteine: lo beva piano piano.", "This is a protein supplement: drink it slowly.", "Esto es un suplemento de proteínas: bébalo despacio.", "C'est un complément protéiné : buvez-le lentement.", "هذا مكمّل بروتين: اشربه ببطء.", "这是蛋白质营养补充剂：请慢慢喝。", "これはたんぱく質の栄養補助飲料です。ゆっくり飲んでください。", "یہ پروٹین کا سپلیمنٹ ہے: اسے آہستہ آہستہ پئیں۔", "Acesta este un supliment de proteine: beți-l încet.", "Ky është një suplement proteinash: pijeni ngadalë.", "ਇਹ ਪ੍ਰੋਟੀਨ ਸਪਲੀਮੈਂਟ ਹੈ: ਇਸਨੂੰ ਹੌਲੀ-ਹੌਲੀ ਪੀਓ।", "Це білкова добавка: пийте її повільно.", "Это белковая добавка: пейте её медленно."]},
     {"g": "Medicine", "ruoli": "IM", "t": ["Questa è la medicina per il dolore.", "This is your pain medicine.", "Este es el medicamento para el dolor.", "Voici le médicament contre la douleur.", "هذا دواء الألم.", "这是止痛药。", "これは痛み止めの薬です。", "یہ درد کی دوا ہے۔", "Acesta este medicamentul pentru durere.", "Ky është ilaçi për dhimbjen.", "ਇਹ ਦਰਦ ਦੀ ਦਵਾਈ ਹੈ।", "Це ліки від болю.", "Это лекарство от боли."]},
     {"g": "Medicine", "ruoli": "IM", "t": ["Questa è la medicina per lo stomaco.", "This is your stomach medicine.", "Este es el medicamento para el estómago.", "Voici le médicament pour l'estomac.", "هذا دواء المعدة.", "这是胃药。", "これは胃の薬です。", "یہ معدے کی دوا ہے۔", "Acesta este medicamentul pentru stomac.", "Ky është ilaçi për stomakun.", "ਇਹ ਪੇਟ ਦੀ ਦਵਾਈ ਹੈ।", "Це ліки для шлунка.", "Это лекарство для желудка."]},
     {"g": "Medicine", "ruoli": "IM", "t": ["Questa è la medicina per dormire.", "This is your sleeping pill.", "Este es el medicamento para dormir.", "Voici le médicament pour dormir.", "هذا دواء للنوم.", "这是安眠药。", "これは眠るための薬です。", "یہ نیند کی دوا ہے۔", "Acesta este medicamentul pentru somn.", "Ky është ilaçi për gjumë.", "ਇਹ ਨੀਂਦ ਦੀ ਦਵਾਈ ਹੈ।", "Це ліки для сну.", "Это лекарство для сна."]},
@@ -1157,6 +1190,7 @@
     try { localStorage.setItem('trad_ruolo', r); } catch (e) {}
     document.getElementById('benvenuto').classList.remove('aperto');
     benvenutoAperto = false;
+    document.body.classList.remove('cercando'); testoCerca = ''; document.getElementById('cerca-testo').value = '';
     disegna();
     window.scrollTo(0, 0);
     centra('lingue'); centra('gruppi');
@@ -1247,6 +1281,22 @@
     }).join('');
     // Frasi: prima le preferite, poi gli argomenti nell'ordine scelto
     var html = '';
+    if (testoCerca) {
+      // Ricerca: tutte le frasi del proprio lavoro che contengono la parola (o una simile)
+      var parole = paroleDaCercare(testoCerca), trovate = '', n = 0, rgc = '';
+      FRASI.forEach(function (f, i) {
+        if (f.gruppo) { rgc = f.ruoli; return; }
+        if (ruolo && (f.ruoli || rgc).indexOf(ruolo) === -1) return;
+        var testo = normalizza(f.t[0] + ' ' + f.t[lingua]);
+        if (!parole.some(function (p) { return testo.indexOf(p) !== -1; })) return;
+        trovate += rigaFrase(f, i); n++;
+      });
+      html = n ? '<h2>' + n + (n === 1 ? ' frase trovata' : ' frasi trovate') + '</h2>' + trovate
+               : '<p class="nessuna">Nessuna frase con «' + esc(testoCerca) + '».<br>Prova con un\'altra parola.</p>';
+      document.getElementById('elenco').innerHTML = html + FIRMA;
+      attivaTrascina();
+      return;
+    }
     if (preferite.length && (gruppo === '' || gruppo === '__pref')) {
       var pref = '';
       FRASI.forEach(function (f, i) { if (!f.gruppo && preferite.indexOf(f.t[0]) !== -1) pref += rigaFrase(f, i); });
@@ -1291,6 +1341,46 @@
     });
   }
   function daTrascinamento() { return Date.now() - appenaTrascinato < 400; }
+
+  // ---------- Ricerca ----------
+  var testoCerca = '';
+  // Parole simili: scrivendo la chiave (o il suo inizio) si trovano anche queste.
+  var SINONIMI = {
+    puntura: ['iniezione', 'prelievo', 'glicemia', 'puntura', 'flebo'], ago: ['iniezione', 'prelievo', 'flebo', 'puntura'],
+    sangue: ['prelievo', 'sangue', 'analisi', 'glicemia'], pipi: ['urin', 'pappagallo', 'catetere', 'padella', 'bagno'],
+    urinare: ['urin', 'pappagallo', 'catetere'], cacca: ['padella', 'clistere', 'bagno', 'pannolone'],
+    feci: ['padella', 'clistere', 'bagno'], toilette: ['bagno', 'padella', 'pappagallo'], wc: ['bagno', 'padella', 'pappagallo'],
+    pastiglia: ['medicin', 'vitamin'], pillola: ['medicin', 'vitamin'], compressa: ['medicin', 'vitamin'],
+    farmac: ['medicin', 'vitamin'], terapia: ['medicin', 'flebo', 'iniezione'],
+    antidolor: ['dolore'], sonnifer: ['dormire'], gastr: ['stomaco'], nausea: ['nausea', 'stomaco'],
+    letto: ['letto', 'lenzuol', 'federa', 'cuscino', 'coperta', 'traversa'], pannolino: ['pannolone', 'traversa'],
+    mangiare: ['pranzo', 'cena', 'colazione', 'fame', 'mangi', 'proteine', 'pasto'], cibo: ['pranzo', 'cena', 'colazione', 'fame', 'mangi', 'pasto'],
+    bere: ['acqua', 'bere', 'sete', 'caffe', 'te?', 'camomilla', 'beva'], esami: ['esame', 'analisi', 'risultat', 'prelievo'],
+    analisi: ['analisi', 'esame', 'risultat', 'prelievo'], flebo: ['flebo', 'vitamin'], drip: ['flebo'],
+    lavare: ['lavar', 'igiene', 'doccia', 'cambiar'], freddo: ['freddo', 'coperta'], dottore: ['medico'], infermiere: ['infermier']
+  };
+  function normalizza(t) { return String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  function paroleDaCercare(q) {
+    q = normalizza(q).trim();
+    var parole = [q];
+    if (q.length >= 3) Object.keys(SINONIMI).forEach(function (k) {
+      if (k.indexOf(q) === 0 || q.indexOf(k) === 0) parole = parole.concat(SINONIMI[k]);
+    });
+    return parole.map(function (p) { return p.replace('te?', 'te '); });
+  }
+  function apriCerca() {
+    document.body.classList.add('cercando');
+    var c = document.getElementById('cerca-testo');
+    c.value = ''; testoCerca = '';
+    c.focus();
+    disegna();
+  }
+  function cercaFrasi(v) { testoCerca = v.trim(); disegna(); window.scrollTo(0, 0); }
+  function chiudiCerca() {
+    document.body.classList.remove('cercando');
+    testoCerca = ''; document.getElementById('cerca-testo').value = '';
+    disegna(); centra('gruppi');
+  }
 
   var gruppo = '', GRUPPI_VISTI = [];
   try { gruppo = localStorage.getItem('trad_gruppo') || ''; } catch (e) {}
@@ -1411,6 +1501,7 @@
   document.addEventListener('backbutton', function (e) {
     e.preventDefault();
     if (aperta) chiudi();
+    else if (document.body.classList.contains('cercando')) chiudiCerca();
     else if (!benvenutoAperto) apriBenvenuto();
     else if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
   }, false);
