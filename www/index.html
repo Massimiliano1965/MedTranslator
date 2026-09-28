@@ -8,7 +8,8 @@
   Traduttore di reparto — frasi pronte per parlare con pazienti stranieri.
   © 2026 Massimiliano Previtali. Tutti i diritti riservati.
 
-  COME SI USA: scegli la lingua in alto, tocca una frase. Compare grande nella
+  COME SI USA: all'avvio scegli il tuo lavoro (infermiere, OSS, OA, medico),
+  poi la lingua in alto e tocca una frase. Compare grande nella
   lingua del paziente (giri il telefono e la legge) e il telefono la dice a
   voce. Se è una domanda, il paziente risponde toccando i bottoni grandi e tu
   leggi la risposta in italiano.
@@ -23,40 +24,39 @@
 <!-- Font dentro l'app (funziona anche senza internet) -->
 <link rel="stylesheet" href="fonts/fonts.css">
 <style>
-  /* Colori presi da TrovaReparti: azzurro delle torri, rosso dei civici,
-     verde del bottone microfono. Font Atkinson Hyperlegible: disegnato
-     per chi vede poco. */
+  /* Stile di Doko: sfondo chiaro, testo verde scuro, verde del logo come
+     colore principale, schede bianche con bordo verdino e angoli tondi. */
   :root {
-    --blu: #1b86c2; --blu-chiaro: #e3f1fa; --rosso: #e0232b; --verde: #2f9e43;
-    --sfondo: #f3f6f9; --carta: #ffffff; --bordo: #d8e1e9; --testo: #1b2530; --tenue: #586776;
-    --ombra: 0 1px 2px rgba(27, 37, 48, 0.06);
+    --blu: #34a847; --blu-chiaro: #eef8ec; --rosso: #E53935; --verde: #34a847;
+    --sfondo: #f7f9fa; --carta: #ffffff; --bordo: rgba(7,72,38,0.15); --testo: #12331d; --tenue: rgba(18,51,29,0.65);
+    --ombra: 0 2px 6px rgba(18,51,29,0.08);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --blu: #45b3ea; --blu-chiaro: #17303f; --rosso: #f0474e; --verde: #45b85a;
-      --sfondo: #11171d; --carta: #1a222b; --bordo: #2b3845; --testo: #e7eef4; --tenue: #9aabbb;
+      --blu: #4cc25f; --blu-chiaro: #173021; --rosso: #f0474e; --verde: #45b85a;
+      --sfondo: #0e1511; --carta: #16211a; --bordo: rgba(140,220,160,0.18); --testo: #e3f1e6; --tenue: rgba(227,241,230,0.65);
       --ombra: none;
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --blu: #45b3ea; --blu-chiaro: #17303f; --rosso: #f0474e; --verde: #45b85a;
-    --sfondo: #11171d; --carta: #1a222b; --bordo: #2b3845; --testo: #e7eef4; --tenue: #9aabbb;
+    --blu: #4cc25f; --blu-chiaro: #173021; --rosso: #f0474e; --verde: #45b85a;
+    --sfondo: #0e1511; --carta: #16211a; --bordo: rgba(140,220,160,0.18); --testo: #e3f1e6; --tenue: rgba(227,241,230,0.65);
     --ombra: none;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
     background: var(--sfondo); color: var(--testo);
-    font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Arabic", "Noto Sans SC", sans-serif;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Noto Sans Arabic", "Noto Sans SC", sans-serif;
     font-size: 18px; line-height: 1.4; -webkit-tap-highlight-color: transparent;
   }
   button:focus-visible { outline: 3px solid var(--blu); outline-offset: 2px; }
   header {
     position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
     background: var(--testata, var(--carta)); border-bottom: 1px solid var(--bordo); border-top: 5px solid var(--blu);
-    padding: 12px 16px 10px;
+    padding: 8px 0 6px;
   }
   /* Colore per ruolo (divise): Medico azzurro chiaro istituzionale, OA
      viola-azzurro, OSS bianco e verde scuro, Infermiere bianco candido. */
@@ -74,42 +74,44 @@
   :root[data-theme="dark"] body[data-ruolo="A"] { --blu: #9d9cf2; --blu-chiaro: #26254a; --testata: var(--carta); }
   :root[data-theme="dark"] body[data-ruolo="S"] { --blu: #6cc793; --blu-chiaro: #17301f; --testata: var(--carta); }
   :root[data-theme="dark"] body[data-ruolo="I"] { --blu: #b9cadb; --blu-chiaro: #243039; --testata: var(--carta); }
-  .testata { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .marchio { width: 32px; height: 32px; flex: none; }
-  header h1 { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.1; }
-  header h1 small { display: block; font-size: 13px; font-weight: 400; color: var(--tenue); margin-top: 2px; }
-  .lingue, .ruoli { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .testata { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; padding: 0 16px; }
+  .marchio { width: 28px; height: 28px; flex: none; }
+  header h1 { margin: 0; font-size: 19px; font-weight: 800; line-height: 1.1; flex: 1; min-width: 0; }
+  /* Bottone del ruolo scelto: toccandolo si torna alla schermata di benvenuto */
+  .btn-ruolo {
+    flex: none; border: 1.5px solid var(--blu); background: var(--blu-chiaro); color: var(--blu);
+    border-radius: 999px; padding: 5px 12px; font: inherit; font-size: 14px; font-weight: 700; white-space: nowrap;
+  }
+  .btn-ruolo span { font-weight: 400; opacity: .8; }
+  /* Lingue e argomenti: UNA riga sola ciascuno, che scorre di lato col dito.
+     Così la testata resta bassa e lo schermo resta alle frasi. */
+  .lingue, .gruppi {
+    display: flex; flex-wrap: nowrap; gap: 6px; align-items: center;
+    overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; padding: 0 16px;
+  }
+  .lingue::-webkit-scrollbar, .gruppi::-webkit-scrollbar { display: none; }
   .lingue button {
-    border: 1.5px solid var(--blu); background: transparent; color: var(--blu);
+    flex: none; border: 1.5px solid var(--blu); background: transparent; color: var(--blu); white-space: nowrap;
     border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 15px; font-weight: 700;
   }
   .lingue button.attiva { background: var(--blu); color: #fff; }
-  .ruoli { margin-top: 8px; }
-  /* Argomenti: una riga sola che scorre di lato, per non alzare la testata */
-  /* Argomenti su più righe (non scorrono di lato): così si possono trascinare */
-  .gruppi { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .gruppi::-webkit-scrollbar { display: none; }
+  .gruppi { margin-top: 6px; }
   .gruppi button {
-    flex: none; border: 1px solid var(--bordo); background: transparent; color: var(--tenue); border-radius: 999px;
+    flex: none; border: 0; background: rgba(7,72,38,0.08); color: var(--testo); border-radius: 999px;
     padding: 4px 10px; font: inherit; font-size: 13.5px; font-weight: 700; white-space: nowrap;
   }
-  .gruppi button.attiva { background: var(--blu); border-color: var(--blu); color: #fff; }
-  .ruoli span { font-size: 14px; color: var(--tenue); margin-right: 2px; }
-  .ruoli button {
-    border: 1px solid var(--bordo); background: var(--sfondo); color: var(--testo); border-radius: 8px;
-    padding: 5px 10px; font: inherit; font-size: 14px; font-weight: 700;
-  }
-  .ruoli button.attiva { background: var(--blu-chiaro); border-color: var(--blu); color: var(--blu); }
+  .gruppi button.attiva { background: var(--testo); color: var(--sfondo); }
   main { padding: 8px 16px 32px; max-width: 640px; margin: 0 auto; }
-  h2 { font-size: 14px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--blu); margin: 22px 4px 8px; }
+  h2 { font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; color: var(--tenue); margin: 20px 4px 8px; }
   /* Frase + stella dei preferiti sulla stessa riga */
   .riga-frase { display: flex; gap: 6px; align-items: stretch; margin: 0 0 8px; }
   .riga-frase .frase { margin: 0; flex: 1; min-width: 0; }
   .stella {
-    flex: none; width: 48px; border: 1px solid var(--bordo); border-radius: 12px; background: var(--carta);
+    flex: none; width: 48px; border: 0; border-radius: 14px; background: rgba(245,196,0,0.14);
     color: var(--tenue); font-size: 24px; line-height: 1; cursor: pointer;
   }
-  .stella.piena { color: #e0a400; border-color: #e0a400; }
+  .stella { color: #d4a300; }
+  .stella.piena { color: #d4a300; background: rgba(245,196,0,0.3); }
   h2.titolo-pref { color: #b88600; }
   /* Tasto Ordina e frecce per spostare lingue, ruoli e argomenti */
   .btn-ordina {
@@ -126,18 +128,51 @@
   .trascina { touch-action: pan-x pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
   .preso { box-shadow: 0 6px 16px rgba(0,0,0,0.25); transform: scale(1.08); }
   .fantasma { opacity: 0.35; outline: 2px dashed var(--blu); }
-  /* Ruoli: una riga sola, bottoni della stessa larghezza (a capo solo mentre si ordina) */
-  body:not(.ordinando) .ruoli { flex-wrap: nowrap; }
-  body:not(.ordinando) .ruoli button { flex: 1; min-width: 0; padding-left: 4px; padding-right: 4px; }
   /* Mentre si ordina, gli argomenti vanno a capo invece di scorrere di lato:
      così il bottone spostato resta sempre in vista */
   .frase {
     display: block; width: 100%; text-align: left; margin: 0 0 8px; padding: 13px 16px;
-    background: var(--carta); color: var(--testo); border: 1px solid var(--bordo); border-radius: 12px;
+    background: var(--carta); color: var(--testo); border: 2px solid var(--bordo); border-radius: 14px;
     box-shadow: var(--ombra); font: inherit; font-size: 18px; font-weight: 700; cursor: pointer;
   }
   .frase small { display: block; font-weight: 400; font-size: 16px; color: var(--tenue); margin-top: 3px; }
   .frase:active { background: var(--blu-chiaro); }
+
+  /* Schermata di benvenuto: all'avvio si sceglie il proprio lavoro */
+  #benvenuto {
+    position: fixed; inset: 0; z-index: 15; background: var(--sfondo); display: none; overflow-y: auto;
+    padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+  }
+  #benvenuto.aperto { display: block; }
+  .bv { max-width: 520px; margin: 0 auto; padding: 28px 16px 16px; }
+  .bv-logo { display: flex; justify-content: center; }
+  .bv-logo .marchio { width: 64px; height: 64px; }
+  .bv h1 { margin: 12px 0 4px; font-size: 32px; font-weight: 800; text-align: center; line-height: 1.15; }
+  .bv-sotto { margin: 0 0 26px; text-align: center; color: var(--tenue); font-size: 17px; }
+  .bv h2 { text-align: center; margin: 0 0 12px; font-size: 15px; }
+  .bv-ruoli { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .bv-ruolo {
+    --c: #1b86c2;
+    display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 18px 8px 16px;
+    background: var(--carta); color: var(--testo); border: 2px solid var(--bordo); border-top: 8px solid var(--c);
+    border-radius: 18px; box-shadow: var(--ombra); font: inherit; cursor: pointer;
+  }
+  .bv-ruolo:active { transform: scale(.97); }
+  .bv-ruolo.ultimo { border-color: var(--verde); background: var(--blu-chiaro); }
+  .bv-ruolo .simbolo { font-size: 40px; line-height: 1.1; }
+  .bv-ruolo b { font-size: 19px; line-height: 1.2; }
+  .bv-ruolo small { font-size: 13.5px; color: var(--tenue); line-height: 1.3; }
+  .bv-ruolo.r-M { --c: #3a9ed6; } .bv-ruolo.r-A { --c: #5b5bc9; } .bv-ruolo.r-S { --c: #1f5b3b; } .bv-ruolo.r-I { --c: #5f7f9c; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .bv-ruolo.r-M { --c: #5cb2ec; } :root:not([data-theme="light"]) .bv-ruolo.r-A { --c: #9d9cf2; }
+    :root:not([data-theme="light"]) .bv-ruolo.r-S { --c: #6cc793; } :root:not([data-theme="light"]) .bv-ruolo.r-I { --c: #b9cadb; }
+  }
+  :root[data-theme="dark"] .bv-ruolo.r-M { --c: #5cb2ec; } :root[data-theme="dark"] .bv-ruolo.r-A { --c: #9d9cf2; }
+  :root[data-theme="dark"] .bv-ruolo.r-S { --c: #6cc793; } :root[data-theme="dark"] .bv-ruolo.r-I { --c: #b9cadb; }
+  .bv-tutti {
+    display: block; margin: 16px auto 0; border: 0; background: transparent; color: var(--blu);
+    font: inherit; font-size: 16px; font-weight: 700; text-decoration: underline; padding: 10px;
+  }
 
   /* Schermata grande per il paziente */
   #grande {
@@ -182,6 +217,12 @@
   }
   .tabella button:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .tabella .simbolo { font-size: 40px; line-height: 1.1; }
+  /* Figure disegnate (tabella e risposte a bottoni): grandi e chiare per il paziente */
+  .tabella .figura { width: 88px; height: 88px; padding: 4px; background: #fff; border-radius: 14px; }
+  .risposte button { display: flex; align-items: center; gap: 14px; text-align: start; }
+  .risposte.due button { justify-content: center; }
+  .risposte .riquadro { flex: none; width: 76px; height: 76px; padding: 4px; background: #fff; border-radius: 14px; }
+  .risposte .riquadro .figura { width: 100%; height: 100%; display: block; }
   .tabella b { font-size: 21px; line-height: 1.2; }
   .tabella small { font-size: 14px; color: var(--tenue); }
   .tabella button.accesa { border-color: var(--blu); background: var(--blu-chiaro); transform: scale(1.03); }
@@ -207,13 +248,25 @@
 <header>
   <div class="testata">
     <svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg>
-    <h1>Traduttore reparto<small>Frasi pronte per parlare con i pazienti</small></h1>
+    <h1>MedTranslator</h1>
+    <button type="button" class="btn-ruolo" id="btn-ruolo" onclick="apriBenvenuto()"></button>
   </div>
   <div class="lingue" id="lingue"></div>
-  <div class="ruoli" id="ruoli"></div>
   <div class="gruppi" id="gruppi"></div>
 </header>
 <main id="elenco"></main>
+
+<div id="benvenuto" role="dialog" aria-modal="true" aria-labelledby="bv-titolo">
+  <div class="bv">
+    <div class="bv-logo"><svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg></div>
+    <h1 id="bv-titolo">Benvenuto in MedTranslator</h1>
+    <p class="bv-sotto">Frasi pronte per parlare con i pazienti stranieri</p>
+    <h2>Che lavoro fai?</h2>
+    <div class="bv-ruoli" id="bv-ruoli"></div>
+    <button type="button" class="bv-tutti" onclick="scegliRuolo('')">Vedi tutte le frasi</button>
+    <div id="bv-firma"></div>
+  </div>
+</div>
 
 <div id="grande" role="dialog" aria-modal="true">
   <div class="barra">
@@ -260,6 +313,63 @@
     ['👪', 'Chiamare un familiare', 'Call my family', 'Llamar a mi familia', 'Appeler ma famille', 'الاتصال بعائلتي', '叫我的家人', '家族を呼んで']
   ];
   var casella = -1;
+  // Figure disegnate per le schermate che vede il paziente (tabella e risposte
+  // a bottoni). Disegni dentro l'app: funzionano anche senza internet.
+  // Chiave = testo italiano della casella o della risposta.
+  var FIGURE = (function () {
+    var L = 'stroke="#12331d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"';
+    function testa(x, pelle) { return '<circle cx="' + x + '" cy="52" r="28" fill="' + (pelle || '#f6cfa6') + '" ' + L + '/>'; }
+    function occhi(x) { return '<circle cx="' + (x - 10) + '" cy="47" r="3.5" fill="#12331d"/><circle cx="' + (x + 10) + '" cy="47" r="3.5" fill="#12331d"/>'; }
+    function goccia(x, y, sc, col) { return '<path transform="translate(' + x + ' ' + y + ') scale(' + sc + ')" d="M0 -10 C5 -3 7 1 7 4 A7 7 0 0 1 -7 4 C-7 1 -5 -3 0 -10Z" fill="' + (col || '#4fb3ea') + '" stroke="#12331d" stroke-width="2"/>'; }
+    function croce() { return '<circle cx="50" cy="50" r="42" fill="none" stroke="#E53935" stroke-width="8"/><path d="M21 79 L79 21" stroke="#E53935" stroke-width="8" stroke-linecap="round"/>'; }
+    var si = '<circle cx="50" cy="50" r="42" fill="#34a847"/><path d="M29 52 L44 67 L72 36" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>';
+    var no = '<circle cx="50" cy="50" r="42" fill="#E53935"/><path d="M33 33 L67 67 M67 33 L33 67" stroke="#fff" stroke-width="11" stroke-linecap="round"/>';
+    var bene = testa(50) + occhi(50) + '<circle cx="35" cy="59" r="4.5" fill="#f19a8a"/><circle cx="65" cy="59" r="4.5" fill="#f19a8a"/><path d="M38 60 Q50 74 62 60" fill="none" ' + L + '/>';
+    var sete = testa(38) + '<circle cx="30" cy="47" r="3.5" fill="#12331d"/><circle cx="48" cy="47" r="3.5" fill="#12331d"/><ellipse cx="40" cy="65" rx="6" ry="7" fill="#7a2a2a" ' + L + '/>' +
+      '<path d="M66 38 H92 L88 92 H70 Z" fill="#e6f5fd"/><path d="M68.5 58 H89.5 L88 92 H70 Z" fill="#4fb3ea"/><path d="M66 38 H92 L88 92 H70 Z" fill="none" ' + L + '/>' +
+      goccia(72, 22, 0.8) + goccia(86, 16, 0.9);
+    var fame = testa(36) + '<circle cx="28" cy="47" r="3.5" fill="#12331d"/><circle cx="46" cy="47" r="3.5" fill="#12331d"/><path d="M28 62 Q37 72 46 62 Z" fill="#7a2a2a" ' + L + '/>' +
+      '<path d="M58 66 H97 A19.5 17 0 0 1 58 66 Z" fill="#fff" ' + L + '/><path d="M62 67 H93" stroke="#e8a33c" stroke-width="5" stroke-linecap="round"/>' +
+      '<path d="M68 58 Q64 52 68 46 Q72 40 68 34 M78 58 Q74 52 78 46 Q82 40 78 34 M88 58 Q84 52 88 46 Q92 40 88 34" fill="none" stroke="#9aa5a0" stroke-width="3" stroke-linecap="round"/>';
+    var freddo = '<path d="M14 40 L8 46 L14 52 M86 40 L92 46 L86 52" fill="none" stroke="#4fb3ea" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
+      testa(50, '#cfe6f7') + occhi(50) + '<rect x="37" y="58" width="26" height="10" rx="3" fill="#fff" ' + L + '/><path d="M40 63 L43 60 L46 66 L49 60 L52 66 L55 60 L58 66 L60 63" fill="none" stroke="#12331d" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M24 76 Q50 90 76 76 L78 84 Q50 98 22 84 Z" fill="#E53935" ' + L + '/><path d="M62 88 L66 99 L74 97 L70 86" fill="#E53935" ' + L + '/>' +
+      '<g stroke="#4fb3ea" stroke-width="3" stroke-linecap="round"><path d="M84 4 V24 M75 9 L93 19 M93 9 L75 19"/></g>';
+    var caldo = '<circle cx="18" cy="18" r="10" fill="#ffc83d" stroke="#e8a33c" stroke-width="3"/><g stroke="#e8a33c" stroke-width="3" stroke-linecap="round"><path d="M18 1 V4 M18 32 V35 M1 18 H4 M32 18 H35 M6 6 L8 8 M28 28 L30 30 M30 6 L28 8 M6 30 L8 28"/></g>' +
+      testa(56, '#f7a88a') + '<path d="M42 48 Q46 44 50 48 M62 48 Q66 44 70 48" fill="none" ' + L + '/><ellipse cx="56" cy="65" rx="7" ry="5" fill="#7a2a2a" ' + L + '/>' +
+      goccia(76, 36, 0.7) + goccia(83, 54, 0.6) + goccia(35, 60, 0.6);
+    var dolore = '<path d="M14 34 L22 38 M12 48 H21 M14 62 L22 58" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>' +
+      testa(50) + '<path d="M36 44 L44 48 L36 52 M64 44 L56 48 L64 52" fill="none" ' + L + '/><path d="M34 37 L44 40 M66 37 L56 40" ' + L + '/>' +
+      '<path d="M38 68 Q50 58 62 68" fill="none" ' + L + '/>' +
+      '<path d="M82 6 L86 18 L96 12 L90 24 L99 28 L88 30 L90 42 L82 32 L74 40 L76 28 L66 26 L76 20 L72 10 Z" fill="#E53935" stroke="#12331d" stroke-width="2" stroke-linejoin="round"/>';
+    var paura = '<path d="M12 36 Q8 44 12 52 M88 36 Q92 44 88 52" fill="none" stroke="#9aa5a0" stroke-width="3" stroke-linecap="round"/>' +
+      testa(50, '#f3e6d2') + '<circle cx="40" cy="46" r="7" fill="#fff" ' + L + '/><circle cx="60" cy="46" r="7" fill="#fff" ' + L + '/><circle cx="40" cy="47" r="2.5" fill="#12331d"/><circle cx="60" cy="47" r="2.5" fill="#12331d"/>' +
+      '<path d="M32 34 Q38 30 44 33 M56 33 Q62 30 68 34" fill="none" ' + L + '/><ellipse cx="50" cy="66" rx="6" ry="8" fill="#7a2a2a" ' + L + '/>' + goccia(74, 34, 0.7);
+    var bagno = '<rect x="30" y="8" width="40" height="24" rx="4" fill="#fff" ' + L + '/><path d="M58 16 H64" ' + L + '/>' +
+      '<path d="M20 40 H80 Q80 66 60 72 L64 92 H36 L40 72 Q20 66 20 40 Z" fill="#fff" ' + L + '/><ellipse cx="50" cy="40" rx="30" ry="7" fill="#dff1fb" ' + L + '/><path d="M38 32 V34 M62 32 V34" ' + L + '/>';
+    function persona(x, y, sc, col) {
+      return '<g transform="translate(' + x + ' ' + y + ') scale(' + sc + ')"><path d="M-16 44 V26 A16 16 0 0 1 16 26 V44 Z" fill="' + col + '" ' + L + '/><circle cx="0" cy="0" r="11" fill="#f6cfa6" ' + L + '/></g>';
+    }
+    var famiglia = persona(26, 34, 1, '#34a847') + persona(74, 34, 1, '#5b5bc9') + persona(50, 56, 0.72, '#e8a33c') +
+      '<rect x="80" y="62" width="16" height="28" rx="3" fill="#12331d"/><rect x="83" y="66" width="10" height="17" fill="#bfe7ff"/>';
+    var tappo = '<path d="M36 20 Q50 8 64 20 L66 34 H34 Z" fill="#c9d1cd" ' + L + '/><circle cx="44" cy="20" r="2" fill="#12331d"/><circle cx="50" cy="16" r="2" fill="#12331d"/><circle cx="56" cy="20" r="2" fill="#12331d"/>';
+    var sale = '<path d="M34 34 H66 L70 92 H30 Z" fill="#fff" ' + L + '/>' + tappo;
+    var pepe = '<path d="M34 34 H66 L70 92 H30 Z" fill="#3b3b3b" ' + L + '/>' + tappo;
+    var maiale = '<path d="M30 42 L26 28 L40 38 M70 42 L74 28 L60 38" fill="#f7b6c2" ' + L + '/><ellipse cx="50" cy="56" rx="26" ry="20" fill="#f7b6c2" ' + L + '/>' +
+      '<ellipse cx="50" cy="62" rx="10" ry="7" fill="#f28fa3" ' + L + '/><circle cx="46" cy="62" r="1.8" fill="#12331d"/><circle cx="54" cy="62" r="1.8" fill="#12331d"/><circle cx="40" cy="50" r="2.5" fill="#12331d"/><circle cx="60" cy="50" r="2.5" fill="#12331d"/>' + croce();
+    var verdure = '<path d="M30 88 Q14 60 30 34 Q52 46 46 88 Z" fill="#34a847" ' + L + '/><path d="M31 84 Q30 60 32 40" fill="none" stroke="#12331d" stroke-width="2"/>' +
+      '<path d="M60 90 L50 44 H78 L72 90 Z" fill="#f28c28" ' + L + '/><path d="M58 44 Q56 30 62 22 M64 44 Q66 30 72 26" fill="none" stroke="#34a847" stroke-width="4" stroke-linecap="round"/>';
+    var grano = '<path d="M50 26 V86" stroke="#12331d" stroke-width="3" stroke-linecap="round"/><g fill="#e8b23c" stroke="#12331d" stroke-width="2"><ellipse cx="44" cy="32" rx="5" ry="8" transform="rotate(-25 44 32)"/><ellipse cx="56" cy="32" rx="5" ry="8" transform="rotate(25 56 32)"/>' +
+      '<ellipse cx="44" cy="47" rx="5" ry="8" transform="rotate(-25 44 47)"/><ellipse cx="56" cy="47" rx="5" ry="8" transform="rotate(25 56 47)"/><ellipse cx="50" cy="20" rx="5" ry="8"/></g>' + croce();
+    var F = {
+      'Sì': si, 'No': no, 'Dolore': dolore, 'Sete': sete, 'Freddo': freddo, 'Caldo': caldo, 'Bagno': bagno, 'Paura': paura,
+      'Chiamare un familiare': famiglia, 'Ho freddo': freddo, 'Ho caldo': caldo, 'Sto bene': bene, 'Ho sete': sete, 'Ho fame': fame,
+      'Sale': sale, 'Pepe': pepe, 'Senza maiale': maiale, 'Vegetariano': verdure, 'Senza glutine': grano
+    };
+    for (var k in F) F[k] = '<svg class="figura" viewBox="0 0 100 100" aria-hidden="true">' + F[k] + '</svg>';
+    return F;
+  })();
+
   var DOLORE_10 = ['Dolore massimo', 'Worst pain', 'Dolor máximo', 'Douleur maximale', 'أشد ألم', '最疼', '最もひどい痛み'];
 
   // Ordine: italiano, English, Español, Français, العربية, 中文
@@ -948,16 +1058,48 @@
   var lingua = 1;   // posizione nella riga delle frasi (1 = English)
   try { var s = +localStorage.getItem('trad_lingua'); if (s >= 1 && s <= LINGUE.length) lingua = s; } catch (e) {}
   var aperta = null;
+  var FIRMA;   // firma dell'ideatore (sotto le frasi e nella schermata di benvenuto)
   var MARCHIO_SVG = '<svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg>';
-  // [codice, nome breve sul bottone, nome intero]
-  var RUOLI = [['', 'Tutti', 'Tutti'], ['I', 'Inf.', 'Infermiere'], ['S', 'OSS', 'OSS'], ['A', 'OA', 'OA'], ['M', 'Med.', 'Medico']];
+  FIRMA = '<footer class="firma">' + MARCHIO_SVG +
+    '<span class="firma-etichetta">Ideazione e design</span>' +
+    '<span class="firma-nome">Massimiliano Previtali</span>' +
+    '<span class="firma-nota">© 2026 · Traduzioni da far controllare a un mediatore culturale.</span></footer>';
+  // [codice, nome sul bottone in alto, nome intero, simbolo, cosa fa]
+  var RUOLI = [
+    ['I', 'Infermiere', 'Infermiere', '💉', 'Terapie, parametri, dolore'],
+    ['S', 'OSS', 'Operatore socio-sanitario', '🤝', 'Igiene, bisogni, pasti'],
+    ['A', 'OA', 'Operatore alberghiero', '🍽️', 'Pasti e bevande'],
+    ['M', 'Medico', 'Medico', '🩺', 'Visita, esami, consenso']
+  ];
   var ruolo = '';
   try { var r0 = localStorage.getItem('trad_ruolo'); if (r0 && 'ISAM'.indexOf(r0) !== -1) ruolo = r0; } catch (e) {}
+  var benvenutoAperto = false;
+  // Schermata di benvenuto: si apre all'avvio e toccando il ruolo in alto.
+  function apriBenvenuto() {
+    document.getElementById('bv-ruoli').innerHTML = RUOLI.map(function (r) {
+      return '<button type="button" class="bv-ruolo r-' + r[0] + (r[0] === ruolo ? ' ultimo' : '') + '" onclick="scegliRuolo(\'' + r[0] + '\')">' +
+        '<span class="simbolo" aria-hidden="true">' + r[3] + '</span><b>' + r[2] + '</b><small>' + r[4] + '</small></button>';
+    }).join('');
+    document.getElementById('bv-firma').innerHTML = FIRMA;
+    var b = document.getElementById('benvenuto');
+    b.classList.add('aperto'); b.scrollTop = 0;
+    document.body.setAttribute('data-ruolo', '');   // benvenuto sempre nel verde di Doko
+    benvenutoAperto = true;
+  }
   function scegliRuolo(r) {
-    if (daTrascinamento()) return;
     ruolo = r;
     try { localStorage.setItem('trad_ruolo', r); } catch (e) {}
+    document.getElementById('benvenuto').classList.remove('aperto');
+    benvenutoAperto = false;
     disegna();
+    window.scrollTo(0, 0);
+    centra('lingue'); centra('gruppi');
+  }
+  // Porta in vista (al centro della riga) il bottone scelto di lingue o argomenti.
+  function centra(id) {
+    var riga = document.getElementById(id), el = riga.querySelector('.attiva');
+    if (!el) { riga.scrollLeft = 0; return; }
+    riga.scrollLeft = el.offsetLeft - riga.offsetLeft - (riga.clientWidth - el.offsetWidth) / 2;
   }
 
   function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -976,7 +1118,6 @@
     });
   }
   var ordLingue = leggi('trad_ordine_lingue', []);
-  var ordRuoli = leggi('trad_ordine_ruoli', []);
   var ordGruppi = leggi('trad_ordine_gruppi', []);
   var preferite = leggi('trad_preferite', []);
   var ordina = false;
@@ -989,7 +1130,6 @@
     if (j < 0 || j >= lista.length) return;
     var x = lista[k]; lista[k] = lista[j]; lista[j] = x;
     if (riga === 'lingue') { ordLingue = lista; salva('trad_ordine_lingue', lista); }
-    if (riga === 'ruoli') { ordRuoli = lista; salva('trad_ordine_ruoli', lista); }
     if (riga === 'gruppi') { ordGruppi = lista; salva('trad_ordine_gruppi', lista); }
     disegna();
   }
@@ -1018,12 +1158,11 @@
       var l = LINGUE[n - 1];
       return chip('lingue', k, '<button type="button" class="' + (n === lingua ? 'attiva' : '') + '" lang="' + l.id + '" onclick="scegliLingua(' + n + ')">' + l.nome + '</button>');
     }).join('');
-    // Chi sei
-    viste.ruoli = ordinaSecondo(RUOLI.map(function (r) { return r[0]; }), ordRuoli);
-    document.getElementById('ruoli').innerHTML = viste.ruoli.map(function (codice, k) {
-      var r = RUOLI.filter(function (x) { return x[0] === codice; })[0];
-      return chip('ruoli', k, '<button type="button" class="' + (codice === ruolo ? 'attiva' : '') + '" title="' + r[2] + '" aria-label="' + r[2] + '" onclick="scegliRuolo(\'' + codice + '\')">' + r[1] + '</button>');
-    }).join('');
+    // Chi sei: il ruolo scelto nella schermata di benvenuto
+    var rs = RUOLI.filter(function (x) { return x[0] === ruolo; })[0];
+    var br = document.getElementById('btn-ruolo');
+    br.innerHTML = (rs ? rs[3] + ' ' + rs[1] : 'Tutti') + ' <span>· cambia</span>';
+    br.setAttribute('aria-label', 'Ruolo: ' + (rs ? rs[2] : 'tutti') + '. Tocca per cambiare');
     document.body.setAttribute('data-ruolo', ruolo);
     // Argomenti che hanno almeno una frase per il ruolo scelto, nell'ordine scelto
     var disponibili = [], nomeGruppo = '', rg = '';
@@ -1057,10 +1196,7 @@
       });
       viste.gruppi.forEach(function (g) { if (perGruppo[g]) html += '<h2>' + esc(g) + '</h2>' + perGruppo[g].join(''); });
     }
-    html += '<footer class="firma">' + MARCHIO_SVG +
-      '<span class="firma-etichetta">Ideazione e design</span>' +
-      '<span class="firma-nome">Massimiliano Previtali</span>' +
-      '<span class="firma-nota">© 2026 · Traduzioni da far controllare a un mediatore culturale.</span></footer>';
+    html += FIRMA;
     document.getElementById('elenco').innerHTML = html;
     attivaTrascina();
   }
@@ -1071,7 +1207,7 @@
   function attivaTrascina() {
     if (typeof Sortable === 'undefined') return;
     ordinatori.forEach(function (o) { o.destroy(); });
-    ordinatori = [['lingue', 'trad_ordine_lingue'], ['ruoli', 'trad_ordine_ruoli'], ['gruppi', 'trad_ordine_gruppi']].map(function (r) {
+    ordinatori = [['lingue', 'trad_ordine_lingue'], ['gruppi', 'trad_ordine_gruppi']].map(function (r) {
       return Sortable.create(document.getElementById(r[0]), {
         draggable: '.trascina', animation: 150, delay: 220, delayOnTouchOnly: true, forceFallback: true,
         fallbackTolerance: 4, ghostClass: 'fantasma', chosenClass: 'preso', scroll: true, bubbleScroll: true,
@@ -1081,7 +1217,6 @@
             var v = b.getAttribute('data-k'); return r[0] === 'lingue' ? +v : v;
           });
           if (r[0] === 'lingue') ordLingue = ordine;
-          if (r[0] === 'ruoli') ordRuoli = ordine;
           if (r[0] === 'gruppi') ordGruppi = ordine;
           salva(r[1], ordine);
           setTimeout(disegna, 0);
@@ -1099,6 +1234,7 @@
     try { localStorage.setItem('trad_gruppo', gruppo); } catch (e) {}
     disegna();
     window.scrollTo(0, 0);
+    centra('gruppi');
   }
 
   function scegliLingua(n) {
@@ -1106,6 +1242,7 @@
     lingua = n;
     try { localStorage.setItem('trad_lingua', String(n)); } catch (e) {}
     disegna();
+    centra('lingue');
   }
 
   function apri(i) {
@@ -1123,7 +1260,7 @@
         '<button type="button" class="no" onclick="risposta(\'No\')">✕ ' + NO[lingua] + '</button></div>';
     } else if (f.scelte) {
       r.innerHTML = '<div class="risposte"' + rtl + '>' + f.scelte.map(function (s, k) {
-        return '<button type="button" class="' + (k === f.scelte.length - 1 ? 'altra' : '') + '" onclick="risposta(\'' + s[0].replace(/'/g, "\\'") + '\')">' + esc(s[lingua]) + '</button>';
+        return '<button type="button" class="' + (k === f.scelte.length - 1 ? 'altra' : '') + '" onclick="risposta(\'' + s[0].replace(/'/g, "\\'") + '\')">' + (FIGURE[s[0]] ? '<span class="riquadro">' + FIGURE[s[0]] + '</span>' : '') + '<span>' + esc(s[lingua]) + '</span></button>';
       }).join('') + '</div>';
     } else if (f.tipo === 'dolore') {
       var colori = ['#2e9e44', '#4fa83d', '#79b236', '#a3b92f', '#c9b82a', '#e0a526', '#e58a24', '#e36c22', '#d9501f', '#c9351f', '#b01c1c'];
@@ -1133,7 +1270,7 @@
     } else if (f.tipo === 'tabella') {
       casella = -1;
       r.innerHTML = '<div class="tabella"' + rtl + '>' + TABELLA.map(function (c, k) {
-        return '<button type="button" id="casella-' + k + '" onclick="scegliCasella(' + k + ')"><span class="simbolo" aria-hidden="true">' + c[0] + '</span>' +
+        return '<button type="button" id="casella-' + k + '" onclick="scegliCasella(' + k + ')">' + (FIGURE[c[1]] || '<span class="simbolo" aria-hidden="true">' + c[0] + '</span>') +
           '<b lang="' + info().id + '">' + esc(c[lingua + 1]) + '</b><small>' + esc(c[1]) + '</small></button>';
       }).join('') + '</div>' +
         '<div class="scorri"><button type="button" onclick="avantiCasella()">▶ Avanti</button><button type="button" class="questa" onclick="scegliCasella(casella)">✓ Questa!</button></div>' +
@@ -1199,10 +1336,13 @@
 
   // Tasto Indietro di Android: chiude la frase aperta invece di uscire.
   window.addEventListener('popstate', function () { if (aperta) chiudi(); });
-  // App Android: il tasto Indietro chiude la frase aperta; se non c'è niente di aperto, esce.
+  // App Android: il tasto Indietro chiude la frase aperta; dalle frasi torna
+  // alla schermata di benvenuto; dal benvenuto esce dall'app.
   document.addEventListener('backbutton', function (e) {
     e.preventDefault();
-    if (aperta) chiudi(); else if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
+    if (aperta) chiudi();
+    else if (!benvenutoAperto) apriBenvenuto();
+    else if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
   }, false);
   var apriOriginale = apri;
   apri = function (i) { apriOriginale(i); try { history.pushState({ f: i }, ''); } catch (e) {} };
@@ -1210,6 +1350,7 @@
   chiudi = function () { var era = aperta; chiudiOriginale(); if (era && history.state && history.state.f !== undefined) history.back(); };
 
   disegna();
+  apriBenvenuto();
 </script>
 </body>
 </html>
