@@ -54,9 +54,11 @@
   }
   button:focus-visible { outline: 3px solid var(--blu); outline-offset: 2px; }
   header {
-    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    /* La barra parte dal bordo in alto e copre anche la zona dell'ora e della
+       batteria: così le frasi non si vedono scorrere dietro. */
+    position: sticky; top: 0; z-index: 5;
     background: var(--testata, var(--carta)); border-bottom: 1px solid var(--bordo); border-top: 5px solid var(--blu);
-    padding: 8px 0 6px;
+    padding: calc(8px + env(safe-area-inset-top, 0px)) 0 6px;
   }
   /* Colore per ruolo (divise): Medico azzurro chiaro istituzionale, OA
      viola-azzurro, OSS bianco e verde scuro, Infermiere bianco candido. */
@@ -76,7 +78,7 @@
   :root[data-theme="dark"] body[data-ruolo="I"] { --blu: #b9cadb; --blu-chiaro: #243039; --testata: var(--carta); }
   .testata { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; padding: 0 16px; }
   .marchio { width: 28px; height: 28px; flex: none; }
-  header h1 { margin: 0; font-size: 19px; font-weight: 800; line-height: 1.1; flex: 1; min-width: 0; }
+  header h1 { margin: 0; font-size: 19px; font-weight: 800; line-height: 1.1; flex: 1; min-width: 0; white-space: nowrap; }
   /* Bottone del ruolo scelto: toccandolo si torna alla schermata di benvenuto */
   .btn-ruolo {
     flex: none; border: 1.5px solid var(--blu); background: var(--blu-chiaro); color: var(--blu);
@@ -1204,7 +1206,7 @@
     // Chi sei: il ruolo scelto nella schermata di benvenuto
     var rs = RUOLI.filter(function (x) { return x[0] === ruolo; })[0];
     var br = document.getElementById('btn-ruolo');
-    br.innerHTML = (rs ? rs[3] + ' ' + rs[1] : 'Tutti') + ' <span>· cambia</span>';
+    br.innerHTML = (rs ? rs[3] + ' ' + rs[1] : 'Tutti') + ' <span>▾</span>';
     br.setAttribute('aria-label', 'Ruolo: ' + (rs ? rs[2] : 'tutti') + '. Tocca per cambiare');
     document.body.setAttribute('data-ruolo', ruolo);
     // Argomenti che hanno almeno una frase per il ruolo scelto, nell'ordine scelto
