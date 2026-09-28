@@ -248,6 +248,17 @@
   .tabella b { font-size: 21px; line-height: 1.2; }
   .tabella small { font-size: 14px; color: var(--tenue); }
   .tabella button.accesa { border-color: var(--blu); background: var(--blu-chiaro); transform: scale(1.03); }
+  /* Scheda tè/caffè/camomilla: 3 figure per riga */
+  .tre { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+  .tre button {
+    display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 4px;
+    background: var(--carta); color: var(--testo); border: 3px solid var(--bordo); border-radius: 16px; font: inherit; min-width: 0;
+  }
+  .tre .figura { width: 100%; max-width: 76px; aspect-ratio: 1; height: auto; padding: 3px; background: #fff; border-radius: 12px; }
+  .tre b { font-size: 17px; line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
+  .tre small { font-size: 13px; color: var(--tenue); }
+  .tre button.accesa { border-color: var(--verde); background: var(--blu-chiaro); }
+  .domanda2 { font-size: 22px; font-weight: 700; margin: 18px 2px 8px; }
   .scorri { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
   .scorri button { border: 0; border-radius: 16px; padding: 18px 8px; font: inherit; font-size: 22px; font-weight: 700; color: #fff; background: var(--blu); }
   .scorri .questa { background: var(--verde); }
@@ -408,7 +419,16 @@
     var pappagallo = '<path d="M26 40 Q26 30 36 30 H70 Q80 30 80 40 V78 Q80 88 70 88 H36 Q26 88 26 78 Z" fill="#e9eef0" ' + L + '/>' +
       '<path d="M26 44 L10 26 L18 20 L34 36" fill="#e9eef0" ' + L + '/><path d="M44 30 Q52 12 70 16 Q78 18 78 30" fill="none" stroke="#12331d" stroke-width="5" stroke-linecap="round"/>' +
       '<path d="M36 70 H70" stroke="#f3d36b" stroke-width="10" stroke-linecap="round" opacity=".7"/>';
+    var limone = '<circle cx="50" cy="54" r="36" fill="#ffe066" ' + L + '/><circle cx="50" cy="54" r="29" fill="#fff6b8"/>' +
+      '<g stroke="#e8c230" stroke-width="3" stroke-linecap="round"><path d="M50 54 V27 M50 54 V81 M50 54 H23 M50 54 H77 M50 54 L31 35 M50 54 L69 73 M50 54 L69 35 M50 54 L31 73"/></g>' +
+      '<circle cx="50" cy="54" r="36" fill="none" ' + L + '/>';
+    var zucchero = '<path d="M20 50 L44 40 L68 50 L44 60 Z" fill="#fff" ' + L + '/><path d="M20 50 V76 L44 86 V60 Z" fill="#eef1f2" ' + L + '/><path d="M68 50 V76 L44 86 V60 Z" fill="#dde3e5" ' + L + '/>' +
+      '<path d="M48 22 L64 15 L80 22 L64 29 Z" fill="#fff" ' + L + '/><path d="M48 22 V40 L64 47 V29 Z" fill="#eef1f2" ' + L + '/><path d="M80 22 V40 L64 47 V29 Z" fill="#dde3e5" ' + L + '/>';
+    var dolcificante = '<path d="M26 18 L32 12 L38 18 L44 12 L50 18 L56 12 L62 18 L68 12 L74 18 V88 H26 Z" fill="#f7b6c2" ' + L + '/>' +
+      '<circle cx="50" cy="52" r="15" fill="#fff" ' + L + '/><path d="M44 52 L48 56 L57 46" fill="none" stroke="#34a847" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<circle cx="38" cy="76" r="2.5" fill="#fff"/><circle cx="50" cy="78" r="2.5" fill="#fff"/><circle cx="62" cy="76" r="2.5" fill="#fff"/>';
     var F = {
+      'Limone': limone, 'Zucchero': zucchero, 'Dolcificante': dolcificante,
       'Padella': padella, 'Pappagallo': pappagallo,
       'Acqua': acqua, 'Caffè': caffe, 'Tè': te, 'Camomilla': camomilla, 'Fame': fame,
       'Sì': si, 'No': no, 'Dolore': dolore, 'Sete': sete, 'Freddo': freddo, 'Caldo': caldo, 'Bagno': bagno, 'Paura': paura,
@@ -446,9 +466,10 @@
     { ruoli: 'ISAM', t: ["Aspetti qui, torno subito.", "Please wait here, I'll be right back.", "Espere aquí, vuelvo enseguida.", "Attendez ici, je reviens tout de suite.", "الرجاء الانتظار هنا، سأعود حالاً.", "请在这里等一下，我马上回来。", "ここでお待ちください。すぐ戻ります。"] },
 
     { gruppo: 'Pasti e bevande', ruoli: 'SA' },
-    { ruoli: 'SA', tipo: 'sn', t: ["Vuole un caffè?", "Would you like a coffee?", "¿Quiere un café?", "Voulez-vous un café ?", "هل تريد قهوة؟", "您要咖啡吗？", "コーヒーはいかがですか？"] },
-    { ruoli: 'SA', tipo: 'sn', t: ["Vuole un tè?", "Would you like some tea?", "¿Quiere un té?", "Voulez-vous un thé ?", "هل تريد شاياً؟", "您要茶吗？", "紅茶はいかがですか？"] },
-    { ruoli: 'SA', tipo: 'sn', t: ["Vuole una camomilla?", "Would you like a camomile tea?", "¿Quiere una manzanilla?", "Voulez-vous une camomille ?", "هل تريد شاي البابونج؟", "您要洋甘菊茶吗？", "カモミールティーはいかがですか？"] },
+    { ruoli: 'SA', tipo: 'calde', t: ["Vuole un tè, un caffè o una camomilla?", "Would you like tea, coffee or camomile tea?", "¿Quiere un té, un café o una manzanilla?", "Voulez-vous un thé, un café ou une camomille ?", "هل تريد شاياً أو قهوة أو شاي البابونج؟", "您要茶、咖啡还是洋甘菊茶？", "紅茶、コーヒー、カモミールティーのどれがいいですか？", "کیا آپ چائے، کافی یا بابونے کی چائے لیں گے؟", "Doriți ceai, cafea sau ceai de mușețel?", "Dëshironi çaj, kafe apo çaj kamomili?", "ਕੀ ਤੁਸੀਂ ਚਾਹ, ਕੌਫ਼ੀ ਜਾਂ ਕੈਮੋਮਾਈਲ ਚਾਹ ਲਓਗੇ?", "Бажаєте чай, каву чи ромашковий чай?", "Хотите чай, кофе или ромашковый чай?"] },
+    { ruoli: 'SA', tipo: 'sn', nascosta: true, t: ["Vuole un caffè?", "Would you like a coffee?", "¿Quiere un café?", "Voulez-vous un café ?", "هل تريد قهوة؟", "您要咖啡吗？", "コーヒーはいかがですか？"] },
+    { ruoli: 'SA', tipo: 'sn', nascosta: true, t: ["Vuole un tè?", "Would you like some tea?", "¿Quiere un té?", "Voulez-vous un thé ?", "هل تريد شاياً؟", "您要茶吗？", "紅茶はいかがですか？"] },
+    { ruoli: 'SA', tipo: 'sn', nascosta: true, t: ["Vuole una camomilla?", "Would you like a camomile tea?", "¿Quiere una manzanilla?", "Voulez-vous une camomille ?", "هل تريد شاي البابونج؟", "您要洋甘菊茶吗？", "カモミールティーはいかがですか？"] },
     { ruoli: 'SA', tipo: 'sn', t: ["Vuole dell'acqua?", "Would you like some water?", "¿Quiere agua?", "Voulez-vous de l'eau ?", "هل تريد ماءً؟", "您要水吗？", "お水はいかがですか？"] },
     { ruoli: 'SA', t: ["Ecco la colazione.", "Here is your breakfast.", "Aquí tiene el desayuno.", "Voici le petit-déjeuner.", "تفضل، هذا الفطور.", "这是您的早餐。", "朝食をお持ちしました。"] },
     { ruoli: 'SA', t: ["Ecco il pranzo.", "Here is your lunch.", "Aquí tiene la comida.", "Voici le déjeuner.", "تفضل، هذا الغداء.", "这是您的午餐。", "昼食をお持ちしました。"] },
@@ -1140,6 +1161,16 @@
     ['🌼', 'Camomilla', 'Camomile tea', 'Manzanilla', 'Camomille', 'بابونج', '洋甘菊茶', 'カモミールティー', 'بابونے کی چائے', 'Ceai de mușețel', 'Çaj kamomili', 'ਕੈਮੋਮਾਈਲ ਚਾਹ', 'Ромашковий чай', 'Ромашковый чай']
   ];
   var TABELLE = { base: TABELLA, bevande: TABELLA_BEVANDE };
+  // Scheda "tè, caffè o camomilla" (sempre proposti insieme) + limone, zucchero, dolcificante.
+  // Righe: [it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru]
+  var CALDE = [TABELLA_BEVANDE[6].slice(1), TABELLA_BEVANDE[5].slice(1), TABELLA_BEVANDE[7].slice(1)];
+  var AGGIUNTE = [
+    ['Limone', 'Lemon', 'Limón', 'Citron', 'ليمون', '柠檬', 'レモン', 'لیموں', 'Lămâie', 'Limon', 'ਨਿੰਬੂ', 'Лимон', 'Лимон'],
+    ['Zucchero', 'Sugar', 'Azúcar', 'Sucre', 'سكر', '糖', '砂糖', 'چینی', 'Zahăr', 'Sheqer', 'ਖੰਡ', 'Цукор', 'Сахар'],
+    ['Dolcificante', 'Sweetener', 'Edulcorante', 'Édulcorant', 'مُحلٍّ صناعي', '代糖', '甘味料', 'سویٹنر', 'Îndulcitor', 'Ëmbëlsues', 'ਸਵੀਟਨਰ', 'Підсолоджувач', 'Сахарозаменитель']
+  ];
+  var DOMANDA_AGGIUNTE = ['Con limone, zucchero o dolcificante?', 'With lemon, sugar or sweetener?', '¿Con limón, azúcar o edulcorante?', 'Avec du citron, du sucre ou de l\'édulcorant ?', 'مع ليمون أو سكر أو مُحلٍّ صناعي؟', '要加柠檬、糖还是代糖？', 'レモン、砂糖、甘味料はいかがですか？', 'لیموں، چینی یا سویٹنر کے ساتھ؟', 'Cu lămâie, zahăr sau îndulcitor?', 'Me limon, sheqer apo ëmbëlsues?', 'ਨਿੰਬੂ, ਖੰਡ ਜਾਂ ਸਵੀਟਨਰ ਨਾਲ?', 'З лимоном, цукром чи підсолоджувачем?', 'С лимоном, сахаром или сахарозаменителем?'];
+  var calda = -1, aggiunte = [];
   var tabAttiva = TABELLA;
   // Tabella bevande per il paziente che non può parlare: stessa frase a voce
   // della tabella a immagini ("chiuda gli occhi quando indico quella giusta").
@@ -1268,7 +1299,7 @@
     var disponibili = [], nomeGruppo = '', rg = '';
     FRASI.forEach(function (f) {
       if (f.gruppo) { nomeGruppo = f.gruppo; rg = f.ruoli; return; }
-      if (ruolo && (f.ruoli || rg).indexOf(ruolo) === -1) return;
+      if (f.nascosta || (ruolo && (f.ruoli || rg).indexOf(ruolo) === -1)) return;
       if (disponibili.indexOf(nomeGruppo) === -1) disponibili.push(nomeGruppo);
     });
     viste.gruppi = ordinaSecondo(disponibili, ordGruppi.concat(disponibili.filter(function (g) { return ordGruppi.indexOf(g) === -1; })));
@@ -1286,7 +1317,7 @@
       var parole = paroleDaCercare(testoCerca), trovate = '', n = 0, rgc = '';
       FRASI.forEach(function (f, i) {
         if (f.gruppo) { rgc = f.ruoli; return; }
-        if (ruolo && (f.ruoli || rgc).indexOf(ruolo) === -1) return;
+        if (f.nascosta || (ruolo && (f.ruoli || rgc).indexOf(ruolo) === -1)) return;
         var testo = normalizza(f.t[0] + ' ' + f.t[lingua]);
         if (!parole.some(function (p) { return testo.indexOf(p) !== -1; })) return;
         trovate += rigaFrase(f, i); n++;
@@ -1299,14 +1330,14 @@
     }
     if (preferite.length && (gruppo === '' || gruppo === '__pref')) {
       var pref = '';
-      FRASI.forEach(function (f, i) { if (!f.gruppo && preferite.indexOf(f.t[0]) !== -1) pref += rigaFrase(f, i); });
+      FRASI.forEach(function (f, i) { if (!f.gruppo && !f.nascosta && preferite.indexOf(f.t[0]) !== -1) pref += rigaFrase(f, i); });
       if (pref) html += '<h2 class="titolo-pref">★ Le mie frasi</h2>' + pref;
     }
     if (gruppo !== '__pref') {
       var perGruppo = {}, ruoliGruppo = '', gruppoAttuale = '';
       FRASI.forEach(function (f, i) {
         if (f.gruppo) { ruoliGruppo = f.ruoli; gruppoAttuale = f.gruppo; return; }
-        if (ruolo && (f.ruoli || ruoliGruppo).indexOf(ruolo) === -1) return;
+        if (f.nascosta || (ruolo && (f.ruoli || ruoliGruppo).indexOf(ruolo) === -1)) return;
         if (gruppo && gruppoAttuale !== gruppo) return;
         (perGruppo[gruppoAttuale] = perGruppo[gruppoAttuale] || []).push(rigaFrase(f, i));
       });
@@ -1423,6 +1454,15 @@
       var b = '';
       for (var n = 0; n <= 10; n++) b += '<button type="button" style="background:' + colori[n] + '" onclick="risposta(\'Dolore ' + n + ' su 10\')">' + n + '</button>';
       r.innerHTML = '<div class="scala" dir="ltr">' + b + '</div><div class="scala-etichette" dir="ltr"><span>0 = ' + esc(DOLORE_0[lingua]) + '</span><span>10 = ' + esc(DOLORE_10[lingua]) + '</span></div>';
+    } else if (f.tipo === 'calde') {
+      calda = -1; aggiunte = [];
+      var voce = function (riga, k, cosa) {
+        return '<button type="button" id="' + cosa + '-' + k + '" onclick="' + (cosa === 'calda' ? 'scegliCalda' : 'alternaAggiunta') + '(' + k + ')">' + (FIGURE[riga[0]] || '') +
+          '<b lang="' + info().id + '">' + esc(riga[lingua]) + '</b><small>' + esc(riga[0]) + '</small></button>';
+      };
+      r.innerHTML = '<div class="tre"' + rtl + '>' + CALDE.map(function (c, k) { return voce(c, k, 'calda'); }).join('') + '</div>' +
+        '<p class="domanda2" lang="' + info().id + '"' + rtl + '>' + esc(DOMANDA_AGGIUNTE[lingua]) + '</p>' +
+        '<div class="tre"' + rtl + '>' + AGGIUNTE.map(function (c, k) { return voce(c, k, 'aggiunta'); }).join('') + '</div>';
     } else if (f.tipo === 'tabella') {
       casella = -1;
       tabAttiva = TABELLE[f.tab || 'base'];
@@ -1434,7 +1474,7 @@
         '<p class="aiuto-tabella">Tocca <b>Avanti</b>: le caselle si accendono una alla volta e il telefono le legge nella lingua del paziente. Quando il paziente chiude gli occhi, tocca <b>Questa!</b> Se il paziente può indicare, indica col dito <b>senza toccare il telefono</b>: la casella la tocchi tu.</p>';
     } else r.innerHTML = '';
     // Il telefono lo tiene sempre l'operatore: il paziente indica o fa cenno, la risposta la tocchi tu.
-    if (f.tipo === 'sn' || f.tipo === 'dolore' || f.scelte)
+    if (f.tipo === 'sn' || f.tipo === 'dolore' || f.tipo === 'calde' || f.scelte)
       r.innerHTML += '<p class="aiuto-tabella">Il paziente indica o fa cenno, <b>senza toccare il telefono</b>: la risposta la tocchi tu.</p>';
     document.getElementById('g-risposta').style.display = 'none';
     document.getElementById('grande').classList.add('aperto');
@@ -1448,6 +1488,25 @@
     g.innerHTML = '<small>Il paziente ha risposto:</small>' + esc(it);
     g.style.display = 'block';
     g.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+
+  // Scheda tè/caffè/camomilla: una bevanda + le aggiunte che vuole.
+  function scegliCalda(k) {
+    calda = k;
+    CALDE.forEach(function (c, j) { document.getElementById('calda-' + j).classList.toggle('accesa', j === k); });
+    parlaTesto(DOMANDA_AGGIUNTE[lingua]);
+    rispostaCalde();
+  }
+  function alternaAggiunta(k) {
+    var i = aggiunte.indexOf(k);
+    if (i === -1) aggiunte.push(k); else aggiunte.splice(i, 1);
+    document.getElementById('aggiunta-' + k).classList.toggle('accesa', i === -1);
+    rispostaCalde();
+  }
+  function rispostaCalde() {
+    var extra = aggiunte.slice().sort().map(function (k) { return AGGIUNTE[k][0].toLowerCase(); });
+    var testo = (calda >= 0 ? CALDE[calda][0] : '') + (extra.length ? (calda >= 0 ? ' con ' : 'Con ') + extra.join(' e ') : '');
+    if (testo) risposta(testo); else document.getElementById('g-risposta').style.display = 'none';
   }
 
   // Tabella: accende la casella successiva e la legge a voce.
