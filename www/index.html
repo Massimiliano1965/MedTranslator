@@ -1663,9 +1663,10 @@
   disegna();
   apriBenvenuto();
 
-  // Avvio: nel fumetto del logo scorrono i saluti nelle 13 lingue (ordine delle colonne), poi sparisce.
+  // Avvio: nel fumetto del logo scorrono i saluti nelle 13 lingue, poi sparisce.
+  // Ordine voluto da Massi: italiano primo, giapponese terzo, francese ultimo.
   // Toccando lo schermo si salta.
-  var SALUTI = ['Ciao', 'Hello', 'Hola', 'Bonjour', 'مرحبا', '你好', 'こんにちは', 'سلام', 'Bună', 'Tungjatjeta', 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ', 'Привіт', 'Привет'];
+  var SALUTI = ['Ciao', 'Hello', 'こんにちは', 'Hola', 'مرحبا', '你好', 'سلام', 'Bună', 'Tungjatjeta', 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ', 'Привіт', 'Привет', 'Bonjour'];
   var tempoAvvio = null;
   function chiudiAvvio() {
     clearInterval(tempoAvvio);
