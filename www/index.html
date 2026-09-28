@@ -208,9 +208,9 @@
   .bv-lingue b { font-size: 16px; line-height: 1.2; white-space: nowrap; letter-spacing: -0.2px; }
   .bv-lingue small { font-size: 12.5px; color: var(--tenue); }
   .bv-lingue button.attiva { border-color: var(--blu); background: var(--blu-chiaro); }
-  .bv-lingue .sigla.bandiera { background: #fff; overflow: hidden; font-size: 24px; line-height: 1; box-shadow: 0 0 0 2px #fff, var(--ombra); }
-  /* la bandiera (emoji) ingrandita dal centro, così il cerchietto mostra il centro della bandiera */
-  .bv-lingue .sigla.bandiera span { display: block; line-height: 1; transform: scale(1.8); }
+  .bv-lingue .sigla.bandiera { background: #fff; overflow: hidden; box-shadow: 0 0 0 2px #fff, var(--ombra); }
+  /* la bandiera disegnata riempie tutto il cerchietto */
+  .bv-lingue .sigla.bandiera svg { display: block; width: 100%; height: 100%; }
   .bv-lingue .sigla.arabo { background: #007a3d; font-size: 20px; box-shadow: 0 0 0 2px #fff; }
   .bv-lingue button.attiva .sigla { box-shadow: 0 0 0 3px var(--blu); }
   .bv-ruoli { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -385,7 +385,23 @@
   // Per la scelta della lingua dell'operatore: nome in italiano e iniziale nella sua scrittura
   var NOMI_IT = ['Italiano', 'Inglese', 'Spagnolo', 'Francese', 'Arabo', 'Cinese', 'Giapponese', 'Urdu', 'Romeno', 'Albanese', 'Punjabi', 'Ucraino', 'Russo'];
   // Bandiera nel cerchietto. Arabo: nessuna bandiera vale per tutti i paesi arabi → lettera ع su verde.
-  var BANDIERE = ['🇮🇹', '🇬🇧', '🇪🇸', '🇫🇷', '', '🇨🇳', '🇯🇵', '🇵🇰', '🇷🇴', '🇦🇱', '🇮🇳', '🇺🇦', '🇷🇺'];
+  // Disegnate dentro l'app (non emoji): centrate nel cerchietto e uguali su tutti i telefoni.
+  // Ordine: it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru
+  var BANDIERE = [
+    '<rect width="10" height="30" fill="#009246"/><rect x="10" width="10" height="30" fill="#fff"/><rect x="20" width="10" height="30" fill="#ce2b37"/>',
+    '<rect width="30" height="30" fill="#012169"/><path d="M0 0L30 30M30 0L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0L30 30M30 0L0 30" stroke="#c8102e" stroke-width="2"/><path d="M15 0V30M0 15H30" stroke="#fff" stroke-width="8"/><path d="M15 0V30M0 15H30" stroke="#c8102e" stroke-width="4.5"/>',
+    '<rect width="30" height="30" fill="#aa151b"/><rect y="7.5" width="30" height="15" fill="#f1bf00"/>',
+    '<rect width="10" height="30" fill="#0055a4"/><rect x="10" width="10" height="30" fill="#fff"/><rect x="20" width="10" height="30" fill="#ef4135"/>',
+    '',
+    '<rect width="30" height="30" fill="#de2910"/><path fill="#ffde00" d="M11.00 7.00 L12.12 10.45 L15.76 10.45 L12.82 12.59 L13.94 16.05 L11.00 13.91 L8.06 16.05 L9.18 12.59 L6.24 10.45 L9.88 10.45 Z M19.01 5.09 L18.98 6.18 L20.00 6.55 L18.95 6.85 L18.91 7.94 L18.30 7.04 L17.26 7.34 L17.93 6.48 L17.32 5.58 L18.34 5.95 Z M22.06 8.44 L21.57 9.41 L22.34 10.18 L21.26 10.01 L20.77 10.98 L20.59 9.91 L19.52 9.73 L20.49 9.24 L20.32 8.16 L21.09 8.93 Z M21.00 12.00 L21.34 13.04 L22.43 13.04 L21.54 13.68 L21.88 14.71 L21.00 14.07 L20.12 14.71 L20.46 13.68 L19.57 13.04 L20.66 13.04 Z M19.01 15.09 L18.98 16.18 L20.00 16.55 L18.95 16.85 L18.91 17.94 L18.30 17.04 L17.26 17.34 L17.93 16.48 L17.32 15.58 L18.34 15.95 Z"/>',
+    '<rect width="30" height="30" fill="#fff"/><circle cx="15" cy="15" r="8" fill="#bc002d"/>',
+    '<rect width="30" height="30" fill="#01411c"/><rect width="7" height="30" fill="#fff"/><circle cx="18.5" cy="15" r="7" fill="#fff"/><circle cx="20.3" cy="13.4" r="6" fill="#01411c"/><path fill="#fff" d="M20.76 9.76 L22.24 10.69 L23.57 9.56 L23.15 11.26 L24.63 12.18 L22.89 12.30 L22.47 13.99 L21.81 12.38 L20.07 12.50 L21.41 11.38 Z"/>',
+    '<rect width="10" height="30" fill="#002b7f"/><rect x="10" width="10" height="30" fill="#fcd116"/><rect x="20" width="10" height="30" fill="#ce1126"/>',
+    '<rect width="30" height="30" fill="#e41e20"/><path fill="#000" d="M15 11 L13.6 9.2 L12.8 6.6 L11.2 6.1 L9.4 7.1 L11 7.7 L11.9 9.4 L12.3 10.8 L10 9.6 L6.2 7.8 L4.4 9.6 L6.8 11 L4 12.2 L5.6 13.6 L4 15.2 L7 15.6 L5.6 17.6 L9 17.2 L11.2 18.2 L12.4 19.2 L11.4 23.2 L13.4 22.2 L15 24.4 L16.6 22.2 L18.6 23.2 L17.6 19.2 L18.8 18.2 L21 17.2 L24.4 17.6 L23 15.6 L26 15.2 L24.4 13.6 L26 12.2 L23.2 11 L25.6 9.6 L23.8 7.8 L20 9.6 L17.7 10.8 L18.1 9.4 L19 7.7 L20.6 7.1 L18.8 6.1 L17.2 6.6 L16.4 9.2 Z"/>',
+    '<rect width="30" height="10" fill="#ff9933"/><rect y="10" width="30" height="10" fill="#fff"/><rect y="20" width="30" height="10" fill="#138808"/><circle cx="15" cy="15" r="3.9" fill="none" stroke="#000080" stroke-width=".8"/><path d="M15 15 L18.60 15.00 M15 15 L18.48 15.93 M15 15 L18.12 16.80 M15 15 L17.55 17.55 M15 15 L16.80 18.12 M15 15 L15.93 18.48 M15 15 L15.00 18.60 M15 15 L14.07 18.48 M15 15 L13.20 18.12 M15 15 L12.45 17.55 M15 15 L11.88 16.80 M15 15 L11.52 15.93 M15 15 L11.40 15.00 M15 15 L11.52 14.07 M15 15 L11.88 13.20 M15 15 L12.45 12.45 M15 15 L13.20 11.88 M15 15 L14.07 11.52 M15 15 L15.00 11.40 M15 15 L15.93 11.52 M15 15 L16.80 11.88 M15 15 L17.55 12.45 M15 15 L18.12 13.20 M15 15 L18.48 14.07 " stroke="#000080" stroke-width=".35"/><circle cx="15" cy="15" r=".8" fill="#000080"/>',
+    '<rect width="30" height="15" fill="#0057b7"/><rect y="15" width="30" height="15" fill="#ffd700"/>',
+    '<rect width="30" height="10" fill="#fff"/><rect y="10" width="30" height="10" fill="#0039a6"/><rect y="20" width="30" height="10" fill="#d52b1e"/>'
+  ];
   // Risposte Sì / No
   var SI = ['Sì', 'Yes', 'Sí', 'Oui', 'نعم', '是', 'はい'];
   var NO = ['No', 'No', 'No', 'Non', 'لا', '否', 'いいえ'];
@@ -1259,7 +1275,7 @@
     }).join('');
     document.getElementById('bv-lingue').innerHTML = TUTTE.map(function (l, n) {
       return '<button type="button" class="' + (n === op ? 'attiva' : '') + '" onclick="scegliOperatore(' + n + ')">' +
-        (BANDIERE[n] ? '<span class="sigla bandiera" aria-hidden="true"><span>' + BANDIERE[n] + '</span></span>' : '<span class="sigla arabo" lang="ar" aria-hidden="true">ع</span>') +
+        (BANDIERE[n] ? '<span class="sigla bandiera" aria-hidden="true"><svg viewBox="0 0 30 30">' + BANDIERE[n] + '</svg></span>' : '<span class="sigla arabo" lang="ar" aria-hidden="true">ع</span>') +
         '<span class="nomi"><b lang="' + l.id + '">' + l.nome + '</b><small>' + NOMI_IT[n] + '</small></span></button>';
     }).join('');
     document.getElementById('bv-firma').innerHTML = FIRMA;
