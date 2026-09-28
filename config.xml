@@ -17,6 +17,11 @@
     <preference name="AndroidWindowSplashScreenBackground" value="#eef8f2" />
     <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/screen/android/splash-icon.png" />
     <preference name="AndroidWindowSplashScreenAnimationDuration" value="300" />
+    <!-- Il logo di Android resta finché l'app è pronta; poi lo toglie l'app stessa
+         (navigator.splashscreen.hide) e subito partono i saluti: un avvio solo, senza sovrapposizioni. -->
+    <preference name="AutoHideSplashScreen" value="false" />
+    <preference name="FadeSplashScreen" value="true" />
+    <preference name="FadeSplashScreenDuration" value="250" />
     <platform name="android">
         <allow-intent href="market:*" />
         <!-- Icona: adattiva (sfondo sfumato + disegno) per Android 8+, classica per i telefoni più vecchi -->

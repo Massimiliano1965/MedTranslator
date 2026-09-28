@@ -181,14 +181,15 @@
   .bv-logo { display: flex; justify-content: center; }
   .bv-logo .marchio { width: 96px; height: 96px; filter: drop-shadow(0 4px 10px rgba(11,58,74,.15)); }
   /* Avvio dell'app: logo con i saluti che scorrono nelle 13 lingue, poi si apre il benvenuto */
+  /* Sempre chiaro, stesso verdino del logo di Android: così il passaggio non si vede (anche col tema notte) */
   #avvio {
-    position: fixed; inset: 0; z-index: 60; background: var(--sfondo); display: flex; flex-direction: column;
+    position: fixed; inset: 0; z-index: 60; background: #eef8f2; color: #24323a; display: flex; flex-direction: column;
     align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 24px; transition: opacity .45s;
   }
   #avvio.via { opacity: 0; pointer-events: none; }
   #avvio .marchio { width: 190px; height: 190px; filter: drop-shadow(0 8px 18px rgba(11,58,74,.18)); margin-bottom: 14px; }
   #avvio h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -.3px; }
-  #avvio p { margin: 0; color: var(--tenue); font-size: 16px; }
+  #avvio p { margin: 0; color: #647580; font-size: 16px; }
   .bv h1 { margin: 12px 0 4px; font-size: 32px; font-weight: 800; text-align: center; line-height: 1.15; }
   .bv-sotto { margin: 0 0 26px; text-align: center; color: var(--tenue); font-size: 17px; }
   .bv h2 { text-align: center; margin: 0 0 12px; font-size: 15px; }
@@ -1703,11 +1704,24 @@
       if (w > 210) t.setAttribute('font-size', String(Math.floor(56 * 210 / w)));   // parole lunghe: più piccole
     }
     mostra();
-    tempoAvvio = setInterval(function () {
-      k++;
-      if (k >= SALUTI.length) { clearInterval(tempoAvvio); setTimeout(chiudiAvvio, 350); return; }
-      mostra();
-    }, 400);   // un saluto ogni 0,4 secondi: si leggono bene e intanto l'app si carica
+    var partito = false;
+    function parti() {
+      if (partito) return; partito = true;
+      // Toglie il logo di Android solo adesso che l'avvio è disegnato: i saluti si vedono tutti dall'inizio.
+      requestAnimationFrame(function () {
+        if (navigator.splashscreen && navigator.splashscreen.hide) { try { navigator.splashscreen.hide(); } catch (e) {} }
+      });
+      k = 0; mostra();
+      tempoAvvio = setInterval(function () {
+        k++;
+        if (k >= SALUTI.length) { clearInterval(tempoAvvio); setTimeout(chiudiAvvio, 350); return; }
+        mostra();
+      }, 400);   // un saluto ogni 0,4 secondi: si leggono bene
+    }
+    // Nell'app si parte quando Cordova è pronto; nel browser subito.
+    // Sicurezza: se "pronto" non arrivasse, si parte comunque dopo 3 secondi.
+    if (window.cordova) { document.addEventListener('deviceready', parti, false); setTimeout(parti, 3000); }
+    else parti();
   })();
 </script>
 </body>
