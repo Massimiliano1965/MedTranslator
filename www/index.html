@@ -29,21 +29,21 @@
   :root {
     --blu: #3a9ed6; --blu-chiaro: #dcecf5; --chip: #dcecf5; --rosso: #E53935; --verde: #34a847;
     --sfondo: #eef8f2; --carta: #ffffff; --bordo: #d3e6dc; --testo: #24323a; --tenue: #647580; --testata: #f6fbf8;
-    --ombra: 0 2px 6px rgba(36,50,58,0.07);
+    --ombra: 0 2px 6px rgba(36,50,58,0.07); --lg1: #e4f4ec; --lg2: #deedf6;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
       --blu: #5cb2ec; --blu-chiaro: #1c2c3d; --chip: #1c2c3d; --rosso: #f0474e; --verde: #45b85a;
       --sfondo: #0e1620; --carta: #16222f; --bordo: #24364a; --testo: #e4edf5; --tenue: #98a9ba; --testata: #111b27;
-      --ombra: none;
+      --ombra: none; --lg1: #182a2a; --lg2: #1a2838;
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
     --blu: #5cb2ec; --blu-chiaro: #1c2c3d; --chip: #1c2c3d; --rosso: #f0474e; --verde: #45b85a;
     --sfondo: #0e1620; --carta: #16222f; --bordo: #24364a; --testo: #e4edf5; --tenue: #98a9ba; --testata: #111b27;
-    --ombra: none;
+    --ombra: none; --lg1: #182a2a; --lg2: #1a2838;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
@@ -171,12 +171,23 @@
   .bv h1 { margin: 12px 0 4px; font-size: 32px; font-weight: 800; text-align: center; line-height: 1.15; }
   .bv-sotto { margin: 0 0 26px; text-align: center; color: var(--tenue); font-size: 17px; }
   .bv h2 { text-align: center; margin: 0 0 12px; font-size: 15px; }
-  .bv-lingue { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0 0 26px; }
+  /* Lingua dell'operatore: schede morbide su 2 colonne, cerchietto a sinistra */
+  .bv-lingue { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 26px; }
   .bv-lingue button {
-    border: 1.5px solid var(--blu); background: var(--carta); color: var(--blu); border-radius: 999px;
-    padding: 7px 13px; font: inherit; font-size: 15px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px; min-width: 0; padding: 9px 8px; text-align: start;
+    background: linear-gradient(135deg, var(--lg1), var(--lg2)); color: var(--testo);
+    border: 2px solid transparent; border-radius: 16px; box-shadow: var(--ombra); font: inherit;
   }
-  .bv-lingue button.attiva { background: var(--blu); color: #fff; }
+  .bv-lingue .sigla {
+    flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+    background: linear-gradient(135deg, #5fb6e3, #56c19a); color: #fff; font-size: 16px; font-weight: 800;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.5);
+  }
+  .bv-lingue .nomi { min-width: 0; display: flex; flex-direction: column; }
+  .bv-lingue b { font-size: 16px; line-height: 1.2; white-space: nowrap; letter-spacing: -0.2px; }
+  .bv-lingue small { font-size: 12.5px; color: var(--tenue); }
+  .bv-lingue button.attiva { border-color: var(--blu); background: var(--blu-chiaro); }
+  .bv-lingue button.attiva .sigla { background: var(--blu); }
   .bv-ruoli { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .bv-ruolo {
     --c: #1b86c2;
@@ -344,6 +355,9 @@
   // Tutte le 13 lingue: la posizione è la colonna nelle frasi (0 = italiano).
   // L'operatore sceglie la sua; il paziente una qualsiasi delle altre.
   var TUTTE = [{ id: 'it', nome: 'Italiano', voce: 'it-IT' }].concat(LINGUE);
+  // Per la scelta della lingua dell'operatore: nome in italiano e iniziale nella sua scrittura
+  var NOMI_IT = ['Italiano', 'Inglese', 'Spagnolo', 'Francese', 'Arabo', 'Cinese', 'Giapponese', 'Urdu', 'Romeno', 'Albanese', 'Punjabi', 'Ucraino', 'Russo'];
+  var SIGLE = ['It', 'En', 'Es', 'Fr', 'ع', '中', '日', 'اُر', 'Ro', 'Sq', 'ਪੰ', 'Ук', 'Ру'];
   // Risposte Sì / No
   var SI = ['Sì', 'Yes', 'Sí', 'Oui', 'نعم', '是', 'はい'];
   var NO = ['No', 'No', 'No', 'Non', 'لا', '否', 'いいえ'];
@@ -1205,7 +1219,9 @@
         '<span class="simbolo" aria-hidden="true">' + r[3] + '</span><b>' + r[2] + '</b><small>' + r[4] + '</small></button>';
     }).join('');
     document.getElementById('bv-lingue').innerHTML = TUTTE.map(function (l, n) {
-      return '<button type="button" class="' + (n === op ? 'attiva' : '') + '" lang="' + l.id + '" onclick="scegliOperatore(' + n + ')">' + l.nome + '</button>';
+      return '<button type="button" class="' + (n === op ? 'attiva' : '') + '" onclick="scegliOperatore(' + n + ')">' +
+        '<span class="sigla" lang="' + l.id + '" aria-hidden="true">' + SIGLE[n] + '</span>' +
+        '<span class="nomi"><b lang="' + l.id + '">' + l.nome + '</b><small>' + NOMI_IT[n] + '</small></span></button>';
     }).join('');
     document.getElementById('bv-firma').innerHTML = FIRMA;
     var b = document.getElementById('benvenuto');
