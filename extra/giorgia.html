@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Il traduttore di Giorgia</title>
+<!--
+  Traduttore di reparto — frasi pronte per parlare con pazienti stranieri.
+  © 2026 Massimiliano Previtali. Tutti i diritti riservati.
+
+  COME SI USA: scegli la lingua in alto, tocca una frase. Compare grande nella
+  lingua del paziente (giri il telefono e la legge) e il telefono la dice a
+  voce. Se è una domanda, il paziente risponde toccando i bottoni grandi e tu
+  leggi la risposta in italiano.
+
+  PER AGGIUNGERE UNA FRASE: copia una riga dentro FRASI e cambia i testi.
+  Ordine sempre: italiano, English, Español, Français, العربية, 中文.
+  tipo: 'sn' = domanda sì/no, 'dolore' = scala 0-10, scelte = risposte a bottoni.
+  ruoli: chi usa la frase. I = infermiere, S = OSS, A = OA, M = medico.
+  Ogni frase ha i suoi ruoli (es. 'SA' = la vedono OSS e OA).
+  Le traduzioni vanno fatte controllare da un mediatore culturale.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Baloo+2:wght@600;800&family=Caveat:wght@600&display=swap">
+<style>
+  /* Colori presi da TrovaReparti: azzurro delle torri, rosso dei civici,
+     verde del bottone microfono. Font Atkinson Hyperlegible: disegnato
+     per chi vede poco. */
+  /* Versione per Giorgia: verde allegro, spillette di animaletti. */
+  :root {
+    --blu: #1f9d45; --blu-chiaro: #e2f7e6; --rosso: #e8364f; --verde: #1f9d45;
+    --rosa: #ff8fb3; --giallo: #ffd23f; --cielo: #5ec8f2;
+    --sfondo: #f4fbf3; --carta: #ffffff; --bordo: #cfe9d2; --testo: #1c2a20; --tenue: #56695b;
+    --ombra: 0 2px 0 rgba(31, 157, 69, 0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --blu: #5fd37c; --blu-chiaro: #183a22; --rosso: #ff5d73; --verde: #3fbf62;
+      --sfondo: #0f1812; --carta: #17241a; --bordo: #2a4230; --testo: #e9f5ea; --tenue: #9fbca5;
+      --ombra: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --blu: #5fd37c; --blu-chiaro: #183a22; --rosso: #ff5d73; --verde: #3fbf62;
+    --sfondo: #0f1812; --carta: #17241a; --bordo: #2a4230; --testo: #e9f5ea; --tenue: #9fbca5;
+    --ombra: none;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--sfondo); color: var(--testo);
+    font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Arabic", "Noto Sans SC", sans-serif;
+    font-size: 18px; line-height: 1.4; -webkit-tap-highlight-color: transparent;
+  }
+  button:focus-visible { outline: 3px solid var(--blu); outline-offset: 2px; }
+  header {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: var(--carta); border-bottom: 1px solid var(--bordo); border-top: 4px solid var(--blu);
+    padding: 12px 16px 10px;
+  }
+  header { border-top: 0 !important; background: var(--blu-chiaro) !important; }
+  .spillette { display: flex; gap: 6px; margin-bottom: 8px; }
+  .spilla {
+    width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 19px;
+    background: #fff; border: 3px solid var(--c, var(--verde)); box-shadow: 0 2px 0 rgba(0,0,0,0.12);
+    transform: rotate(var(--r, 0deg));
+  }
+  header h1, h2, .dedica h2 { font-family: "Baloo 2", "Atkinson Hyperlegible", system-ui, sans-serif; }
+  header h1 { font-size: 23px; font-weight: 800; color: var(--blu); }
+  h2 { font-size: 16px; letter-spacing: 1px; }
+  .dedica {
+    margin: 16px 0 4px; padding: 18px; border-radius: 20px; background: var(--carta);
+    border: 2px dashed var(--rosa); display: flex; gap: 14px; align-items: flex-start;
+  }
+  .dedica .spilla { flex: none; width: 48px; height: 48px; font-size: 26px; }
+  .dedica h2 { margin: 0 0 4px; text-transform: none; letter-spacing: 0; font-size: 24px; font-weight: 800; color: var(--blu); }
+  .dedica p { margin: 0; font-size: 17px; line-height: 1.45; }
+  .dedica .da { font-family: "Caveat", "Segoe Script", cursive; font-size: 26px; color: var(--rosa); margin-top: 6px; }
+  .testata { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .marchio { width: 32px; height: 32px; flex: none; }
+  header h1 { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.1; }
+  header h1 small { display: block; font-size: 13px; font-weight: 400; color: var(--tenue); margin-top: 2px; }
+  .lingue, .ruoli { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .lingue button {
+    border: 1.5px solid var(--blu); background: transparent; color: var(--blu);
+    border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 15px; font-weight: 700;
+  }
+  .lingue button.attiva { background: var(--blu); color: #fff; }
+  .ruoli { margin-top: 8px; }
+  .ruoli span { font-size: 14px; color: var(--tenue); margin-right: 2px; }
+  .ruoli button {
+    border: 1px solid var(--bordo); background: var(--sfondo); color: var(--testo); border-radius: 8px;
+    padding: 5px 10px; font: inherit; font-size: 14px; font-weight: 700;
+  }
+  .ruoli button.attiva { background: var(--blu-chiaro); border-color: var(--blu); color: var(--blu); }
+  main { padding: 8px 16px 32px; max-width: 640px; margin: 0 auto; }
+  h2 { font-size: 14px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--blu); margin: 22px 4px 8px; }
+  .frase {
+    display: block; width: 100%; text-align: left; margin: 0 0 8px; padding: 13px 16px;
+    background: var(--carta); color: var(--testo); border: 1px solid var(--bordo); border-radius: 12px;
+    box-shadow: var(--ombra); font: inherit; font-size: 18px; font-weight: 700; cursor: pointer;
+  }
+  .frase small { display: block; font-weight: 400; font-size: 16px; color: var(--tenue); margin-top: 3px; }
+  .frase:active { background: var(--blu-chiaro); }
+
+  /* Schermata grande per il paziente */
+  #grande {
+    position: fixed; inset: 0; z-index: 20; background: var(--sfondo); display: none;
+    flex-direction: column; padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px)); overflow-y: auto;
+  }
+  #grande.aperto { display: flex; }
+  .barra { display: flex; justify-content: space-between; gap: 10px; }
+  .barra button {
+    border: 1px solid var(--bordo); border-radius: 999px; padding: 11px 20px; font: inherit; font-size: 17px; font-weight: 700;
+    background: var(--carta); color: var(--testo);
+  }
+  .barra .ascolta { background: var(--blu); border-color: var(--blu); color: #fff; }
+  #g-testo { font-size: 34px; font-weight: 700; line-height: 1.3; margin: 28px 0 14px; text-wrap: balance; }
+  #g-testo[dir="rtl"] { font-size: 38px; }
+  #g-it { font-size: 17px; color: var(--tenue); margin: 0 0 20px; }
+  .risposte { display: grid; gap: 12px; margin-top: auto; }
+  .risposte.due { grid-template-columns: 1fr 1fr; }
+  .risposte button {
+    border: 0; border-radius: 16px; padding: 22px 10px; font: inherit; font-size: 26px; font-weight: 700;
+    color: #fff; background: var(--verde);
+  }
+  .risposte .no { background: var(--rosso); }
+  .risposte .altra { background: var(--blu); }
+  .scala { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: auto; }
+  .scala button {
+    border: 0; border-radius: 12px; padding: 16px 0; font: inherit; font-size: 24px; font-weight: 700; color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+  .scala-etichette { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; margin-top: 8px; }
+  #g-risposta {
+    display: none; margin-top: 18px; padding: 18px; border-radius: 16px; background: var(--carta); color: var(--testo);
+    border: 3px solid var(--blu); font-size: 30px; font-weight: 700; text-align: center;
+  }
+  #g-risposta small { display: block; font-size: 15px; font-weight: 400; color: var(--tenue); margin-bottom: 4px; }
+
+  /* Firma dell'ideatore */
+  .firma {
+    margin-top: 36px; padding: 22px 16px 10px; border-top: 1px solid var(--bordo);
+    display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
+  }
+  .firma .marchio { width: 40px; height: 40px; margin-bottom: 4px; }
+  .firma-etichetta { font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--tenue); }
+  .firma-nome { font-family: "Caveat", "Segoe Script", "Brush Script MT", cursive; font-size: 36px; font-weight: 600; line-height: 1.1; color: var(--blu); }
+  .firma-nota { font-size: 13px; color: var(--tenue); max-width: 34ch; }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="spillette" aria-hidden="true">
+    <span class="spilla" style="--c:var(--rosa);--r:-8deg">🐱</span>
+    <span class="spilla" style="--c:var(--giallo);--r:6deg">🐶</span>
+    <span class="spilla" style="--c:var(--cielo);--r:-4deg">🐰</span>
+    <span class="spilla" style="--c:var(--rosa);--r:9deg">🦊</span>
+    <span class="spilla" style="--c:var(--giallo);--r:-6deg">🐼</span>
+    <span class="spilla" style="--c:var(--cielo);--r:5deg">🐸</span>
+    <span class="spilla" style="--c:var(--rosa);--r:-7deg">🐢</span>
+  </div>
+  <div class="testata">
+    <svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg>
+    <h1>Il traduttore di Giorgia<small>Frasi pronte per parlare con i pazienti</small></h1>
+  </div>
+  <div class="lingue" id="lingue"></div>
+  <div class="ruoli" id="ruoli"></div>
+</header>
+<main id="elenco"></main>
+
+<div id="grande" role="dialog" aria-modal="true">
+  <div class="barra">
+    <button type="button" onclick="chiudi()">✕ Chiudi</button>
+    <button type="button" class="ascolta" onclick="parla()">🔊 Ascolta</button>
+  </div>
+  <div id="g-testo"></div>
+  <p id="g-it"></p>
+  <div id="g-risposte"></div>
+  <div id="g-risposta"></div>
+</div>
+
+<script>
+  var LINGUE = [
+    { id: 'en', nome: 'English', voce: 'en-GB' },
+    { id: 'es', nome: 'Español', voce: 'es-ES' },
+    { id: 'fr', nome: 'Français', voce: 'fr-FR' },
+    { id: 'ar', nome: 'العربية', voce: 'ar-SA', rtl: true },
+    { id: 'zh', nome: '中文', voce: 'zh-CN' }
+  ];
+  // Risposte Sì / No
+  var SI = ['Sì', 'Yes', 'Sí', 'Oui', 'نعم', '是'];
+  var NO = ['No', 'No', 'No', 'Non', 'لا', '否'];
+  var DOLORE_0 = ['Nessun dolore', 'No pain', 'Sin dolor', 'Aucune douleur', 'لا ألم', '不疼'];
+  var DOLORE_10 = ['Dolore massimo', 'Worst pain', 'Dolor máximo', 'Douleur maximale', 'أشد ألم', '最疼'];
+
+  // Ordine: italiano, English, Español, Français, العربية, 中文
+  var FRASI = [
+    { gruppo: 'Saluti', ruoli: 'ISAM' },
+    { ruoli: 'ISAM', t: ["Buongiorno", "Good morning", "Buenos días", "Bonjour", "صباح الخير", "早上好"] },
+    { ruoli: 'ISAM', t: ["Buonasera", "Good evening", "Buenas tardes", "Bonsoir", "مساء الخير", "晚上好"] },
+    { ruoli: 'SA', t: ["Buon appetito", "Enjoy your meal", "¡Buen provecho!", "Bon appétit !", "بالهناء والشفاء", "请慢用"] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Ha finito?", "Have you finished?", "¿Ha terminado?", "Vous avez terminé ?", "هل انتهيت؟", "您吃完了吗？"] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Basta così?", "Is that enough?", "¿Es suficiente?", "C'est suffisant ?", "هل هذا يكفي؟", "这样够了吗？"] },
+    { ruoli: 'ISAM', t: ["Ci vediamo dopo", "See you later", "Hasta luego", "À tout à l'heure", "أراك لاحقاً", "待会儿见"] },
+    { ruoli: 'ISA', t: ["Buonanotte", "Good night", "Buenas noches", "Bonne nuit", "ليلة سعيدة", "晚安"] },
+    { ruoli: 'ISA', t: ["Buonanotte, a domani", "Good night, see you tomorrow", "Buenas noches, hasta mañana", "Bonne nuit, à demain", "ليلة سعيدة، إلى الغد", "晚安，明天见"] },
+    { ruoli: 'ISAM', t: ["Buon rientro a casa", "Have a safe journey home", "¡Que tenga un buen regreso a casa!", "Bon retour à la maison", "عودة سالمة إلى البيت", "祝您平安回家"] },
+    { ruoli: 'ISAM', t: ["Tante belle cose", "All the best", "¡Que le vaya muy bien!", "Bonne continuation !", "أتمنى لك كل الخير", "祝您一切顺利"] },
+
+    { gruppo: 'Accoglienza', ruoli: 'ISAM' },
+    { ruoli: 'I', t: ["Buongiorno, sono l'infermiere.", "Hello, I'm the nurse.", "Buenos días, soy el enfermero.", "Bonjour, je suis l'infirmier.", "صباح الخير، أنا الممرض.", "您好，我是护士。"] },
+    { ruoli: 'S', t: ["Buongiorno, sono l'operatore socio-sanitario (OSS).", "Hello, I'm the healthcare assistant.", "Buenos días, soy la auxiliar de enfermería.", "Bonjour, je suis l'aide-soignante.", "صباح الخير، أنا مساعدة التمريض.", "您好，我是护理员。"] },
+    { ruoli: 'A', t: ["Buongiorno, sono l'operatore alberghiero: porto i pasti.", "Hello, I'm from the catering staff: I bring the meals.", "Buenos días, soy del personal de comedor: traigo las comidas.", "Bonjour, je fais partie du service hôtelier : j'apporte les repas.", "صباح الخير، أنا من طاقم خدمة الطعام: أُحضر الوجبات.", "您好，我是送餐员，负责送饭。"] },
+    { ruoli: 'M', t: ["Buongiorno, sono il medico.", "Hello, I'm the doctor.", "Buenos días, soy el médico.", "Bonjour, je suis le médecin.", "صباح الخير، أنا الطبيب.", "您好，我是医生。"] },
+    { ruoli: 'ISAM', t: ["Come si chiama?", "What is your name?", "¿Cómo se llama?", "Comment vous appelez-vous ?", "ما اسمك؟", "您叫什么名字？"] },
+    { ruoli: 'ISAM', tipo: 'sn', t: ["Parla italiano? Inglese?", "Do you speak Italian? English?", "¿Habla italiano? ¿Inglés?", "Vous parlez italien ? Anglais ?", "هل تتكلم الإيطالية؟ الإنجليزية؟", "您会说意大利语吗？英语呢？"] },
+    { ruoli: 'ISM', tipo: 'sn', t: ["Chiamiamo un familiare per tradurre?", "Shall we call a family member to translate?", "¿Llamamos a un familiar para que traduzca?", "On appelle un membre de votre famille pour traduire ?", "هل نتصل بأحد أفراد عائلتك ليترجم؟", "要不要打电话请一位家人来翻译？"] },
+    { ruoli: 'ISAM', t: ["Aspetti qui, torno subito.", "Please wait here, I'll be right back.", "Espere aquí, vuelvo enseguida.", "Attendez ici, je reviens tout de suite.", "الرجاء الانتظار هنا، سأعود حالاً.", "请在这里等一下，我马上回来。"] },
+
+    { gruppo: 'Pasti e bevande', ruoli: 'SA' },
+    { ruoli: 'SA', tipo: 'sn', t: ["Vuole un caffè?", "Would you like a coffee?", "¿Quiere un café?", "Voulez-vous un café ?", "هل تريد قهوة؟", "您要咖啡吗？"] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Vuole un tè?", "Would you like some tea?", "¿Quiere un té?", "Voulez-vous un thé ?", "هل تريد شاياً؟", "您要茶吗？"] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Vuole una camomilla?", "Would you like a camomile tea?", "¿Quiere una manzanilla?", "Voulez-vous une camomille ?", "هل تريد شاي البابونج؟", "您要洋甘菊茶吗？"] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Vuole dell'acqua?", "Would you like some water?", "¿Quiere agua?", "Voulez-vous de l'eau ?", "هل تريد ماءً؟", "您要水吗？"] },
+    { ruoli: 'SA', t: ["Ecco la colazione.", "Here is your breakfast.", "Aquí tiene el desayuno.", "Voici le petit-déjeuner.", "تفضل، هذا الفطور.", "这是您的早餐。"] },
+    { ruoli: 'SA', t: ["Ecco il pranzo.", "Here is your lunch.", "Aquí tiene la comida.", "Voici le déjeuner.", "تفضل، هذا الغداء.", "这是您的午餐。"] },
+    { ruoli: 'SA', t: ["Ecco la cena.", "Here is your dinner.", "Aquí tiene la cena.", "Voici le dîner.", "تفضل، هذا العشاء.", "这是您的晚餐。"] },
+    { ruoli: 'SA', t: ["Ecco le posate.", "Here is your cutlery.", "Aquí tiene los cubiertos.", "Voici les couverts.", "تفضل، هذه أدوات الأكل.", "这是您的餐具。"] },
+    { ruoli: 'SA', t: ["Vuole sale o pepe?", "Would you like salt or pepper?", "¿Quiere sal o pimienta?", "Voulez-vous du sel ou du poivre ?", "هل تريد ملحاً أو فلفلاً؟", "您要盐还是胡椒？"],
+      scelte: [["Sale", "Salt", "Sal", "Sel", "ملح", "盐"], ["Pepe", "Pepper", "Pimienta", "Poivre", "فلفل", "胡椒"], ["No, grazie", "No, thank you", "No, gracias", "Non, merci", "لا، شكراً", "不用了，谢谢"]] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Le apro la bottiglietta?", "Shall I open the bottle for you?", "¿Le abro la botella?", "Je vous ouvre la bouteille ?", "هل أفتح لك الزجاجة؟", "要我帮您打开瓶子吗？"] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Posso prendere il vassoio?", "May I take the tray?", "¿Puedo llevarme la bandeja?", "Je peux prendre le plateau ?", "هل يمكنني أخذ الصينية؟", "我可以把托盘拿走吗？"] },
+    { ruoli: 'A', t: ["Non posso toccare i pazienti: chiamo un OSS.", "I'm not allowed to touch patients: I'll call a care assistant.", "No puedo tocar a los pacientes: llamo a un auxiliar sanitario.", "Je ne peux pas toucher les patients : j'appelle un aide-soignant.", "لا يُسمح لي بلمس المرضى: سأنادي أحد المساعدين الصحيين.", "我不能接触病人：我去叫护理员来。"] },
+    { ruoli: 'SA', t: ["Appena posso le porto quello che ha chiesto.", "I'll bring you what you asked for as soon as I can.", "En cuanto pueda, le traigo lo que ha pedido.", "Dès que possible, je vous apporte ce que vous avez demandé.", "سأحضر لك ما طلبته في أقرب وقت ممكن.", "我会尽快把您要的东西拿来。"] },
+
+    { gruppo: 'Dolore e come sta', ruoli: 'IM' },
+    { ruoli: 'IM', tipo: 'sn', t: ["Ha dolore?", "Are you in pain?", "¿Tiene dolor?", "Avez-vous mal ?", "هل لديك ألم؟", "您疼吗？"] },
+    { ruoli: 'IM', t: ["Dove le fa male? Me lo indichi.", "Where does it hurt? Please point to it.", "¿Dónde le duele? Señálelo, por favor.", "Où avez-vous mal ? Montrez-moi l'endroit.", "أين مكان الألم؟ الرجاء الإشارة إليه.", "哪里疼？请指给我看。"] },
+    { ruoli: 'IM', tipo: 'dolore', t: ["Quanto dolore ha, da 0 a 10?", "How much pain do you have, from 0 to 10?", "¿Cuánto dolor tiene, del 0 al 10?", "Quelle est l'intensité de votre douleur, de 0 à 10 ?", "ما شدة الألم من 0 إلى 10؟", "您有多疼？请从0到10选一个数字。"] },
+    { ruoli: 'IM', tipo: 'sn', t: ["Ha nausea?", "Do you feel sick (nauseous)?", "¿Tiene náuseas?", "Avez-vous la nausée ?", "هل لديك غثيان؟", "您恶心吗？"] },
+    { ruoli: 'IS', t: ["Ha freddo o caldo?", "Are you cold or hot?", "¿Tiene frío o calor?", "Avez-vous froid ou chaud ?", "هل تشعر بالبرد أم بالحر؟", "您觉得冷还是热？"],
+      scelte: [["Ho freddo", "I'm cold", "Tengo frío", "J'ai froid", "أشعر بالبرد", "我冷"], ["Ho caldo", "I'm hot", "Tengo calor", "J'ai chaud", "أشعر بالحر", "我热"], ["Sto bene", "I'm fine", "Estoy bien", "Ça va", "أنا بخير", "还好"]] },
+    { ruoli: 'IM', tipo: 'sn', t: ["Ha difficoltà a respirare?", "Do you have trouble breathing?", "¿Le cuesta respirar?", "Avez-vous du mal à respirer ?", "هل لديك صعوبة في التنفس؟", "您呼吸困难吗？"] },
+
+    { gruppo: 'Bisogni', ruoli: 'IS' },
+    { ruoli: 'IS', tipo: 'sn', t: ["Ha bisogno del bagno?", "Do you need the toilet?", "¿Necesita ir al baño?", "Avez-vous besoin d'aller aux toilettes ?", "هل تريد الذهاب إلى الحمّام؟", "您要上厕所吗？"] },
+    { ruoli: 'ISA', t: ["Ha sete? Ha fame?", "Are you thirsty? Are you hungry?", "¿Tiene sed? ¿Tiene hambre?", "Avez-vous soif ? Avez-vous faim ?", "هل تشعر بالعطش؟ هل تشعر بالجوع؟", "您渴吗？您饿吗？"],
+      scelte: [["Ho sete", "I'm thirsty", "Tengo sed", "J'ai soif", "أريد أن أشرب", "我渴了"], ["Ho fame", "I'm hungry", "Tengo hambre", "J'ai faim", "أريد أن آكل", "我饿了"], ["No, grazie", "No, thank you", "No, gracias", "Non, merci", "لا، شكراً", "不用了，谢谢"]] },
+    { ruoli: 'IS', tipo: 'sn', t: ["Vuole cambiarsi / lavarsi?", "Would you like to change your clothes / have a wash?", "¿Quiere cambiarse / lavarse?", "Voulez-vous vous changer / vous laver ?", "هل تريد تغيير ملابسك / الاغتسال؟", "您想换衣服／洗漱吗？"] },
+    { ruoli: 'ISA', t: ["Per chiamare premi questo campanello.", "To call us, press this button.", "Para llamarnos, pulse este timbre.", "Pour nous appeler, appuyez sur cette sonnette.", "للاتصال بنا، اضغط على هذا الجرس.", "需要帮忙时，请按这个呼叫铃。"] },
+    { ruoli: 'ISM', t: ["Deve restare a letto. Non si alzi da solo.", "You must stay in bed. Do not get up on your own.", "Debe quedarse en la cama. No se levante sin ayuda.", "Vous devez rester au lit. Ne vous levez pas sans aide.", "يجب البقاء في السرير. لا تنهض دون مساعدة.", "您必须卧床。不要自己起来。"] },
+
+    { gruppo: 'Esami e cure', ruoli: 'IM' },
+    { ruoli: 'ISAM', t: ["Deve stare a digiuno: non mangi e non beva niente.", "You must fast: do not eat or drink anything.", "Debe estar en ayunas: no coma ni beba nada.", "Vous devez rester à jeun : ne mangez et ne buvez rien.", "يجب الصيام التام: ممنوع الأكل والشرب.", "您需要禁食：不要吃东西，也不要喝水。"] },
+    { ruoli: 'IM', t: ["Domani fa un esame.", "Tomorrow you have a test.", "Mañana tiene una prueba.", "Demain, vous avez un examen.", "لديك فحص غداً.", "您明天要做检查。"] },
+    { ruoli: 'I', t: ["Adesso le facciamo un prelievo di sangue.", "We are now going to take a blood sample.", "Ahora le vamos a sacar sangre.", "Nous allons maintenant vous faire une prise de sang.", "سنأخذ منك الآن عينة دم.", "现在给您抽血。"] },
+    { ruoli: 'IS', t: ["Le misuro la pressione / la febbre.", "I'm going to check your blood pressure / temperature.", "Le voy a tomar la tensión / la temperatura.", "Je vais prendre votre tension / votre température.", "سأقيس ضغط الدم / الحرارة.", "我给您量血压／体温。"] },
+    { ruoli: 'I', t: ["Questa è la sua medicina.", "This is your medicine.", "Este es su medicamento.", "Voici votre médicament.", "هذا دواؤك.", "这是您的药。"] },
+    { ruoli: 'IM', tipo: 'sn', t: ["È allergico a qualche medicina?", "Are you allergic to any medicine?", "¿Tiene alergia a algún medicamento?", "Êtes-vous allergique à un médicament ?", "هل لديك حساسية من أي دواء؟", "您对什么药物过敏吗？"] },
+    { ruoli: 'ISA', t: ["Il medico passa più tardi.", "The doctor will come later.", "El médico pasará más tarde.", "Le médecin passera plus tard.", "سيأتي الطبيب لاحقاً.", "医生晚一点会来。"] },
+
+    { gruppo: 'Visita medica', ruoli: 'M' },
+    { ruoli: 'M', t: ["Da quanti giorni sta male?", "How many days have you been unwell?", "¿Desde hace cuántos días se encuentra mal?", "Depuis combien de jours êtes-vous malade ?", "منذ كم يوماً بدأ المرض؟", "您不舒服几天了？"] },
+    { ruoli: 'IM', tipo: 'sn', t: ["Prende medicine a casa? Me le mostri.", "Do you take any medicines at home? Please show them to me.", "¿Toma medicamentos en casa? Enséñemelos, por favor.", "Prenez-vous des médicaments à la maison ? Montrez-les-moi, s'il vous plaît.", "هل تتناول أدوية في البيت؟ الرجاء إحضارها لأراها.", "您在家吃药吗？请拿给我看看。"] },
+    { ruoli: 'IM', tipo: 'sn', t: ["Ha malattie importanti? (cuore, diabete, pressione)", "Do you have any serious illnesses? (heart, diabetes, blood pressure)", "¿Tiene alguna enfermedad importante? (corazón, diabetes, tensión)", "Avez-vous des maladies importantes ? (cœur, diabète, tension)", "هل لديك أمراض مهمة؟ (القلب، السكري، ضغط الدم)", "您有严重的疾病吗？（心脏病、糖尿病、高血压）"] },
+    { ruoli: 'IM', tipo: 'sn', t: ["È incinta?", "Are you pregnant?", "¿Está embarazada?", "Êtes-vous enceinte ?", "هل أنتِ حامل؟", "您怀孕了吗？"] },
+    { ruoli: 'M', t: ["Domani la dimettiamo.", "You will be discharged tomorrow.", "Mañana le damos el alta.", "Vous pourrez sortir demain.", "الخروج من المستشفى سيكون غداً.", "您明天可以出院。"] },
+    { ruoli: 'M', t: ["Deve fare un'operazione.", "You need an operation.", "Necesita una operación.", "Une opération est nécessaire.", "يلزم إجراء عملية جراحية.", "您需要做手术。"] },
+
+    { gruppo: 'Familiari', ruoli: 'ISAM' },
+    { ruoli: 'ISA', t: ["L'orario delle visite è ...", "Visiting hours are: ...", "El horario de visitas es: ...", "Les heures de visite sont : ...", "مواعيد الزيارة: ...", "探视时间是：……"] },
+    { ruoli: 'ISA', t: ["Può entrare una persona alla volta.", "Only one person at a time may come in.", "Puede entrar una persona cada vez.", "Une seule personne à la fois peut entrer.", "يمكن دخول شخص واحد فقط في كل مرة.", "每次只能进来一个人。"] },
+    { ruoli: 'ISAM', t: ["Il paziente sta riposando.", "The patient is resting.", "El paciente está descansando.", "Le patient se repose.", "المريض يستريح الآن.", "病人正在休息。"] }
+  ];
+
+  var lingua = 1;   // posizione nella riga delle frasi (1 = English)
+  try { var s = +localStorage.getItem('giorgia_lingua'); if (s >= 1 && s <= 5) lingua = s; } catch (e) {}
+  var aperta = null;
+  var ANIMALI = ['🐱', '🐶', '🐰', '🦊', '🐼', '🐸', '🐢', '🦄', '🐝'];
+  var MARCHIO_SVG = '<svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg>';
+  var RUOLI = [['', 'Tutti'], ['I', 'Infermiere'], ['S', 'OSS'], ['A', 'OA'], ['M', 'Medico']];
+  var ruolo = 'S';   // Giorgia è OSS
+  try { var r0 = localStorage.getItem('giorgia_ruolo'); if (r0 !== null && (r0 === '' || 'ISAM'.indexOf(r0) !== -1)) ruolo = r0; } catch (e) {}
+  function scegliRuolo(r) {
+    ruolo = r;
+    try { localStorage.setItem('giorgia_ruolo', r); } catch (e) {}
+    disegna();
+  }
+
+  function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function info() { return LINGUE[lingua - 1]; }
+
+  function disegna() {
+    document.getElementById('lingue').innerHTML = LINGUE.map(function (l, i) {
+      return '<button type="button" class="' + (i + 1 === lingua ? 'attiva' : '') + '" lang="' + l.id + '" onclick="scegliLingua(' + (i + 1) + ')">' + l.nome + '</button>';
+    }).join('');
+    document.getElementById('ruoli').innerHTML = '<span>Chi sei:</span>' + RUOLI.map(function (r) {
+      return '<button type="button" class="' + (r[0] === ruolo ? 'attiva' : '') + '" onclick="scegliRuolo(\'' + r[0] + '\')">' + r[1] + '</button>';
+    }).join('');
+    var html = '<section class="dedica"><span class="spilla" style="--c:var(--rosa);--r:-8deg" aria-hidden="true">🦄</span><div>' +
+      '<h2>Per Giorgia</h2><p>Che porta allegria in corsia. Buona fortuna nel nuovo ospedale: questo traduttore viene con te, così nessun paziente resta senza parole.</p>' +
+      '<p class="da">con affetto, Massi</p></div></section>', ruoliGruppo = '', titolo = '';
+    var nGruppo = 0;
+    FRASI.forEach(function (f, i) {
+      if (f.gruppo) { ruoliGruppo = f.ruoli; titolo = '<h2>' + ANIMALI[(nGruppo++) % ANIMALI.length] + ' ' + esc(f.gruppo) + '</h2>'; return; }
+      if (ruolo && (f.ruoli || ruoliGruppo).indexOf(ruolo) === -1) return;
+      html += titolo; titolo = '';
+      html += '<button type="button" class="frase" onclick="apri(' + i + ')">' + esc(f.t[0]) +
+        '<small lang="' + info().id + '"' + (info().rtl ? ' dir="rtl"' : '') + '>' + esc(f.t[lingua]) + '</small></button>';
+    });
+    html += '<footer class="firma">' + MARCHIO_SVG.replace('class="marchio"', 'class="marchio"') +
+      '<span class="firma-etichetta">Ideato per Giorgia da</span>' +
+      '<span class="firma-nome">Massimiliano Previtali</span>' +
+      '<span class="firma-nota">© 2026 · Traduzioni da far controllare a un mediatore culturale.</span></footer>';
+    document.getElementById('elenco').innerHTML = html;
+  }
+
+  function scegliLingua(n) {
+    lingua = n;
+    try { localStorage.setItem('giorgia_lingua', String(n)); } catch (e) {}
+    disegna();
+  }
+
+  function apri(i) {
+    var f = FRASI[i]; aperta = f;
+    var t = document.getElementById('g-testo');
+    t.textContent = f.t[lingua];
+    t.setAttribute('lang', info().id);
+    t.setAttribute('dir', info().rtl ? 'rtl' : 'ltr');
+    document.getElementById('g-it').textContent = f.t[0];
+    var r = document.getElementById('g-risposte');
+    var rtl = info().rtl ? ' dir="rtl"' : '';
+    if (f.tipo === 'sn') {
+      r.innerHTML = '<div class="risposte due"' + rtl + '>' +
+        '<button type="button" onclick="risposta(\'Sì\')">✓ ' + SI[lingua] + '</button>' +
+        '<button type="button" class="no" onclick="risposta(\'No\')">✕ ' + NO[lingua] + '</button></div>';
+    } else if (f.scelte) {
+      r.innerHTML = '<div class="risposte"' + rtl + '>' + f.scelte.map(function (s, k) {
+        return '<button type="button" class="' + (k === f.scelte.length - 1 ? 'altra' : '') + '" onclick="risposta(\'' + s[0].replace(/'/g, "\\'") + '\')">' + esc(s[lingua]) + '</button>';
+      }).join('') + '</div>';
+    } else if (f.tipo === 'dolore') {
+      var colori = ['#2e9e44', '#4fa83d', '#79b236', '#a3b92f', '#c9b82a', '#e0a526', '#e58a24', '#e36c22', '#d9501f', '#c9351f', '#b01c1c'];
+      var b = '';
+      for (var n = 0; n <= 10; n++) b += '<button type="button" style="background:' + colori[n] + '" onclick="risposta(\'Dolore ' + n + ' su 10\')">' + n + '</button>';
+      r.innerHTML = '<div class="scala" dir="ltr">' + b + '</div><div class="scala-etichette" dir="ltr"><span>0 = ' + esc(DOLORE_0[lingua]) + '</span><span>10 = ' + esc(DOLORE_10[lingua]) + '</span></div>';
+    } else r.innerHTML = '';
+    document.getElementById('g-risposta').style.display = 'none';
+    document.getElementById('grande').classList.add('aperto');
+    document.getElementById('grande').scrollTop = 0;
+    parla();
+  }
+
+  // Risposta del paziente: grande, in italiano, per chi assiste.
+  function risposta(it) {
+    var g = document.getElementById('g-risposta');
+    g.innerHTML = '<small>Il paziente ha risposto:</small>' + esc(it);
+    g.style.display = 'block';
+    g.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+
+  function chiudi() {
+    document.getElementById('grande').classList.remove('aperto');
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    aperta = null;
+  }
+
+  function parla() {
+    if (!aperta || !('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(aperta.t[lingua].replace(/\.\.\.|……/g, ''));
+    u.lang = info().voce; u.rate = 0.9;
+    var v = speechSynthesis.getVoices().filter(function (x) { return x.lang && x.lang.replace('_', '-').indexOf(info().id) === 0; });
+    if (v.length) u.voice = v[0];
+    speechSynthesis.speak(u);
+  }
+  if ('speechSynthesis' in window) speechSynthesis.getVoices();
+
+  // Tasto Indietro di Android: chiude la frase aperta invece di uscire.
+  window.addEventListener('popstate', function () { if (aperta) chiudi(); });
+  var apriOriginale = apri;
+  apri = function (i) { apriOriginale(i); try { history.pushState({ f: i }, ''); } catch (e) {} };
+  var chiudiOriginale = chiudi;
+  chiudi = function () { var era = aperta; chiudiOriginale(); if (era && history.state && history.state.f !== undefined) history.back(); };
+
+  disegna();
+</script>
+</body>
+</html>

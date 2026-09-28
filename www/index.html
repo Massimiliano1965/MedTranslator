@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Traduttore reparto</title>
+<!--
+  Traduttore di reparto — frasi pronte per parlare con pazienti stranieri.
+  © 2026 Massimiliano Previtali. Tutti i diritti riservati.
+
+  COME SI USA: scegli la lingua in alto, tocca una frase. Compare grande nella
+  lingua del paziente (giri il telefono e la legge) e il telefono la dice a
+  voce. Se è una domanda, il paziente risponde toccando i bottoni grandi e tu
+  leggi la risposta in italiano.
+
+  PER AGGIUNGERE UNA FRASE: copia una riga dentro FRASI e cambia i testi.
+  Ordine sempre: italiano, English, Español, Français, العربية, 中文, 日本語.
+  tipo: 'sn' = domanda sì/no, 'dolore' = scala 0-10, scelte = risposte a bottoni.
+  ruoli: chi usa la frase. I = infermiere, S = OSS, A = OA, M = medico.
+  Ogni frase ha i suoi ruoli (es. 'SA' = la vedono OSS e OA).
+  Le traduzioni vanno fatte controllare da un mediatore culturale.
+-->
+<!-- Font dentro l'app (funziona anche senza internet) -->
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+  /* Colori presi da TrovaReparti: azzurro delle torri, rosso dei civici,
+     verde del bottone microfono. Font Atkinson Hyperlegible: disegnato
+     per chi vede poco. */
+  :root {
+    --blu: #1b86c2; --blu-chiaro: #e3f1fa; --rosso: #e0232b; --verde: #2f9e43;
+    --sfondo: #f3f6f9; --carta: #ffffff; --bordo: #d8e1e9; --testo: #1b2530; --tenue: #586776;
+    --ombra: 0 1px 2px rgba(27, 37, 48, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --blu: #45b3ea; --blu-chiaro: #17303f; --rosso: #f0474e; --verde: #45b85a;
+      --sfondo: #11171d; --carta: #1a222b; --bordo: #2b3845; --testo: #e7eef4; --tenue: #9aabbb;
+      --ombra: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --blu: #45b3ea; --blu-chiaro: #17303f; --rosso: #f0474e; --verde: #45b85a;
+    --sfondo: #11171d; --carta: #1a222b; --bordo: #2b3845; --testo: #e7eef4; --tenue: #9aabbb;
+    --ombra: none;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--sfondo); color: var(--testo);
+    font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Arabic", "Noto Sans SC", sans-serif;
+    font-size: 18px; line-height: 1.4; -webkit-tap-highlight-color: transparent;
+  }
+  button:focus-visible { outline: 3px solid var(--blu); outline-offset: 2px; }
+  header {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: var(--testata, var(--carta)); border-bottom: 1px solid var(--bordo); border-top: 5px solid var(--blu);
+    padding: 12px 16px 10px;
+  }
+  /* Colore per ruolo (divise): Medico azzurro chiaro istituzionale, OA
+     viola-azzurro, OSS bianco e verde scuro, Infermiere bianco candido. */
+  body[data-ruolo="M"] { --blu: #3a9ed6; --blu-chiaro: #e3f2fb; --testata: #eaf5fc; }
+  body[data-ruolo="A"] { --blu: #5b5bc9; --blu-chiaro: #ebebfb; --testata: #f3f2fe; }
+  body[data-ruolo="S"] { --blu: #1f5b3b; --blu-chiaro: #e2eee6; --testata: #ffffff; }
+  body[data-ruolo="I"] { --blu: #5f7f9c; --blu-chiaro: #eef3f7; --testata: #ffffff; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) body[data-ruolo="M"] { --blu: #5cb2ec; --blu-chiaro: #16303f; --testata: var(--carta); }
+    :root:not([data-theme="light"]) body[data-ruolo="A"] { --blu: #9d9cf2; --blu-chiaro: #26254a; --testata: var(--carta); }
+    :root:not([data-theme="light"]) body[data-ruolo="S"] { --blu: #6cc793; --blu-chiaro: #17301f; --testata: var(--carta); }
+    :root:not([data-theme="light"]) body[data-ruolo="I"] { --blu: #b9cadb; --blu-chiaro: #243039; --testata: var(--carta); }
+  }
+  :root[data-theme="dark"] body[data-ruolo="M"] { --blu: #5cb2ec; --blu-chiaro: #16303f; --testata: var(--carta); }
+  :root[data-theme="dark"] body[data-ruolo="A"] { --blu: #9d9cf2; --blu-chiaro: #26254a; --testata: var(--carta); }
+  :root[data-theme="dark"] body[data-ruolo="S"] { --blu: #6cc793; --blu-chiaro: #17301f; --testata: var(--carta); }
+  :root[data-theme="dark"] body[data-ruolo="I"] { --blu: #b9cadb; --blu-chiaro: #243039; --testata: var(--carta); }
+  .testata { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .marchio { width: 32px; height: 32px; flex: none; }
+  header h1 { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.1; }
+  header h1 small { display: block; font-size: 13px; font-weight: 400; color: var(--tenue); margin-top: 2px; }
+  .lingue, .ruoli { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .lingue button {
+    border: 1.5px solid var(--blu); background: transparent; color: var(--blu);
+    border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 15px; font-weight: 700;
+  }
+  .lingue button.attiva { background: var(--blu); color: #fff; }
+  .ruoli { margin-top: 8px; }
+  /* Argomenti: una riga sola che scorre di lato, per non alzare la testata */
+  /* Argomenti su più righe (non scorrono di lato): così si possono trascinare */
+  .gruppi { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .gruppi::-webkit-scrollbar { display: none; }
+  .gruppi button {
+    flex: none; border: 1px solid var(--bordo); background: transparent; color: var(--tenue); border-radius: 999px;
+    padding: 4px 10px; font: inherit; font-size: 13.5px; font-weight: 700; white-space: nowrap;
+  }
+  .gruppi button.attiva { background: var(--blu); border-color: var(--blu); color: #fff; }
+  .ruoli span { font-size: 14px; color: var(--tenue); margin-right: 2px; }
+  .ruoli button {
+    border: 1px solid var(--bordo); background: var(--sfondo); color: var(--testo); border-radius: 8px;
+    padding: 5px 10px; font: inherit; font-size: 14px; font-weight: 700;
+  }
+  .ruoli button.attiva { background: var(--blu-chiaro); border-color: var(--blu); color: var(--blu); }
+  main { padding: 8px 16px 32px; max-width: 640px; margin: 0 auto; }
+  h2 { font-size: 14px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--blu); margin: 22px 4px 8px; }
+  /* Frase + stella dei preferiti sulla stessa riga */
+  .riga-frase { display: flex; gap: 6px; align-items: stretch; margin: 0 0 8px; }
+  .riga-frase .frase { margin: 0; flex: 1; min-width: 0; }
+  .stella {
+    flex: none; width: 48px; border: 1px solid var(--bordo); border-radius: 12px; background: var(--carta);
+    color: var(--tenue); font-size: 24px; line-height: 1; cursor: pointer;
+  }
+  .stella.piena { color: #e0a400; border-color: #e0a400; }
+  h2.titolo-pref { color: #b88600; }
+  /* Tasto Ordina e frecce per spostare lingue, ruoli e argomenti */
+  .btn-ordina {
+    margin-left: auto; flex: none; border: 1px solid var(--blu); background: transparent; color: var(--blu);
+    border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 14px; font-weight: 700;
+  }
+  body.ordinando .btn-ordina { background: var(--blu); color: #fff; }
+  .chip-ordina { display: inline-flex; align-items: center; gap: 2px; flex: none; }
+  .chip-ordina .freccia {
+    border: 0; background: var(--blu-chiaro); color: var(--blu); border-radius: 8px;
+    width: 26px; height: 30px; padding: 0; font: inherit; font-size: 20px; font-weight: 700; line-height: 1;
+  }
+  /* Trascinamento: il bottone preso si solleva, il posto libero è tratteggiato */
+  .trascina { touch-action: pan-x pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  .preso { box-shadow: 0 6px 16px rgba(0,0,0,0.25); transform: scale(1.08); }
+  .fantasma { opacity: 0.35; outline: 2px dashed var(--blu); }
+  /* Ruoli: una riga sola, bottoni della stessa larghezza (a capo solo mentre si ordina) */
+  body:not(.ordinando) .ruoli { flex-wrap: nowrap; }
+  body:not(.ordinando) .ruoli button { flex: 1; min-width: 0; padding-left: 4px; padding-right: 4px; }
+  /* Mentre si ordina, gli argomenti vanno a capo invece di scorrere di lato:
+     così il bottone spostato resta sempre in vista */
+  .frase {
+    display: block; width: 100%; text-align: left; margin: 0 0 8px; padding: 13px 16px;
+    background: var(--carta); color: var(--testo); border: 1px solid var(--bordo); border-radius: 12px;
+    box-shadow: var(--ombra); font: inherit; font-size: 18px; font-weight: 700; cursor: pointer;
+  }
+  .frase small { display: block; font-weight: 400; font-size: 16px; color: var(--tenue); margin-top: 3px; }
+  .frase:active { background: var(--blu-chiaro); }
+
+  /* Schermata grande per il paziente */
+  #grande {
+    position: fixed; inset: 0; z-index: 20; background: var(--sfondo); display: none;
+    flex-direction: column; padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px)); overflow-y: auto;
+  }
+  #grande.aperto { display: flex; }
+  .barra { display: flex; justify-content: space-between; gap: 10px; }
+  .barra button {
+    border: 1px solid var(--bordo); border-radius: 999px; padding: 11px 20px; font: inherit; font-size: 17px; font-weight: 700;
+    background: var(--carta); color: var(--testo);
+  }
+  .barra .ascolta { background: var(--blu); border-color: var(--blu); color: #fff; }
+  #g-testo { font-size: 34px; font-weight: 700; line-height: 1.3; margin: 28px 0 14px; text-wrap: balance; }
+  #g-testo[dir="rtl"] { font-size: 38px; }
+  #g-it { font-size: 17px; color: var(--tenue); margin: 0 0 20px; }
+  .risposte { display: grid; gap: 12px; margin-top: auto; }
+  .risposte.due { grid-template-columns: 1fr 1fr; }
+  .risposte button {
+    border: 0; border-radius: 16px; padding: 22px 10px; font: inherit; font-size: 26px; font-weight: 700;
+    color: #fff; background: var(--verde);
+  }
+  .risposte .no { background: var(--rosso); }
+  .risposte .altra { background: var(--blu); }
+  .scala { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: auto; }
+  .scala button {
+    border: 0; border-radius: 12px; padding: 16px 0; font: inherit; font-size: 24px; font-weight: 700; color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+  .scala-etichette { display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; margin-top: 8px; }
+  #g-risposta {
+    display: none; margin-top: 18px; padding: 18px; border-radius: 16px; background: var(--carta); color: var(--testo);
+    border: 3px solid var(--blu); font-size: 30px; font-weight: 700; text-align: center;
+  }
+  #g-risposta small { display: block; font-size: 15px; font-weight: 400; color: var(--tenue); margin-bottom: 4px; }
+
+  /* Tabella a immagini (paziente che non può parlare) */
+  .tabella { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+  .tabella button {
+    display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 8px;
+    background: var(--carta); color: var(--testo); border: 3px solid var(--bordo); border-radius: 16px; font: inherit;
+  }
+  .tabella button:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .tabella .simbolo { font-size: 40px; line-height: 1.1; }
+  .tabella b { font-size: 21px; line-height: 1.2; }
+  .tabella small { font-size: 14px; color: var(--tenue); }
+  .tabella button.accesa { border-color: var(--blu); background: var(--blu-chiaro); transform: scale(1.03); }
+  .scorri { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .scorri button { border: 0; border-radius: 16px; padding: 18px 8px; font: inherit; font-size: 22px; font-weight: 700; color: #fff; background: var(--blu); }
+  .scorri .questa { background: var(--verde); }
+  .aiuto-tabella { font-size: 15px; color: var(--tenue); margin: 10px 2px 0; }
+  @media (prefers-reduced-motion: reduce) { .tabella button.accesa { transform: none; } }
+
+  /* Firma dell'ideatore */
+  .firma {
+    margin-top: 36px; padding: 22px 16px 10px; border-top: 1px solid var(--bordo);
+    display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
+  }
+  .firma .marchio { width: 40px; height: 40px; margin-bottom: 4px; }
+  .firma-etichetta { font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--tenue); }
+  .firma-nome { font-family: "Caveat", "Segoe Script", "Brush Script MT", cursive; font-size: 36px; font-weight: 600; line-height: 1.1; color: var(--blu); }
+  .firma-nota { font-size: 13px; color: var(--tenue); max-width: 34ch; }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="testata">
+    <svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg>
+    <h1>Traduttore reparto<small>Frasi pronte per parlare con i pazienti</small></h1>
+  </div>
+  <div class="lingue" id="lingue"></div>
+  <div class="ruoli" id="ruoli"></div>
+  <div class="gruppi" id="gruppi"></div>
+</header>
+<main id="elenco"></main>
+
+<div id="grande" role="dialog" aria-modal="true">
+  <div class="barra">
+    <button type="button" onclick="chiudi()">✕ Chiudi</button>
+    <button type="button" class="ascolta" onclick="parla()">🔊 Ascolta</button>
+  </div>
+  <div id="g-testo"></div>
+  <p id="g-it"></p>
+  <div id="g-risposte"></div>
+  <div id="g-risposta"></div>
+</div>
+
+<script src="lib/Sortable.min.js"></script>
+<script src="cordova.js"></script>
+<script>
+  var LINGUE = [
+    { id: 'en', nome: 'English', voce: 'en-GB' },
+    { id: 'es', nome: 'Español', voce: 'es-ES' },
+    { id: 'fr', nome: 'Français', voce: 'fr-FR' },
+    { id: 'ar', nome: 'العربية', voce: 'ar-SA', rtl: true },
+    { id: 'zh', nome: '中文', voce: 'zh-CN' },
+    { id: 'ja', nome: '日本語', voce: 'ja-JP' },
+    { id: 'ur', nome: 'اردو', voce: 'ur-PK', rtl: true },
+    { id: 'ro', nome: 'Română', voce: 'ro-RO' },
+    { id: 'sq', nome: 'Shqip', voce: 'sq-AL' },
+    { id: 'pa', nome: 'ਪੰਜਾਬੀ', voce: 'pa-IN' },
+    { id: 'uk', nome: 'Українська', voce: 'uk-UA' },
+    { id: 'ru', nome: 'Русский', voce: 'ru-RU' }
+  ];
+  // Risposte Sì / No
+  var SI = ['Sì', 'Yes', 'Sí', 'Oui', 'نعم', '是', 'はい'];
+  var NO = ['No', 'No', 'No', 'Non', 'لا', '否', 'いいえ'];
+  var DOLORE_0 = ['Nessun dolore', 'No pain', 'Sin dolor', 'Aucune douleur', 'لا ألم', '不疼', '痛みなし'];
+  // Tabella a immagini per chi non può parlare: [simbolo, it, en, es, fr, ar, zh, ja]
+  var TABELLA = [
+    ['✅', 'Sì', 'Yes', 'Sí', 'Oui', 'نعم', '是', 'はい'],
+    ['❌', 'No', 'No', 'No', 'Non', 'لا', '否', 'いいえ'],
+    ['🤕', 'Dolore', 'Pain', 'Dolor', 'Douleur', 'ألم', '疼痛', '痛み'],
+    ['💧', 'Sete', 'Thirst', 'Sed', 'Soif', 'عطش', '口渴', '喉の渇き'],
+    ['🥶', 'Freddo', 'Cold', 'Frío', 'Froid', 'برد', '冷', '寒い'],
+    ['🥵', 'Caldo', 'Hot', 'Calor', 'Chaud', 'حر', '热', '暑い'],
+    ['🚽', 'Bagno', 'Toilet', 'Baño', 'Toilettes', 'الحمّام', '厕所', 'トイレ'],
+    ['😨', 'Paura', 'Fear', 'Miedo', 'Peur', 'خوف', '害怕', '怖い'],
+    ['👪', 'Chiamare un familiare', 'Call my family', 'Llamar a mi familia', 'Appeler ma famille', 'الاتصال بعائلتي', '叫我的家人', '家族を呼んで']
+  ];
+  var casella = -1;
+  var DOLORE_10 = ['Dolore massimo', 'Worst pain', 'Dolor máximo', 'Douleur maximale', 'أشد ألم', '最疼', '最もひどい痛み'];
+
+  // Ordine: italiano, English, Español, Français, العربية, 中文
+  var FRASI = [
+    { gruppo: 'Saluti', ruoli: 'ISAM' },
+    { ruoli: 'ISAM', t: ["Buongiorno", "Good morning", "Buenos días", "Bonjour", "صباح الخير", "早上好", "おはようございます"] },
+    { ruoli: 'ISAM', t: ["Buonasera", "Good evening", "Buenas tardes", "Bonsoir", "مساء الخير", "晚上好", "こんばんは"] },
+    { ruoli: 'SA', t: ["Buon appetito", "Enjoy your meal", "¡Buen provecho!", "Bon appétit !", "بالهناء والشفاء", "请慢用", "どうぞ召し上がってください"] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Ha finito?", "Have you finished?", "¿Ha terminado?", "Vous avez terminé ?", "هل انتهيت؟", "您吃完了吗？", "お済みですか？"] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Basta così?", "Is that enough?", "¿Es suficiente?", "C'est suffisant ?", "هل هذا يكفي؟", "这样够了吗？", "これで十分ですか？"] },
+    { ruoli: 'ISAM', t: ["Ci vediamo dopo", "See you later", "Hasta luego", "À tout à l'heure", "أراك لاحقاً", "待会儿见", "また後で来ます"] },
+    { ruoli: 'ISA', t: ["Buonanotte", "Good night", "Buenas noches", "Bonne nuit", "ليلة سعيدة", "晚安", "おやすみなさい"] },
+    { ruoli: 'ISA', t: ["Buonanotte, a domani", "Good night, see you tomorrow", "Buenas noches, hasta mañana", "Bonne nuit, à demain", "ليلة سعيدة، إلى الغد", "晚安，明天见", "おやすみなさい。また明日"] },
+    { ruoli: 'ISAM', t: ["Buon rientro a casa", "Have a safe journey home", "¡Que tenga un buen regreso a casa!", "Bon retour à la maison", "عودة سالمة إلى البيت", "祝您平安回家", "お気をつけてお帰りください"] },
+    { ruoli: 'ISAM', t: ["Tante belle cose", "All the best", "¡Que le vaya muy bien!", "Bonne continuation !", "أتمنى لك كل الخير", "祝您一切顺利", "どうぞお元気で"] },
+
+    { gruppo: 'Accoglienza', ruoli: 'ISAM' },
+    { ruoli: 'I', t: ["Buongiorno, sono l'infermiere.", "Hello, I'm the nurse.", "Buenos días, soy el enfermero.", "Bonjour, je suis l'infirmier.", "صباح الخير، أنا الممرض.", "您好，我是护士。", "こんにちは。看護師です。"] },
+    { ruoli: 'S', t: ["Buongiorno, sono l'operatore socio-sanitario (OSS).", "Hello, I'm the healthcare assistant.", "Buenos días, soy el auxiliar de enfermería.", "Bonjour, je suis l'aide-soignant.", "صباح الخير، أنا مساعد التمريض.", "您好，我是护理员。", "こんにちは。看護助手です。"] },
+    { ruoli: 'A', t: ["Buongiorno, sono l'operatore alberghiero: porto i pasti.", "Hello, I'm from the catering staff: I bring the meals.", "Buenos días, soy del personal de comedor: traigo las comidas.", "Bonjour, je fais partie du service hôtelier : j'apporte les repas.", "صباح الخير، أنا من طاقم خدمة الطعام: أُحضر الوجبات.", "您好，我是送餐员，负责送饭。", "こんにちは。配膳担当です。お食事をお持ちします。"] },
+    { ruoli: 'M', t: ["Buongiorno, sono il medico.", "Hello, I'm the doctor.", "Buenos días, soy el médico.", "Bonjour, je suis le médecin.", "صباح الخير، أنا الطبيب.", "您好，我是医生。", "こんにちは。医師です。"] },
+    { ruoli: 'ISAM', t: ["Come si chiama?", "What is your name?", "¿Cómo se llama?", "Comment vous appelez-vous ?", "ما اسمك؟", "您叫什么名字？", "お名前を教えてください。"] },
+    { ruoli: 'ISAM', tipo: 'sn', t: ["Parla italiano? Inglese?", "Do you speak Italian? English?", "¿Habla italiano? ¿Inglés?", "Vous parlez italien ? Anglais ?", "هل تتكلم الإيطالية؟ الإنجليزية؟", "您会说意大利语吗？英语呢？", "イタリア語は話せますか？英語はどうですか？"] },
+    { ruoli: 'ISM', tipo: 'sn', t: ["Chiamiamo un familiare per tradurre?", "Shall we call a family member to translate?", "¿Llamamos a un familiar para que traduzca?", "On appelle un membre de votre famille pour traduire ?", "هل نتصل بأحد أفراد عائلتك ليترجم؟", "要不要打电话请一位家人来翻译？", "通訳のために、ご家族に電話しましょうか？"] },
+    { ruoli: 'ISAM', t: ["Aspetti qui, torno subito.", "Please wait here, I'll be right back.", "Espere aquí, vuelvo enseguida.", "Attendez ici, je reviens tout de suite.", "الرجاء الانتظار هنا، سأعود حالاً.", "请在这里等一下，我马上回来。", "ここでお待ちください。すぐ戻ります。"] },
+
+    { gruppo: 'Pasti e bevande', ruoli: 'SA' },
+    { ruoli: 'SA', tipo: 'sn', t: ["Vuole un caffè?", "Would you like a coffee?", "¿Quiere un café?", "Voulez-vous un café ?", "هل تريد قهوة؟", "您要咖啡吗？", "コーヒーはいかがですか？"] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Vuole un tè?", "Would you like some tea?", "¿Quiere un té?", "Voulez-vous un thé ?", "هل تريد شاياً؟", "您要茶吗？", "紅茶はいかがですか？"] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Vuole una camomilla?", "Would you like a camomile tea?", "¿Quiere una manzanilla?", "Voulez-vous une camomille ?", "هل تريد شاي البابونج؟", "您要洋甘菊茶吗？", "カモミールティーはいかがですか？"] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Vuole dell'acqua?", "Would you like some water?", "¿Quiere agua?", "Voulez-vous de l'eau ?", "هل تريد ماءً؟", "您要水吗？", "お水はいかがですか？"] },
+    { ruoli: 'SA', t: ["Ecco la colazione.", "Here is your breakfast.", "Aquí tiene el desayuno.", "Voici le petit-déjeuner.", "تفضل، هذا الفطور.", "这是您的早餐。", "朝食をお持ちしました。"] },
+    { ruoli: 'SA', t: ["Ecco il pranzo.", "Here is your lunch.", "Aquí tiene la comida.", "Voici le déjeuner.", "تفضل، هذا الغداء.", "这是您的午餐。", "昼食をお持ちしました。"] },
+    { ruoli: 'SA', t: ["Ecco la cena.", "Here is your dinner.", "Aquí tiene la cena.", "Voici le dîner.", "تفضل، هذا العشاء.", "这是您的晚餐。", "夕食をお持ちしました。"] },
+    { ruoli: 'SA', t: ["Ecco le posate.", "Here is your cutlery.", "Aquí tiene los cubiertos.", "Voici les couverts.", "تفضل، هذه أدوات الأكل.", "这是您的餐具。", "ナイフ・フォーク・スプーンをどうぞ。"] },
+    { ruoli: 'SA', t: ["Vuole sale o pepe?", "Would you like salt or pepper?", "¿Quiere sal o pimienta?", "Voulez-vous du sel ou du poivre ?", "هل تريد ملحاً أو فلفلاً؟", "您要盐还是胡椒？", "塩かコショウはいかがですか？"],
+      scelte: [["Sale", "Salt", "Sal", "Sel", "ملح", "盐", "塩"], ["Pepe", "Pepper", "Pimienta", "Poivre", "فلفل", "胡椒", "コショウ"], ["No, grazie", "No, thank you", "No, gracias", "Non, merci", "لا، شكراً", "不用了，谢谢", "いいえ、結構です"]] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Le apro la bottiglietta?", "Shall I open the bottle for you?", "¿Le abro la botella?", "Je vous ouvre la bouteille ?", "هل أفتح لك الزجاجة؟", "要我帮您打开瓶子吗？", "ボトルを開けましょうか？"] },
+    { ruoli: 'SA', tipo: 'sn', t: ["Posso prendere il vassoio?", "May I take the tray?", "¿Puedo llevarme la bandeja?", "Je peux prendre le plateau ?", "هل يمكنني أخذ الصينية؟", "我可以把托盘拿走吗？", "トレーを下げてもよろしいですか？"] },
+    { ruoli: 'A', t: ["Non posso toccare i pazienti: chiamo un OSS.", "I'm not allowed to touch patients: I'll call a care assistant.", "No puedo tocar a los pacientes: llamo a un auxiliar sanitario.", "Je ne peux pas toucher les patients : j'appelle un aide-soignant.", "لا يُسمح لي بلمس المرضى: سأنادي أحد المساعدين الصحيين.", "我不能接触病人：我去叫护理员来。", "私は患者さんに触れることができません。看護助手を呼びます。"] },
+    { ruoli: 'SA', t: ["Appena posso le porto quello che ha chiesto.", "I'll bring you what you asked for as soon as I can.", "En cuanto pueda, le traigo lo que ha pedido.", "Dès que possible, je vous apporte ce que vous avez demandé.", "سأحضر لك ما طلبته في أقرب وقت ممكن.", "我会尽快把您要的东西拿来。", "ご依頼のものは、できるだけ早くお持ちします。"] },
+
+    { gruppo: 'Dolore e come sta', ruoli: 'IM' },
+    { ruoli: 'IM', tipo: 'sn', t: ["Ha dolore?", "Are you in pain?", "¿Tiene dolor?", "Avez-vous mal ?", "هل لديك ألم؟", "您疼吗？", "痛みはありますか？"] },
+    { ruoli: 'IM', t: ["Dove le fa male? Me lo indichi.", "Where does it hurt? Please point to it.", "¿Dónde le duele? Señálelo, por favor.", "Où avez-vous mal ? Montrez-moi l'endroit.", "أين مكان الألم؟ الرجاء الإشارة إليه.", "哪里疼？请指给我看。", "どこが痛いですか？指で示してください。"] },
+    { ruoli: 'IM', tipo: 'dolore', t: ["Quanto dolore ha, da 0 a 10?", "How much pain do you have, from 0 to 10?", "¿Cuánto dolor tiene, del 0 al 10?", "Quelle est l'intensité de votre douleur, de 0 à 10 ?", "ما شدة الألم من 0 إلى 10؟", "您有多疼？请从0到10选一个数字。", "痛みはどのくらいですか？0から10で選んでください。"] },
+    { ruoli: 'IM', tipo: 'sn', t: ["Ha nausea?", "Do you feel sick (nauseous)?", "¿Tiene náuseas?", "Avez-vous la nausée ?", "هل لديك غثيان؟", "您恶心吗？", "吐き気はありますか？"] },
+    { ruoli: 'IS', t: ["Ha freddo o caldo?", "Are you cold or hot?", "¿Tiene frío o calor?", "Avez-vous froid ou chaud ?", "هل تشعر بالبرد أم بالحر؟", "您觉得冷还是热？", "寒いですか、それとも暑いですか？"],
+      scelte: [["Ho freddo", "I'm cold", "Tengo frío", "J'ai froid", "أشعر بالبرد", "我冷", "寒い"], ["Ho caldo", "I'm hot", "Tengo calor", "J'ai chaud", "أشعر بالحر", "我热", "暑い"], ["Sto bene", "I'm fine", "Estoy bien", "Ça va", "أنا بخير", "还好", "大丈夫です"]] },
+    { ruoli: 'IM', tipo: 'sn', t: ["Ha difficoltà a respirare?", "Do you have trouble breathing?", "¿Le cuesta respirar?", "Avez-vous du mal à respirer ?", "هل لديك صعوبة في التنفس؟", "您呼吸困难吗？", "息苦しいですか？"] },
+
+    { gruppo: 'Paziente che non può parlare', ruoli: 'ISM' },
+    { ruoli: 'ISM', tipo: 'tabella', t: ["Tabella a immagini: indico una casella, il paziente chiude gli occhi", "Close your eyes when I point to the right one.", "Cierre los ojos cuando señale lo correcto.", "Fermez les yeux quand je montre la bonne case.", "أغمض عينيك عندما أشير إلى الخيار الصحيح.", "我指到正确的那一项时，请闭上眼睛。", "正しいものを指したら、目を閉じてください。"] },
+    { ruoli: 'ISM', tipo: 'sn', t: ["Se non può parlare: chiuda gli occhi una volta per SÌ, due volte per NO.", "If you cannot speak: close your eyes once for YES, twice for NO.", "Si no puede hablar: cierre los ojos una vez para SÍ, dos veces para NO.", "Si vous ne pouvez pas parler : fermez les yeux une fois pour OUI, deux fois pour NON.", "إذا لم تستطع الكلام: أغمض عينيك مرة واحدة تعني نعم، ومرتين تعني لا.", "如果您不能说话：闭眼一次表示“是”，闭眼两次表示“不是”。", "話せない場合：「はい」は目を1回閉じてください。「いいえ」は2回閉じてください。"] },
+    { ruoli: 'ISM', tipo: 'sn', t: ["Se non può parlare: stringa la mia mano una volta per SÌ, due volte per NO.", "If you cannot speak: squeeze my hand once for YES, twice for NO.", "Si no puede hablar: apriete mi mano una vez para SÍ, dos veces para NO.", "Si vous ne pouvez pas parler : serrez ma main une fois pour OUI, deux fois pour NON.", "إذا لم تستطع الكلام: اضغط على يدي مرة واحدة تعني نعم، ومرتين تعني لا.", "如果您不能说话：捏我的手一次表示“是”，两次表示“不是”。", "話せない場合：「はい」は私の手を1回握ってください。「いいえ」は2回握ってください。"] },
+    { ruoli: 'ISM', tipo: 'sn', t: ["Se non può parlare: muova la testa su e giù per SÌ, a destra e sinistra per NO.", "If you cannot speak: nod your head for YES, shake it for NO.", "Si no puede hablar: mueva la cabeza arriba y abajo para SÍ, a los lados para NO.", "Si vous ne pouvez pas parler : hochez la tête pour OUI, secouez-la pour NON.", "إذا لم تستطع الكلام: حرّك رأسك لأعلى ولأسفل تعني نعم، ولليمين واليسار تعني لا.", "如果您不能说话：点头表示“是”，摇头表示“不是”。", "話せない場合：「はい」はうなずいてください。「いいえ」は首を横に振ってください。"] },
+
+    { gruppo: 'Bisogni', ruoli: 'IS' },
+    { ruoli: 'IS', tipo: 'sn', t: ["Ha bisogno del bagno?", "Do you need the toilet?", "¿Necesita ir al baño?", "Avez-vous besoin d'aller aux toilettes ?", "هل تريد الذهاب إلى الحمّام؟", "您要上厕所吗？", "トイレに行きたいですか？"] },
+    { ruoli: 'ISA', t: ["Ha sete? Ha fame?", "Are you thirsty? Are you hungry?", "¿Tiene sed? ¿Tiene hambre?", "Avez-vous soif ? Avez-vous faim ?", "هل تشعر بالعطش؟ هل تشعر بالجوع؟", "您渴吗？您饿吗？", "喉が渇いていますか？お腹は空いていますか？"],
+      scelte: [["Ho sete", "I'm thirsty", "Tengo sed", "J'ai soif", "أريد أن أشرب", "我渴了", "喉が渇いた"], ["Ho fame", "I'm hungry", "Tengo hambre", "J'ai faim", "أريد أن آكل", "我饿了", "お腹が空いた"], ["No, grazie", "No, thank you", "No, gracias", "Non, merci", "لا، شكراً", "不用了，谢谢", "いいえ、結構です"]] },
+    { ruoli: 'IS', tipo: 'sn', t: ["Vuole cambiarsi / lavarsi?", "Would you like to change your clothes / have a wash?", "¿Quiere cambiarse / lavarse?", "Voulez-vous vous changer / vous laver ?", "هل تريد تغيير ملابسك / الاغتسال؟", "您想换衣服／洗漱吗？", "着替えますか？／体を洗いますか？"] },
+    { ruoli: 'ISA', t: ["Per chiamare premi questo campanello.", "To call us, press this button.", "Para llamarnos, pulse este timbre.", "Pour nous appeler, appuyez sur cette sonnette.", "للاتصال بنا، اضغط على هذا الجرس.", "需要帮忙时，请按这个呼叫铃。", "用があるときは、このボタンを押してください。"] },
+    { ruoli: 'ISM', t: ["Deve restare a letto. Non si alzi da solo.", "You must stay in bed. Do not get up on your own.", "Debe quedarse en la cama. No se levante sin ayuda.", "Vous devez rester au lit. Ne vous levez pas sans aide.", "يجب البقاء في السرير. لا تنهض دون مساعدة.", "您必须卧床。不要自己起来。", "ベッドで安静にしていてください。一人で起き上がらないでください。"] },
+
+    { gruppo: 'Esami e cure', ruoli: 'IM' },
+    { ruoli: 'ISAM', t: ["Deve stare a digiuno: non mangi e non beva niente.", "You must fast: do not eat or drink anything.", "Debe estar en ayunas: no coma ni beba nada.", "Vous devez rester à jeun : ne mangez et ne buvez rien.", "يجب الصيام التام: ممنوع الأكل والشرب.", "您需要禁食：不要吃东西，也不要喝水。", "絶食が必要です。何も食べたり飲んだりしないでください。"] },
+    { ruoli: 'IM', t: ["Domani fa un esame.", "Tomorrow you have a test.", "Mañana tiene una prueba.", "Demain, vous avez un examen.", "لديك فحص غداً.", "您明天要做检查。", "明日、検査があります。"] },
+    { ruoli: 'I', t: ["Adesso le facciamo un prelievo di sangue.", "We are now going to take a blood sample.", "Ahora le vamos a sacar sangre.", "Nous allons maintenant vous faire une prise de sang.", "سنأخذ منك الآن عينة دم.", "现在给您抽血。", "これから採血をします。"] },
+    { ruoli: 'IS', t: ["Le misuro la pressione / la febbre.", "I'm going to check your blood pressure / temperature.", "Le voy a tomar la tensión / la temperatura.", "Je vais prendre votre tension / votre température.", "سأقيس ضغط الدم / الحرارة.", "我给您量血压／体温。", "血圧／体温を測ります。"] },
+    { ruoli: 'I', t: ["Questa è la sua medicina.", "This is your medicine.", "Este es su medicamento.", "Voici votre médicament.", "هذا دواؤك.", "这是您的药。", "こちらがお薬です。"] },
+    { ruoli: 'IM', tipo: 'sn', t: ["È allergico a qualche medicina?", "Are you allergic to any medicine?", "¿Tiene alergia a algún medicamento?", "Êtes-vous allergique à un médicament ?", "هل لديك حساسية من أي دواء؟", "您对什么药物过敏吗？", "薬のアレルギーはありますか？"] },
+    { ruoli: 'ISA', t: ["Il medico passa più tardi.", "The doctor will come later.", "El médico pasará más tarde.", "Le médecin passera plus tard.", "سيأتي الطبيب لاحقاً.", "医生晚一点会来。", "医師は後で来ます。"] },
+
+    { gruppo: 'Visita medica', ruoli: 'M' },
+    { ruoli: 'M', t: ["Da quanti giorni sta male?", "How many days have you been unwell?", "¿Desde hace cuántos días se encuentra mal?", "Depuis combien de jours êtes-vous malade ?", "منذ كم يوماً بدأ المرض؟", "您不舒服几天了？", "何日前から具合が悪いですか？"] },
+    { ruoli: 'IM', tipo: 'sn', t: ["Prende medicine a casa? Me le mostri.", "Do you take any medicines at home? Please show them to me.", "¿Toma medicamentos en casa? Enséñemelos, por favor.", "Prenez-vous des médicaments à la maison ? Montrez-les-moi, s'il vous plaît.", "هل تتناول أدوية في البيت؟ الرجاء إحضارها لأراها.", "您在家吃药吗？请拿给我看看。", "家で飲んでいる薬はありますか？見せてください。"] },
+    { ruoli: 'IM', tipo: 'sn', t: ["Ha malattie importanti? (cuore, diabete, pressione)", "Do you have any serious illnesses? (heart, diabetes, blood pressure)", "¿Tiene alguna enfermedad importante? (corazón, diabetes, tensión)", "Avez-vous des maladies importantes ? (cœur, diabète, tension)", "هل لديك أمراض مهمة؟ (القلب، السكري، ضغط الدم)", "您有严重的疾病吗？（心脏病、糖尿病、高血压）", "大きな病気はありますか？（心臓病、糖尿病、高血圧）"] },
+    { ruoli: 'IM', tipo: 'sn', t: ["È incinta?", "Are you pregnant?", "¿Está embarazada?", "Êtes-vous enceinte ?", "هل أنتِ حامل؟", "您怀孕了吗？", "妊娠していますか？"] },
+    { ruoli: 'M', t: ["Domani la dimettiamo.", "You will be discharged tomorrow.", "Mañana le damos el alta.", "Vous pourrez sortir demain.", "الخروج من المستشفى سيكون غداً.", "您明天可以出院。", "明日、退院できます。"] },
+    { ruoli: 'M', t: ["Deve fare un'operazione.", "You need an operation.", "Necesita una operación.", "Une opération est nécessaire.", "يلزم إجراء عملية جراحية.", "您需要做手术。", "手術が必要です。"] },
+
+    { gruppo: 'Familiari', ruoli: 'ISAM' },
+    { ruoli: 'ISA', t: ["L'orario delle visite è ...", "Visiting hours are: ...", "El horario de visitas es: ...", "Les heures de visite sont : ...", "مواعيد الزيارة: ...", "探视时间是：……", "面会時間：…"] },
+    { ruoli: 'ISA', t: ["Può entrare una persona alla volta.", "Only one person at a time may come in.", "Puede entrar una persona cada vez.", "Une seule personne à la fois peut entrer.", "يمكن دخول شخص واحد فقط في كل مرة.", "每次只能进来一个人。", "一度に入れるのは1人だけです。"] },
+    { ruoli: 'ISAM', t: ["Il paziente sta riposando.", "The patient is resting.", "El paciente está descansando.", "Le patient se repose.", "المريض يستريح الآن.", "病人正在休息。", "患者さんは休んでいます。"] }
+  ];
+
+  // Urdu (Pakistan): aggiunto in fondo a ogni frase, così le altre lingue
+  // restano dove sono. Chiave = la frase italiana.
+  var URDU = {
+    "Buongiorno": "صبح بخیر",
+    "Buonasera": "شام بخیر",
+    "Buon appetito": "کھانے کا لطف اٹھائیں",
+    "Ha finito?": "کیا آپ نے ختم کر لیا؟",
+    "Basta così?": "کیا اتنا کافی ہے؟",
+    "Ci vediamo dopo": "بعد میں ملتے ہیں",
+    "Buonanotte": "شب بخیر",
+    "Buonanotte, a domani": "شب بخیر، کل ملیں گے",
+    "Buon rientro a casa": "خیریت سے گھر جائیں",
+    "Tante belle cose": "آپ کے لیے نیک تمنائیں",
+    "Buongiorno, sono l'infermiere.": "السلام علیکم، میں نرس ہوں۔",
+    "Buongiorno, sono l'operatore socio-sanitario (OSS).": "السلام علیکم، میں نرسنگ اسسٹنٹ ہوں۔",
+    "Buongiorno, sono l'operatore alberghiero: porto i pasti.": "السلام علیکم، میں کھانے کے عملے سے ہوں: کھانا لاتا ہوں۔",
+    "Buongiorno, sono il medico.": "السلام علیکم، میں ڈاکٹر ہوں۔",
+    "Come si chiama?": "آپ کا نام کیا ہے؟",
+    "Parla italiano? Inglese?": "کیا آپ اطالوی بولتے ہیں؟ انگریزی؟",
+    "Chiamiamo un familiare per tradurre?": "کیا ترجمے کے لیے آپ کے گھر والوں میں سے کسی کو فون کریں؟",
+    "Aspetti qui, torno subito.": "یہاں انتظار کریں، میں ابھی واپس آتا ہوں۔",
+    "Vuole un caffè?": "کیا آپ کافی لیں گے؟",
+    "Vuole un tè?": "کیا آپ چائے لیں گے؟",
+    "Vuole una camomilla?": "کیا آپ بابونے کی چائے لیں گے؟",
+    "Vuole dell'acqua?": "کیا آپ پانی لیں گے؟",
+    "Ecco la colazione.": "یہ رہا آپ کا ناشتہ۔",
+    "Ecco il pranzo.": "یہ رہا آپ کا دوپہر کا کھانا۔",
+    "Ecco la cena.": "یہ رہا آپ کا رات کا کھانا۔",
+    "Ecco le posate.": "یہ رہے چمچ، کانٹا اور چھری۔",
+    "Vuole sale o pepe?": "کیا آپ نمک یا کالی مرچ لیں گے؟",
+    "Sale": "نمک",
+    "Pepe": "کالی مرچ",
+    "No, grazie": "نہیں، شکریہ",
+    "Le apro la bottiglietta?": "کیا میں آپ کے لیے بوتل کھول دوں؟",
+    "Posso prendere il vassoio?": "کیا میں ٹرے لے جاؤں؟",
+    "Non posso toccare i pazienti: chiamo un OSS.": "مجھے مریضوں کو چھونے کی اجازت نہیں: میں نرسنگ اسسٹنٹ کو بلاتا ہوں۔",
+    "Appena posso le porto quello che ha chiesto.": "آپ نے جو مانگا ہے، میں جلد از جلد لے آؤں گا۔",
+    "Ha dolore?": "کیا آپ کو درد ہے؟",
+    "Dove le fa male? Me lo indichi.": "کہاں درد ہو رہا ہے؟ انگلی سے بتائیں۔",
+    "Quanto dolore ha, da 0 a 10?": "درد کتنا ہے، 0 سے 10 تک؟",
+    "Ha nausea?": "کیا آپ کو متلی ہو رہی ہے؟",
+    "Ha freddo o caldo?": "کیا آپ کو سردی لگ رہی ہے یا گرمی؟",
+    "Ho freddo": "مجھے سردی لگ رہی ہے",
+    "Ho caldo": "مجھے گرمی لگ رہی ہے",
+    "Sto bene": "میں ٹھیک ہوں",
+    "Ha difficoltà a respirare?": "کیا آپ کو سانس لینے میں مشکل ہو رہی ہے؟",
+    "Tabella a immagini: indico una casella, il paziente chiude gli occhi": "جب میں صحیح خانے کی طرف اشارہ کروں تو آنکھیں بند کریں۔",
+    "Se non può parlare: chiuda gli occhi una volta per SÌ, due volte per NO.": "اگر آپ بول نہیں سکتے: ہاں کے لیے ایک بار آنکھیں بند کریں، نہیں کے لیے دو بار۔",
+    "Se non può parlare: stringa la mia mano una volta per SÌ, due volte per NO.": "اگر آپ بول نہیں سکتے: ہاں کے لیے میرا ہاتھ ایک بار دبائیں، نہیں کے لیے دو بار۔",
+    "Se non può parlare: muova la testa su e giù per SÌ, a destra e sinistra per NO.": "اگر آپ بول نہیں سکتے: ہاں کے لیے سر اوپر نیچے ہلائیں، نہیں کے لیے دائیں بائیں۔",
+    "Ha bisogno del bagno?": "کیا آپ کو بیت الخلا جانا ہے؟",
+    "Ha sete? Ha fame?": "کیا آپ کو پیاس لگی ہے؟ کیا آپ کو بھوک لگی ہے؟",
+    "Ho sete": "مجھے پیاس لگی ہے",
+    "Ho fame": "مجھے بھوک لگی ہے",
+    "Vuole cambiarsi / lavarsi?": "کیا آپ کپڑے بدلنا / نہانا چاہتے ہیں؟",
+    "Per chiamare premi questo campanello.": "ہمیں بلانے کے لیے یہ گھنٹی دبائیں۔",
+    "Deve restare a letto. Non si alzi da solo.": "آپ کو بستر پر ہی رہنا ہے۔ اکیلے مت اٹھیں۔",
+    "Deve stare a digiuno: non mangi e non beva niente.": "آپ کو خالی پیٹ رہنا ہے: کچھ نہ کھائیں اور نہ پئیں۔",
+    "Domani fa un esame.": "کل آپ کا ٹیسٹ ہے۔",
+    "Adesso le facciamo un prelievo di sangue.": "اب ہم آپ کے خون کا نمونہ لیں گے۔",
+    "Le misuro la pressione / la febbre.": "میں آپ کا بلڈ پریشر / بخار چیک کرتا ہوں۔",
+    "Questa è la sua medicina.": "یہ آپ کی دوا ہے۔",
+    "È allergico a qualche medicina?": "کیا آپ کو کسی دوا سے الرجی ہے؟",
+    "Il medico passa più tardi.": "ڈاکٹر بعد میں آئیں گے۔",
+    "Da quanti giorni sta male?": "آپ کتنے دنوں سے بیمار ہیں؟",
+    "Prende medicine a casa? Me le mostri.": "کیا آپ گھر پر کوئی دوا لیتے ہیں؟ مجھے دکھائیں۔",
+    "Ha malattie importanti? (cuore, diabete, pressione)": "کیا آپ کو کوئی بڑی بیماری ہے؟ (دل، شوگر، بلڈ پریشر)",
+    "È incinta?": "کیا آپ حاملہ ہیں؟",
+    "Domani la dimettiamo.": "کل آپ کو ہسپتال سے چھٹی مل جائے گی۔",
+    "Deve fare un'operazione.": "آپ کا آپریشن کرنا ہوگا۔",
+    "L'orario delle visite è ...": "ملاقات کا وقت: ...",
+    "Può entrare una persona alla volta.": "ایک وقت میں صرف ایک شخص اندر آ سکتا ہے۔",
+    "Il paziente sta riposando.": "مریض آرام کر رہا ہے۔",
+    // tabella a immagini
+    "Sì": "ہاں", "No": "نہیں", "Dolore": "درد", "Sete": "پیاس", "Freddo": "سردی", "Caldo": "گرمی",
+    "Bagno": "بیت الخلا", "Paura": "ڈر", "Chiamare un familiare": "میرے گھر والوں کو بلائیں"
+  };
+  URDU.__si = 'ہاں'; URDU.__no = 'نہیں'; URDU.__d0 = 'کوئی درد نہیں'; URDU.__d10 = 'شدید ترین درد';
+  // Romeno, albanese, punjabi (India), ucraino: le lingue delle comunità più
+  // numerose della provincia di Bergamo (dati 2024). Stesso sistema dell'urdu.
+  var ROMENO = {
+    "Buongiorno": "Bună ziua",
+    "Buonasera": "Bună seara",
+    "Buon appetito": "Poftă bună",
+    "Ha finito?": "Ați terminat?",
+    "Basta così?": "Este suficient?",
+    "Ci vediamo dopo": "Ne vedem mai târziu",
+    "Buonanotte": "Noapte bună",
+    "Buonanotte, a domani": "Noapte bună, pe mâine",
+    "Buon rientro a casa": "Drum bun spre casă",
+    "Tante belle cose": "Toate cele bune",
+    "Buongiorno, sono l'infermiere.": "Bună ziua, sunt asistentul medical.",
+    "Buongiorno, sono l'operatore socio-sanitario (OSS).": "Bună ziua, sunt infirmierul.",
+    "Buongiorno, sono l'operatore alberghiero: porto i pasti.": "Bună ziua, sunt de la serviciul de masă: aduc mesele.",
+    "Buongiorno, sono il medico.": "Bună ziua, sunt medicul.",
+    "Come si chiama?": "Cum vă numiți?",
+    "Parla italiano? Inglese?": "Vorbiți italiană? Engleză?",
+    "Chiamiamo un familiare per tradurre?": "Să sunăm o rudă ca să traducă?",
+    "Aspetti qui, torno subito.": "Așteptați aici, mă întorc imediat.",
+    "Vuole un caffè?": "Doriți o cafea?",
+    "Vuole un tè?": "Doriți un ceai?",
+    "Vuole una camomilla?": "Doriți un ceai de mușețel?",
+    "Vuole dell'acqua?": "Doriți apă?",
+    "Ecco la colazione.": "Poftiți micul dejun.",
+    "Ecco il pranzo.": "Poftiți prânzul.",
+    "Ecco la cena.": "Poftiți cina.",
+    "Ecco le posate.": "Poftiți tacâmurile.",
+    "Vuole sale o pepe?": "Doriți sare sau piper?",
+    "Sale": "Sare",
+    "Pepe": "Piper",
+    "No, grazie": "Nu, mulțumesc",
+    "Le apro la bottiglietta?": "Vă deschid sticla?",
+    "Posso prendere il vassoio?": "Pot să iau tava?",
+    "Non posso toccare i pazienti: chiamo un OSS.": "Nu am voie să ating pacienții: chem un infirmier.",
+    "Appena posso le porto quello che ha chiesto.": "Vă aduc ce ați cerut cât pot de repede.",
+    "Ha dolore?": "Aveți dureri?",
+    "Dove le fa male? Me lo indichi.": "Unde vă doare? Arătați-mi, vă rog.",
+    "Quanto dolore ha, da 0 a 10?": "Cât de tare vă doare, de la 0 la 10?",
+    "Ha nausea?": "Vă este greață?",
+    "Ha freddo o caldo?": "Vă este frig sau cald?",
+    "Ho freddo": "Mi-e frig",
+    "Ho caldo": "Mi-e cald",
+    "Sto bene": "Sunt bine",
+    "Ha difficoltà a respirare?": "Respirați greu?",
+    "Tabella a immagini: indico una casella, il paziente chiude gli occhi": "Închideți ochii când arăt căsuța potrivită.",
+    "Se non può parlare: chiuda gli occhi una volta per SÌ, due volte per NO.": "Dacă nu puteți vorbi: închideți ochii o dată pentru DA, de două ori pentru NU.",
+    "Se non può parlare: stringa la mia mano una volta per SÌ, due volte per NO.": "Dacă nu puteți vorbi: strângeți-mi mâna o dată pentru DA, de două ori pentru NU.",
+    "Se non può parlare: muova la testa su e giù per SÌ, a destra e sinistra per NO.": "Dacă nu puteți vorbi: mișcați capul sus-jos pentru DA, stânga-dreapta pentru NU.",
+    "Ha bisogno del bagno?": "Aveți nevoie la toaletă?",
+    "Ha sete? Ha fame?": "Vă este sete? Vă este foame?",
+    "Ho sete": "Mi-e sete",
+    "Ho fame": "Mi-e foame",
+    "Vuole cambiarsi / lavarsi?": "Doriți să vă schimbați / să vă spălați?",
+    "Per chiamare premi questo campanello.": "Ca să ne chemați, apăsați butonul acesta.",
+    "Deve restare a letto. Non si alzi da solo.": "Trebuie să rămâneți în pat. Nu vă ridicați singur.",
+    "Deve stare a digiuno: non mangi e non beva niente.": "Trebuie să stați nemâncat: nu mâncați și nu beți nimic.",
+    "Domani fa un esame.": "Mâine aveți o investigație.",
+    "Adesso le facciamo un prelievo di sangue.": "Acum vă recoltăm sânge.",
+    "Le misuro la pressione / la febbre.": "Vă măsor tensiunea / temperatura.",
+    "Questa è la sua medicina.": "Acesta este medicamentul dumneavoastră.",
+    "È allergico a qualche medicina?": "Sunteți alergic la vreun medicament?",
+    "Il medico passa più tardi.": "Medicul va veni mai târziu.",
+    "Da quanti giorni sta male?": "De câte zile vă simțiți rău?",
+    "Prende medicine a casa? Me le mostri.": "Luați medicamente acasă? Arătați-mi-le, vă rog.",
+    "Ha malattie importanti? (cuore, diabete, pressione)": "Aveți boli importante? (inimă, diabet, tensiune)",
+    "È incinta?": "Sunteți însărcinată?",
+    "Domani la dimettiamo.": "Mâine vă externăm.",
+    "Deve fare un'operazione.": "Trebuie să fiți operat.",
+    "L'orario delle visite è ...": "Programul de vizită este: ...",
+    "Può entrare una persona alla volta.": "Poate intra o singură persoană odată.",
+    "Il paziente sta riposando.": "Pacientul se odihnește.",
+    "Sì": "Da",
+    "No": "Nu",
+    "Dolore": "Durere",
+    "Sete": "Sete",
+    "Freddo": "Frig",
+    "Caldo": "Cald",
+    "Bagno": "Toaletă",
+    "Paura": "Frică",
+    "Chiamare un familiare": "Chemați familia",
+    "__si": "Da",
+    "__no": "Nu",
+    "__d0": "Nicio durere",
+    "__d10": "Cea mai mare durere"
+  };
+  var ALBANESE = {
+    "Buongiorno": "Mirëmëngjes",
+    "Buonasera": "Mirëmbrëma",
+    "Buon appetito": "Ju bëftë mirë",
+    "Ha finito?": "Keni mbaruar?",
+    "Basta così?": "Mjafton kaq?",
+    "Ci vediamo dopo": "Shihemi më vonë",
+    "Buonanotte": "Natën e mirë",
+    "Buonanotte, a domani": "Natën e mirë, shihemi nesër",
+    "Buon rientro a casa": "Kthim të mbarë në shtëpi",
+    "Tante belle cose": "Gjithë të mirat",
+    "Buongiorno, sono l'infermiere.": "Mirëdita, jam infermieri.",
+    "Buongiorno, sono l'operatore socio-sanitario (OSS).": "Mirëdita, jam ndihmës-infermieri.",
+    "Buongiorno, sono l'operatore alberghiero: porto i pasti.": "Mirëdita, jam nga shërbimi i ushqimit: sjell ushqimin.",
+    "Buongiorno, sono il medico.": "Mirëdita, jam mjeku.",
+    "Come si chiama?": "Si quheni?",
+    "Parla italiano? Inglese?": "Flisni italisht? Anglisht?",
+    "Chiamiamo un familiare per tradurre?": "A ta telefonojmë një të afërm që të përkthejë?",
+    "Aspetti qui, torno subito.": "Prisni këtu, kthehem menjëherë.",
+    "Vuole un caffè?": "Dëshironi një kafe?",
+    "Vuole un tè?": "Dëshironi një çaj?",
+    "Vuole una camomilla?": "Dëshironi një çaj kamomili?",
+    "Vuole dell'acqua?": "Dëshironi ujë?",
+    "Ecco la colazione.": "Ja mëngjesi.",
+    "Ecco il pranzo.": "Ja dreka.",
+    "Ecco la cena.": "Ja darka.",
+    "Ecco le posate.": "Ja takëmet.",
+    "Vuole sale o pepe?": "Dëshironi kripë apo piper?",
+    "Sale": "Kripë",
+    "Pepe": "Piper",
+    "No, grazie": "Jo, faleminderit",
+    "Le apro la bottiglietta?": "T'jua hap shishen?",
+    "Posso prendere il vassoio?": "Mund ta marr tabakanë?",
+    "Non posso toccare i pazienti: chiamo un OSS.": "Nuk më lejohet t'i prek pacientët: po thërras një ndihmës-infermier.",
+    "Appena posso le porto quello che ha chiesto.": "Sa më shpejt që të mundem, do t'ju sjell atë që kërkuat.",
+    "Ha dolore?": "Keni dhimbje?",
+    "Dove le fa male? Me lo indichi.": "Ku ju dhemb? Ma tregoni, ju lutem.",
+    "Quanto dolore ha, da 0 a 10?": "Sa e fortë është dhimbja, nga 0 në 10?",
+    "Ha nausea?": "Keni të përzier?",
+    "Ha freddo o caldo?": "Keni ftohtë apo vapë?",
+    "Ho freddo": "Kam ftohtë",
+    "Ho caldo": "Kam vapë",
+    "Sto bene": "Jam mirë",
+    "Ha difficoltà a respirare?": "Keni vështirësi në frymëmarrje?",
+    "Tabella a immagini: indico una casella, il paziente chiude gli occhi": "Mbyllni sytë kur të tregoj kutinë e duhur.",
+    "Se non può parlare: chiuda gli occhi una volta per SÌ, due volte per NO.": "Nëse nuk mund të flisni: mbyllni sytë një herë për PO, dy herë për JO.",
+    "Se non può parlare: stringa la mia mano una volta per SÌ, due volte per NO.": "Nëse nuk mund të flisni: shtrëngojeni dorën time një herë për PO, dy herë për JO.",
+    "Se non può parlare: muova la testa su e giù per SÌ, a destra e sinistra per NO.": "Nëse nuk mund të flisni: lëvizni kokën lart e poshtë për PO, majtas e djathtas për JO.",
+    "Ha bisogno del bagno?": "Keni nevojë për tualet?",
+    "Ha sete? Ha fame?": "Keni etje? Keni uri?",
+    "Ho sete": "Kam etje",
+    "Ho fame": "Kam uri",
+    "Vuole cambiarsi / lavarsi?": "Dëshironi të ndërroheni / të laheni?",
+    "Per chiamare premi questo campanello.": "Për të na thirrur, shtypni këtë zile.",
+    "Deve restare a letto. Non si alzi da solo.": "Duhet të qëndroni në shtrat. Mos u ngrini vetëm.",
+    "Deve stare a digiuno: non mangi e non beva niente.": "Duhet të jeni esëll: mos hani dhe mos pini asgjë.",
+    "Domani fa un esame.": "Nesër keni një ekzaminim.",
+    "Adesso le facciamo un prelievo di sangue.": "Tani do t'ju marrim gjak për analiza.",
+    "Le misuro la pressione / la febbre.": "Do t'ju mas tensionin / temperaturën.",
+    "Questa è la sua medicina.": "Ky është ilaçi juaj.",
+    "È allergico a qualche medicina?": "Jeni alergjik ndaj ndonjë ilaçi?",
+    "Il medico passa più tardi.": "Mjeku do të vijë më vonë.",
+    "Da quanti giorni sta male?": "Prej sa ditësh nuk ndiheni mirë?",
+    "Prende medicine a casa? Me le mostri.": "Merrni ilaçe në shtëpi? M'i tregoni, ju lutem.",
+    "Ha malattie importanti? (cuore, diabete, pressione)": "Keni sëmundje të rënda? (zemër, diabet, tension)",
+    "È incinta?": "Jeni shtatzënë?",
+    "Domani la dimettiamo.": "Nesër do të dilni nga spitali.",
+    "Deve fare un'operazione.": "Duhet t'ju bëjmë një operacion.",
+    "L'orario delle visite è ...": "Orari i vizitave është: ...",
+    "Può entrare una persona alla volta.": "Mund të hyjë vetëm një person në një kohë.",
+    "Il paziente sta riposando.": "Pacienti po pushon.",
+    "Sì": "Po",
+    "No": "Jo",
+    "Dolore": "Dhimbje",
+    "Sete": "Etje",
+    "Freddo": "Ftohtë",
+    "Caldo": "Vapë",
+    "Bagno": "Tualet",
+    "Paura": "Frikë",
+    "Chiamare un familiare": "Thirrni familjen",
+    "__si": "Po",
+    "__no": "Jo",
+    "__d0": "Asnjë dhimbje",
+    "__d10": "Dhimbja më e fortë"
+  };
+  var PUNJABI = {
+    "Buongiorno": "ਸ਼ੁਭ ਸਵੇਰ",
+    "Buonasera": "ਸ਼ੁਭ ਸ਼ਾਮ",
+    "Buon appetito": "ਖਾਣੇ ਦਾ ਆਨੰਦ ਮਾਣੋ",
+    "Ha finito?": "ਕੀ ਤੁਸੀਂ ਖਤਮ ਕਰ ਲਿਆ?",
+    "Basta così?": "ਕੀ ਇੰਨਾ ਕਾਫ਼ੀ ਹੈ?",
+    "Ci vediamo dopo": "ਬਾਅਦ ਵਿੱਚ ਮਿਲਦੇ ਹਾਂ",
+    "Buonanotte": "ਸ਼ੁਭ ਰਾਤ",
+    "Buonanotte, a domani": "ਸ਼ੁਭ ਰਾਤ, ਕੱਲ੍ਹ ਮਿਲਾਂਗੇ",
+    "Buon rientro a casa": "ਸੁਖੀ-ਸਾਂਦੀ ਘਰ ਜਾਓ",
+    "Tante belle cose": "ਤੁਹਾਡਾ ਭਲਾ ਹੋਵੇ",
+    "Buongiorno, sono l'infermiere.": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ਮੈਂ ਨਰਸ ਹਾਂ।",
+    "Buongiorno, sono l'operatore socio-sanitario (OSS).": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ਮੈਂ ਨਰਸਿੰਗ ਸਹਾਇਕ ਹਾਂ।",
+    "Buongiorno, sono l'operatore alberghiero: porto i pasti.": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ਮੈਂ ਖਾਣੇ ਵਾਲੇ ਸਟਾਫ਼ ਤੋਂ ਹਾਂ: ਖਾਣਾ ਲਿਆਉਂਦਾ ਹਾਂ।",
+    "Buongiorno, sono il medico.": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, ਮੈਂ ਡਾਕਟਰ ਹਾਂ।",
+    "Come si chiama?": "ਤੁਹਾਡਾ ਨਾਮ ਕੀ ਹੈ?",
+    "Parla italiano? Inglese?": "ਕੀ ਤੁਸੀਂ ਇਤਾਲਵੀ ਬੋਲਦੇ ਹੋ? ਅੰਗਰੇਜ਼ੀ?",
+    "Chiamiamo un familiare per tradurre?": "ਕੀ ਅਨੁਵਾਦ ਲਈ ਤੁਹਾਡੇ ਪਰਿਵਾਰ ਵਿੱਚੋਂ ਕਿਸੇ ਨੂੰ ਫ਼ੋਨ ਕਰੀਏ?",
+    "Aspetti qui, torno subito.": "ਇੱਥੇ ਉਡੀਕ ਕਰੋ, ਮੈਂ ਹੁਣੇ ਵਾਪਸ ਆਉਂਦਾ ਹਾਂ।",
+    "Vuole un caffè?": "ਕੀ ਤੁਸੀਂ ਕੌਫ਼ੀ ਲਓਗੇ?",
+    "Vuole un tè?": "ਕੀ ਤੁਸੀਂ ਚਾਹ ਲਓਗੇ?",
+    "Vuole una camomilla?": "ਕੀ ਤੁਸੀਂ ਕੈਮੋਮਾਈਲ ਚਾਹ ਲਓਗੇ?",
+    "Vuole dell'acqua?": "ਕੀ ਤੁਸੀਂ ਪਾਣੀ ਲਓਗੇ?",
+    "Ecco la colazione.": "ਇਹ ਤੁਹਾਡਾ ਨਾਸ਼ਤਾ ਹੈ।",
+    "Ecco il pranzo.": "ਇਹ ਤੁਹਾਡਾ ਦੁਪਹਿਰ ਦਾ ਖਾਣਾ ਹੈ।",
+    "Ecco la cena.": "ਇਹ ਤੁਹਾਡਾ ਰਾਤ ਦਾ ਖਾਣਾ ਹੈ।",
+    "Ecco le posate.": "ਇਹ ਚਮਚ, ਕਾਂਟਾ ਅਤੇ ਛੁਰੀ ਹਨ।",
+    "Vuole sale o pepe?": "ਕੀ ਤੁਸੀਂ ਲੂਣ ਜਾਂ ਕਾਲੀ ਮਿਰਚ ਲਓਗੇ?",
+    "Sale": "ਲੂਣ",
+    "Pepe": "ਕਾਲੀ ਮਿਰਚ",
+    "No, grazie": "ਨਹੀਂ, ਧੰਨਵਾਦ",
+    "Le apro la bottiglietta?": "ਕੀ ਮੈਂ ਤੁਹਾਡੇ ਲਈ ਬੋਤਲ ਖੋਲ੍ਹ ਦਿਆਂ?",
+    "Posso prendere il vassoio?": "ਕੀ ਮੈਂ ਟ੍ਰੇ ਲੈ ਜਾਵਾਂ?",
+    "Non posso toccare i pazienti: chiamo un OSS.": "ਮੈਨੂੰ ਮਰੀਜ਼ਾਂ ਨੂੰ ਛੂਹਣ ਦੀ ਇਜਾਜ਼ਤ ਨਹੀਂ: ਮੈਂ ਨਰਸਿੰਗ ਸਹਾਇਕ ਨੂੰ ਬੁਲਾਉਂਦਾ ਹਾਂ।",
+    "Appena posso le porto quello che ha chiesto.": "ਤੁਸੀਂ ਜੋ ਮੰਗਿਆ ਹੈ, ਮੈਂ ਜਿੰਨੀ ਜਲਦੀ ਹੋ ਸਕੇ ਲਿਆਵਾਂਗਾ।",
+    "Ha dolore?": "ਕੀ ਤੁਹਾਨੂੰ ਦਰਦ ਹੈ?",
+    "Dove le fa male? Me lo indichi.": "ਕਿੱਥੇ ਦਰਦ ਹੁੰਦਾ ਹੈ? ਉਂਗਲ ਨਾਲ ਦੱਸੋ।",
+    "Quanto dolore ha, da 0 a 10?": "ਦਰਦ ਕਿੰਨਾ ਹੈ, 0 ਤੋਂ 10 ਤੱਕ?",
+    "Ha nausea?": "ਕੀ ਤੁਹਾਡਾ ਜੀਅ ਕੱਚਾ ਹੋ ਰਿਹਾ ਹੈ?",
+    "Ha freddo o caldo?": "ਕੀ ਤੁਹਾਨੂੰ ਠੰਢ ਲੱਗ ਰਹੀ ਹੈ ਜਾਂ ਗਰਮੀ?",
+    "Ho freddo": "ਮੈਨੂੰ ਠੰਢ ਲੱਗ ਰਹੀ ਹੈ",
+    "Ho caldo": "ਮੈਨੂੰ ਗਰਮੀ ਲੱਗ ਰਹੀ ਹੈ",
+    "Sto bene": "ਮੈਂ ਠੀਕ ਹਾਂ",
+    "Ha difficoltà a respirare?": "ਕੀ ਤੁਹਾਨੂੰ ਸਾਹ ਲੈਣ ਵਿੱਚ ਔਖ ਹੋ ਰਹੀ ਹੈ?",
+    "Tabella a immagini: indico una casella, il paziente chiude gli occhi": "ਜਦੋਂ ਮੈਂ ਸਹੀ ਖਾਨੇ ਵੱਲ ਇਸ਼ਾਰਾ ਕਰਾਂ ਤਾਂ ਅੱਖਾਂ ਬੰਦ ਕਰੋ।",
+    "Se non può parlare: chiuda gli occhi una volta per SÌ, due volte per NO.": "ਜੇ ਤੁਸੀਂ ਬੋਲ ਨਹੀਂ ਸਕਦੇ: ਹਾਂ ਲਈ ਇੱਕ ਵਾਰ ਅੱਖਾਂ ਬੰਦ ਕਰੋ, ਨਹੀਂ ਲਈ ਦੋ ਵਾਰ।",
+    "Se non può parlare: stringa la mia mano una volta per SÌ, due volte per NO.": "ਜੇ ਤੁਸੀਂ ਬੋਲ ਨਹੀਂ ਸਕਦੇ: ਹਾਂ ਲਈ ਮੇਰਾ ਹੱਥ ਇੱਕ ਵਾਰ ਦਬਾਓ, ਨਹੀਂ ਲਈ ਦੋ ਵਾਰ।",
+    "Se non può parlare: muova la testa su e giù per SÌ, a destra e sinistra per NO.": "ਜੇ ਤੁਸੀਂ ਬੋਲ ਨਹੀਂ ਸਕਦੇ: ਹਾਂ ਲਈ ਸਿਰ ਉੱਪਰ-ਹੇਠਾਂ ਹਿਲਾਓ, ਨਹੀਂ ਲਈ ਸੱਜੇ-ਖੱਬੇ।",
+    "Ha bisogno del bagno?": "ਕੀ ਤੁਹਾਨੂੰ ਬਾਥਰੂਮ ਜਾਣਾ ਹੈ?",
+    "Ha sete? Ha fame?": "ਕੀ ਤੁਹਾਨੂੰ ਪਿਆਸ ਲੱਗੀ ਹੈ? ਕੀ ਤੁਹਾਨੂੰ ਭੁੱਖ ਲੱਗੀ ਹੈ?",
+    "Ho sete": "ਮੈਨੂੰ ਪਿਆਸ ਲੱਗੀ ਹੈ",
+    "Ho fame": "ਮੈਨੂੰ ਭੁੱਖ ਲੱਗੀ ਹੈ",
+    "Vuole cambiarsi / lavarsi?": "ਕੀ ਤੁਸੀਂ ਕੱਪੜੇ ਬਦਲਣੇ / ਨਹਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
+    "Per chiamare premi questo campanello.": "ਸਾਨੂੰ ਬੁਲਾਉਣ ਲਈ ਇਹ ਘੰਟੀ ਦਬਾਓ।",
+    "Deve restare a letto. Non si alzi da solo.": "ਤੁਹਾਨੂੰ ਬਿਸਤਰੇ 'ਤੇ ਹੀ ਰਹਿਣਾ ਹੈ। ਇਕੱਲੇ ਨਾ ਉੱਠੋ।",
+    "Deve stare a digiuno: non mangi e non beva niente.": "ਤੁਹਾਨੂੰ ਖਾਲੀ ਪੇਟ ਰਹਿਣਾ ਹੈ: ਕੁਝ ਨਾ ਖਾਓ ਅਤੇ ਨਾ ਪੀਓ।",
+    "Domani fa un esame.": "ਕੱਲ੍ਹ ਤੁਹਾਡਾ ਟੈਸਟ ਹੈ।",
+    "Adesso le facciamo un prelievo di sangue.": "ਹੁਣ ਅਸੀਂ ਤੁਹਾਡੇ ਖੂਨ ਦਾ ਨਮੂਨਾ ਲਵਾਂਗੇ।",
+    "Le misuro la pressione / la febbre.": "ਮੈਂ ਤੁਹਾਡਾ ਬਲੱਡ ਪ੍ਰੈਸ਼ਰ / ਬੁਖਾਰ ਚੈੱਕ ਕਰਦਾ ਹਾਂ।",
+    "Questa è la sua medicina.": "ਇਹ ਤੁਹਾਡੀ ਦਵਾਈ ਹੈ।",
+    "È allergico a qualche medicina?": "ਕੀ ਤੁਹਾਨੂੰ ਕਿਸੇ ਦਵਾਈ ਤੋਂ ਐਲਰਜੀ ਹੈ?",
+    "Il medico passa più tardi.": "ਡਾਕਟਰ ਬਾਅਦ ਵਿੱਚ ਆਉਣਗੇ।",
+    "Da quanti giorni sta male?": "ਤੁਸੀਂ ਕਿੰਨੇ ਦਿਨਾਂ ਤੋਂ ਬਿਮਾਰ ਹੋ?",
+    "Prende medicine a casa? Me le mostri.": "ਕੀ ਤੁਸੀਂ ਘਰ ਵਿੱਚ ਕੋਈ ਦਵਾਈ ਲੈਂਦੇ ਹੋ? ਮੈਨੂੰ ਦਿਖਾਓ।",
+    "Ha malattie importanti? (cuore, diabete, pressione)": "ਕੀ ਤੁਹਾਨੂੰ ਕੋਈ ਵੱਡੀ ਬਿਮਾਰੀ ਹੈ? (ਦਿਲ, ਸ਼ੂਗਰ, ਬਲੱਡ ਪ੍ਰੈਸ਼ਰ)",
+    "È incinta?": "ਕੀ ਤੁਸੀਂ ਗਰਭਵਤੀ ਹੋ?",
+    "Domani la dimettiamo.": "ਕੱਲ੍ਹ ਤੁਹਾਨੂੰ ਹਸਪਤਾਲ ਤੋਂ ਛੁੱਟੀ ਮਿਲ ਜਾਵੇਗੀ।",
+    "Deve fare un'operazione.": "ਤੁਹਾਡਾ ਆਪ੍ਰੇਸ਼ਨ ਕਰਨਾ ਪਵੇਗਾ।",
+    "L'orario delle visite è ...": "ਮੁਲਾਕਾਤ ਦਾ ਸਮਾਂ: ...",
+    "Può entrare una persona alla volta.": "ਇੱਕ ਸਮੇਂ ਸਿਰਫ਼ ਇੱਕ ਵਿਅਕਤੀ ਅੰਦਰ ਆ ਸਕਦਾ ਹੈ।",
+    "Il paziente sta riposando.": "ਮਰੀਜ਼ ਆਰਾਮ ਕਰ ਰਿਹਾ ਹੈ।",
+    "Sì": "ਹਾਂ",
+    "No": "ਨਹੀਂ",
+    "Dolore": "ਦਰਦ",
+    "Sete": "ਪਿਆਸ",
+    "Freddo": "ਠੰਢ",
+    "Caldo": "ਗਰਮੀ",
+    "Bagno": "ਬਾਥਰੂਮ",
+    "Paura": "ਡਰ",
+    "Chiamare un familiare": "ਮੇਰੇ ਪਰਿਵਾਰ ਨੂੰ ਬੁਲਾਓ",
+    "__si": "ਹਾਂ",
+    "__no": "ਨਹੀਂ",
+    "__d0": "ਕੋਈ ਦਰਦ ਨਹੀਂ",
+    "__d10": "ਸਭ ਤੋਂ ਵੱਧ ਦਰਦ"
+  };
+  var UCRAINO = {
+    "Buongiorno": "Добрий день",
+    "Buonasera": "Добрий вечір",
+    "Buon appetito": "Смачного",
+    "Ha finito?": "Ви закінчили?",
+    "Basta così?": "Цього достатньо?",
+    "Ci vediamo dopo": "Побачимося пізніше",
+    "Buonanotte": "На добраніч",
+    "Buonanotte, a domani": "На добраніч, до завтра",
+    "Buon rientro a casa": "Щасливо дістатися додому",
+    "Tante belle cose": "Усього найкращого",
+    "Buongiorno, sono l'infermiere.": "Добрий день, я медбрат.",
+    "Buongiorno, sono l'operatore socio-sanitario (OSS).": "Добрий день, я помічник медсестри.",
+    "Buongiorno, sono l'operatore alberghiero: porto i pasti.": "Добрий день, я з харчоблоку: приношу їжу.",
+    "Buongiorno, sono il medico.": "Добрий день, я лікар.",
+    "Come si chiama?": "Як Вас звати?",
+    "Parla italiano? Inglese?": "Ви розмовляєте італійською? Англійською?",
+    "Chiamiamo un familiare per tradurre?": "Зателефонувати комусь із Ваших рідних, щоб перекладав?",
+    "Aspetti qui, torno subito.": "Зачекайте тут, я зараз повернуся.",
+    "Vuole un caffè?": "Бажаєте кави?",
+    "Vuole un tè?": "Бажаєте чаю?",
+    "Vuole una camomilla?": "Бажаєте ромашкового чаю?",
+    "Vuole dell'acqua?": "Бажаєте води?",
+    "Ecco la colazione.": "Ось Ваш сніданок.",
+    "Ecco il pranzo.": "Ось Ваш обід.",
+    "Ecco la cena.": "Ось Ваша вечеря.",
+    "Ecco le posate.": "Ось столові прибори.",
+    "Vuole sale o pepe?": "Бажаєте солі чи перцю?",
+    "Sale": "Сіль",
+    "Pepe": "Перець",
+    "No, grazie": "Ні, дякую",
+    "Le apro la bottiglietta?": "Відкрити Вам пляшку?",
+    "Posso prendere il vassoio?": "Можна забрати тацю?",
+    "Non posso toccare i pazienti: chiamo un OSS.": "Мені не можна торкатися пацієнтів: я покличу помічника медсестри.",
+    "Appena posso le porto quello che ha chiesto.": "Я принесу те, що Ви просили, щойно зможу.",
+    "Ha dolore?": "У Вас болить?",
+    "Dove le fa male? Me lo indichi.": "Де болить? Покажіть, будь ласка.",
+    "Quanto dolore ha, da 0 a 10?": "Наскільки сильний біль, від 0 до 10?",
+    "Ha nausea?": "Вас нудить?",
+    "Ha freddo o caldo?": "Вам холодно чи жарко?",
+    "Ho freddo": "Мені холодно",
+    "Ho caldo": "Мені жарко",
+    "Sto bene": "Усе добре",
+    "Ha difficoltà a respirare?": "Вам важко дихати?",
+    "Tabella a immagini: indico una casella, il paziente chiude gli occhi": "Заплющте очі, коли я покажу на потрібну клітинку.",
+    "Se non può parlare: chiuda gli occhi una volta per SÌ, due volte per NO.": "Якщо Ви не можете говорити: заплющте очі один раз — ТАК, двічі — НІ.",
+    "Se non può parlare: stringa la mia mano una volta per SÌ, due volte per NO.": "Якщо Ви не можете говорити: стисніть мою руку один раз — ТАК, двічі — НІ.",
+    "Se non può parlare: muova la testa su e giù per SÌ, a destra e sinistra per NO.": "Якщо Ви не можете говорити: кивніть головою — ТАК, похитайте головою — НІ.",
+    "Ha bisogno del bagno?": "Вам потрібно в туалет?",
+    "Ha sete? Ha fame?": "Ви хочете пити? Ви хочете їсти?",
+    "Ho sete": "Я хочу пити",
+    "Ho fame": "Я хочу їсти",
+    "Vuole cambiarsi / lavarsi?": "Бажаєте переодягнутися / помитися?",
+    "Per chiamare premi questo campanello.": "Щоб покликати нас, натисніть цю кнопку.",
+    "Deve restare a letto. Non si alzi da solo.": "Вам потрібно лежати в ліжку. Не вставайте самостійно.",
+    "Deve stare a digiuno: non mangi e non beva niente.": "Вам не можна їсти й пити: нічого не їжте і не пийте.",
+    "Domani fa un esame.": "Завтра у Вас обстеження.",
+    "Adesso le facciamo un prelievo di sangue.": "Зараз ми візьмемо у Вас кров на аналіз.",
+    "Le misuro la pressione / la febbre.": "Я виміряю Вам тиск / температуру.",
+    "Questa è la sua medicina.": "Це Ваші ліки.",
+    "È allergico a qualche medicina?": "У Вас є алергія на якісь ліки?",
+    "Il medico passa più tardi.": "Лікар прийде пізніше.",
+    "Da quanti giorni sta male?": "Скільки днів Ви почуваєтеся погано?",
+    "Prende medicine a casa? Me le mostri.": "Ви приймаєте ліки вдома? Покажіть мені їх, будь ласка.",
+    "Ha malattie importanti? (cuore, diabete, pressione)": "У Вас є серйозні захворювання? (серце, діабет, тиск)",
+    "È incinta?": "Ви вагітні?",
+    "Domani la dimettiamo.": "Завтра Вас випишуть.",
+    "Deve fare un'operazione.": "Вам потрібна операція.",
+    "L'orario delle visite è ...": "Години відвідування: ...",
+    "Può entrare una persona alla volta.": "Заходити можна лише по одній людині.",
+    "Il paziente sta riposando.": "Пацієнт відпочиває.",
+    "Sì": "Так",
+    "No": "Ні",
+    "Dolore": "Біль",
+    "Sete": "Спрага",
+    "Freddo": "Холодно",
+    "Caldo": "Жарко",
+    "Bagno": "Туалет",
+    "Paura": "Страх",
+    "Chiamare un familiare": "Покликати рідних",
+    "__si": "Так",
+    "__no": "Ні",
+    "__d0": "Немає болю",
+    "__d10": "Найсильніший біль"
+  };
+  var RUSSO = {
+    "Buongiorno": "Добрый день",
+    "Buonasera": "Добрый вечер",
+    "Buon appetito": "Приятного аппетита",
+    "Ha finito?": "Вы закончили?",
+    "Basta così?": "Этого достаточно?",
+    "Ci vediamo dopo": "Увидимся позже",
+    "Buonanotte": "Спокойной ночи",
+    "Buonanotte, a domani": "Спокойной ночи, до завтра",
+    "Buon rientro a casa": "Счастливого пути домой",
+    "Tante belle cose": "Всего доброго",
+    "Buongiorno, sono l'infermiere.": "Здравствуйте, я медбрат.",
+    "Buongiorno, sono l'operatore socio-sanitario (OSS).": "Здравствуйте, я помощник медсестры.",
+    "Buongiorno, sono l'operatore alberghiero: porto i pasti.": "Здравствуйте, я из службы питания: приношу еду.",
+    "Buongiorno, sono il medico.": "Здравствуйте, я врач.",
+    "Come si chiama?": "Как Вас зовут?",
+    "Parla italiano? Inglese?": "Вы говорите по-итальянски? По-английски?",
+    "Chiamiamo un familiare per tradurre?": "Позвонить кому-нибудь из Ваших родных, чтобы переводил?",
+    "Aspetti qui, torno subito.": "Подождите здесь, я сейчас вернусь.",
+    "Vuole un caffè?": "Хотите кофе?",
+    "Vuole un tè?": "Хотите чаю?",
+    "Vuole una camomilla?": "Хотите ромашкового чая?",
+    "Vuole dell'acqua?": "Хотите воды?",
+    "Ecco la colazione.": "Вот Ваш завтрак.",
+    "Ecco il pranzo.": "Вот Ваш обед.",
+    "Ecco la cena.": "Вот Ваш ужин.",
+    "Ecco le posate.": "Вот столовые приборы.",
+    "Vuole sale o pepe?": "Хотите соль или перец?",
+    "Sale": "Соль",
+    "Pepe": "Перец",
+    "No, grazie": "Нет, спасибо",
+    "Le apro la bottiglietta?": "Открыть Вам бутылку?",
+    "Posso prendere il vassoio?": "Можно забрать поднос?",
+    "Non posso toccare i pazienti: chiamo un OSS.": "Мне нельзя прикасаться к пациентам: я позову помощника медсестры.",
+    "Appena posso le porto quello che ha chiesto.": "Я принесу то, что Вы просили, как только смогу.",
+    "Ha dolore?": "У Вас что-нибудь болит?",
+    "Dove le fa male? Me lo indichi.": "Где болит? Покажите, пожалуйста.",
+    "Quanto dolore ha, da 0 a 10?": "Насколько сильная боль, от 0 до 10?",
+    "Ha nausea?": "Вас тошнит?",
+    "Ha freddo o caldo?": "Вам холодно или жарко?",
+    "Ho freddo": "Мне холодно",
+    "Ho caldo": "Мне жарко",
+    "Sto bene": "Всё хорошо",
+    "Ha difficoltà a respirare?": "Вам трудно дышать?",
+    "Tabella a immagini: indico una casella, il paziente chiude gli occhi": "Закройте глаза, когда я покажу на нужную клетку.",
+    "Se non può parlare: chiuda gli occhi una volta per SÌ, due volte per NO.": "Если Вы не можете говорить: закройте глаза один раз — ДА, два раза — НЕТ.",
+    "Se non può parlare: stringa la mia mano una volta per SÌ, due volte per NO.": "Если Вы не можете говорить: сожмите мою руку один раз — ДА, два раза — НЕТ.",
+    "Se non può parlare: muova la testa su e giù per SÌ, a destra e sinistra per NO.": "Если Вы не можете говорить: кивните — ДА, покачайте головой — НЕТ.",
+    "Ha bisogno del bagno?": "Вам нужно в туалет?",
+    "Ha sete? Ha fame?": "Вы хотите пить? Вы хотите есть?",
+    "Ho sete": "Я хочу пить",
+    "Ho fame": "Я хочу есть",
+    "Vuole cambiarsi / lavarsi?": "Хотите переодеться / помыться?",
+    "Per chiamare premi questo campanello.": "Чтобы позвать нас, нажмите эту кнопку.",
+    "Deve restare a letto. Non si alzi da solo.": "Вам нужно лежать в постели. Не вставайте сами.",
+    "Deve stare a digiuno: non mangi e non beva niente.": "Вам нельзя есть и пить: ничего не ешьте и не пейте.",
+    "Domani fa un esame.": "Завтра у Вас обследование.",
+    "Adesso le facciamo un prelievo di sangue.": "Сейчас мы возьмём у Вас кровь на анализ.",
+    "Le misuro la pressione / la febbre.": "Я измерю Вам давление / температуру.",
+    "Questa è la sua medicina.": "Это Ваше лекарство.",
+    "È allergico a qualche medicina?": "У Вас есть аллергия на какие-нибудь лекарства?",
+    "Il medico passa più tardi.": "Врач придёт позже.",
+    "Da quanti giorni sta male?": "Сколько дней Вы чувствуете себя плохо?",
+    "Prende medicine a casa? Me le mostri.": "Вы принимаете лекарства дома? Покажите их мне, пожалуйста.",
+    "Ha malattie importanti? (cuore, diabete, pressione)": "У Вас есть серьёзные заболевания? (сердце, диабет, давление)",
+    "È incinta?": "Вы беременны?",
+    "Domani la dimettiamo.": "Завтра Вас выпишут.",
+    "Deve fare un'operazione.": "Вам нужна операция.",
+    "L'orario delle visite è ...": "Часы посещения: ...",
+    "Può entrare una persona alla volta.": "Заходить можно только по одному человеку.",
+    "Il paziente sta riposando.": "Пациент отдыхает.",
+    "Sì": "Да",
+    "No": "Нет",
+    "Dolore": "Боль",
+    "Sete": "Жажда",
+    "Freddo": "Холодно",
+    "Caldo": "Жарко",
+    "Bagno": "Туалет",
+    "Paura": "Страх",
+    "Chiamare un familiare": "Позвать родных",
+    "__si": "Да",
+    "__no": "Нет",
+    "__d0": "Нет боли",
+    "__d10": "Самая сильная боль"
+  };
+  // Frasi aggiunte il 28/09/2026, già in tutte le 13 lingue
+  // (it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru).
+  var GRUPPI_NUOVI = {"Pronto soccorso": "ISAM", "Igiene e movimento": "IS", "Prima e dopo l'operazione": "ISM", "Dimissione": "ISAM", "Mamme e bambini": "ISM"};
+  var FRASI_NUOVE = [
+    {"g": "Accoglienza", "ruoli": "ISAM", "t": ["Non capisco. Può ripetere?", "I don't understand. Could you repeat that?", "No entiendo. ¿Puede repetirlo?", "Je ne comprends pas. Pouvez-vous répéter ?", "لا أفهم. هل يمكنك أن تعيد؟", "我听不懂。请您再说一遍。", "わかりません。もう一度言ってください。", "میں سمجھا نہیں۔ کیا آپ دوبارہ کہہ سکتے ہیں؟", "Nu înțeleg. Puteți repeta?", "Nuk kuptoj. Mund ta përsërisni?", "ਮੈਨੂੰ ਸਮਝ ਨਹੀਂ ਆਈ। ਕੀ ਤੁਸੀਂ ਦੁਬਾਰਾ ਦੱਸ ਸਕਦੇ ਹੋ?", "Я не розумію. Можете повторити?", "Я не понимаю. Можете повторить?"]},
+    {"g": "Accoglienza", "ruoli": "ISAM", "t": ["Me lo mostri con le mani.", "Please show me with your hands.", "Muéstremelo con las manos.", "Montrez-le-moi avec les mains.", "أرني ذلك بيديك من فضلك.", "请用手比给我看。", "手で示してください。", "مجھے ہاتھ کے اشارے سے بتائیں۔", "Arătați-mi cu mâinile.", "Ma tregoni me duar.", "ਮੈਨੂੰ ਹੱਥਾਂ ਨਾਲ ਇਸ਼ਾਰਾ ਕਰਕੇ ਦੱਸੋ।", "Покажіть мені руками.", "Покажите мне руками."]},
+    {"g": "Accoglienza", "ruoli": "ISA", "t": ["Questo è il suo letto.", "This is your bed.", "Esta es su cama.", "Voici votre lit.", "هذا سريرك.", "这是您的床。", "こちらがあなたのベッドです。", "یہ آپ کا بستر ہے۔", "Acesta este patul dumneavoastră.", "Ky është shtrati juaj.", "ਇਹ ਤੁਹਾਡਾ ਬਿਸਤਰਾ ਹੈ।", "Це Ваше ліжко.", "Это Ваша кровать."]},
+    {"g": "Accoglienza", "ruoli": "SA", "t": ["Metta qui i suoi vestiti e le sue cose.", "Please put your clothes and belongings here.", "Ponga aquí su ropa y sus cosas.", "Mettez ici vos vêtements et vos affaires.", "ضع ملابسك وأغراضك هنا.", "请把您的衣服和东西放在这里。", "服と荷物はここに置いてください。", "اپنے کپڑے اور سامان یہاں رکھ دیں۔", "Puneți aici hainele și lucrurile dumneavoastră.", "Vendosini këtu rrobat dhe sendet tuaja.", "ਆਪਣੇ ਕੱਪੜੇ ਅਤੇ ਸਮਾਨ ਇੱਥੇ ਰੱਖ ਦਿਓ।", "Покладіть сюди свій одяг і речі.", "Положите сюда свою одежду и вещи."]},
+    {"g": "Accoglienza", "ruoli": "I", "tipo": "sn", "t": ["Ha con sé i documenti e la tessera sanitaria?", "Do you have your ID and health card with you?", "¿Tiene sus documentos y la tarjeta sanitaria?", "Avez-vous vos papiers et votre carte de santé ?", "هل معك أوراقك الشخصية والبطاقة الصحية؟", "您带身份证件和医保卡了吗？", "身分証明書と保険証をお持ちですか？", "کیا آپ کے پاس شناختی کارڈ اور ہیلتھ کارڈ ہے؟", "Aveți la dumneavoastră actele și cardul de sănătate?", "A i keni me vete dokumentet dhe kartën shëndetësore?", "ਕੀ ਤੁਹਾਡੇ ਕੋਲ ਪਛਾਣ ਪੱਤਰ ਅਤੇ ਹੈਲਥ ਕਾਰਡ ਹੈ?", "У Вас є з собою документи й картка медичного страхування?", "У Вас есть с собой документы и медицинский полис?"]},
+    {"g": "Pasti e bevande", "ruoli": "IA", "t": ["Ha una dieta particolare?", "Do you follow a special diet?", "¿Sigue alguna dieta especial?", "Suivez-vous un régime particulier ?", "هل تتبع نظاماً غذائياً خاصاً؟", "您有特殊饮食要求吗？", "食事の制限はありますか？", "کیا آپ کی کوئی خاص غذا ہے؟", "Țineți o dietă specială?", "Mbani ndonjë dietë të veçantë?", "ਕੀ ਤੁਸੀਂ ਕੋਈ ਖ਼ਾਸ ਖੁਰਾਕ ਲੈਂਦੇ ਹੋ?", "У Вас особлива дієта?", "У Вас особая диета?"], "scelte": [["Senza maiale", "No pork", "Sin cerdo", "Sans porc", "بدون لحم خنزير", "不吃猪肉", "豚肉なし", "سور کے گوشت کے بغیر", "Fără carne de porc", "Pa mish derri", "ਸੂਰ ਦੇ ਮਾਸ ਤੋਂ ਬਿਨਾਂ", "Без свинини", "Без свинины"], ["Vegetariano", "Vegetarian", "Vegetariana", "Végétarien", "نباتي", "素食", "ベジタリアン", "سبزی خور", "Vegetarian", "Vegjetarian", "ਸ਼ਾਕਾਹਾਰੀ", "Вегетаріанська", "Вегетарианская"], ["Senza glutine", "Gluten-free", "Sin gluten", "Sans gluten", "خالٍ من الغلوتين", "无麸质", "グルテンフリー", "گلوٹین کے بغیر", "Fără gluten", "Pa gluten", "ਗਲੂਟਨ ਤੋਂ ਬਿਨਾਂ", "Без глютену", "Без глютена"], ["Nessuna", "No", "No", "Non", "لا", "没有", "ありません", "نہیں", "Nu", "Jo", "ਨਹੀਂ", "Ні", "Нет"]]},
+    {"g": "Pasti e bevande", "ruoli": "IA", "t": ["Deve mangiare senza sale.", "You must eat without salt.", "Debe comer sin sal.", "Vous devez manger sans sel.", "يجب أن تأكل بدون ملح.", "您必须吃无盐的食物。", "塩分なしの食事にしてください。", "آپ کو بغیر نمک کے کھانا ہے۔", "Trebuie să mâncați fără sare.", "Duhet të hani pa kripë.", "ਤੁਹਾਨੂੰ ਬਿਨਾਂ ਲੂਣ ਦੇ ਖਾਣਾ ਹੈ।", "Вам потрібно їсти без солі.", "Вам нужно есть без соли."]},
+    {"g": "Pasti e bevande", "ruoli": "ISA", "t": ["Oggi non può mangiare.", "You cannot eat today.", "Hoy no puede comer.", "Aujourd'hui, vous ne pouvez pas manger.", "لا يمكنك الأكل اليوم.", "您今天不能吃东西。", "今日は食事ができません。", "آج آپ کچھ نہیں کھا سکتے۔", "Astăzi nu aveți voie să mâncați.", "Sot nuk mund të hani.", "ਅੱਜ ਤੁਸੀਂ ਕੁਝ ਨਹੀਂ ਖਾ ਸਕਦੇ।", "Сьогодні Вам не можна їсти.", "Сегодня Вам нельзя есть."]},
+    {"g": "Pronto soccorso", "ruoli": "IM", "tipo": "sn", "t": ["Ha battuto la testa?", "Did you hit your head?", "¿Se ha golpeado la cabeza?", "Vous êtes-vous cogné la tête ?", "هل ضربت رأسك؟", "您撞到头了吗？", "頭を打ちましたか？", "کیا آپ کے سر پر چوٹ لگی ہے؟", "V-ați lovit la cap?", "E keni goditur kokën?", "ਕੀ ਤੁਹਾਡੇ ਸਿਰ 'ਤੇ ਸੱਟ ਲੱਗੀ ਹੈ?", "Ви вдарилися головою?", "Вы ударились головой?"]},
+    {"g": "Pronto soccorso", "ruoli": "IM", "tipo": "sn", "t": ["Ha perso conoscenza?", "Did you lose consciousness?", "¿Ha perdido el conocimiento?", "Avez-vous perdu connaissance ?", "هل فقدت الوعي؟", "您失去过意识吗？", "意識を失いましたか？", "کیا آپ بے ہوش ہوئے تھے؟", "Ați pierdut cunoștința?", "Keni humbur ndjenjat?", "ਕੀ ਤੁਸੀਂ ਬੇਹੋਸ਼ ਹੋਏ ਸੀ?", "Ви втрачали свідомість?", "Вы теряли сознание?"]},
+    {"g": "Pronto soccorso", "ruoli": "IM", "tipo": "sn", "t": ["Ha dolore al petto?", "Do you have chest pain?", "¿Tiene dolor en el pecho?", "Avez-vous mal à la poitrine ?", "هل لديك ألم في الصدر؟", "您胸口疼吗？", "胸が痛みますか？", "کیا آپ کے سینے میں درد ہے؟", "Aveți dureri în piept?", "Keni dhimbje në gjoks?", "ਕੀ ਤੁਹਾਡੀ ਛਾਤੀ ਵਿੱਚ ਦਰਦ ਹੈ?", "У Вас болить у грудях?", "У Вас болит в груди?"]},
+    {"g": "Pronto soccorso", "ruoli": "IM", "t": ["Da quando ha questi disturbi?", "Since when have you had these symptoms?", "¿Desde cuándo tiene estas molestias?", "Depuis quand avez-vous ces symptômes ?", "منذ متى لديك هذه الأعراض؟", "这些症状从什么时候开始的？", "その症状はいつからですか？", "یہ تکلیف کب سے ہے؟", "De când aveți aceste simptome?", "Që kur i keni këto shqetësime?", "ਇਹ ਤਕਲੀਫ਼ ਕਦੋਂ ਤੋਂ ਹੈ?", "Відколи у Вас ці симптоми?", "С какого времени у Вас эти симптомы?"], "scelte": [["Da poche ore", "A few hours", "Desde hace unas horas", "Depuis quelques heures", "منذ بضع ساعات", "几个小时", "数時間前から", "چند گھنٹوں سے", "De câteva ore", "Prej disa orësh", "ਕੁਝ ਘੰਟਿਆਂ ਤੋਂ", "Кілька годин", "Несколько часов"], ["Da ieri", "Since yesterday", "Desde ayer", "Depuis hier", "منذ أمس", "从昨天开始", "昨日から", "کل سے", "De ieri", "Që dje", "ਕੱਲ੍ਹ ਤੋਂ", "Від учора", "Со вчерашнего дня"], ["Da alcuni giorni", "A few days", "Desde hace unos días", "Depuis quelques jours", "منذ بضعة أيام", "几天了", "数日前から", "کچھ دنوں سے", "De câteva zile", "Prej disa ditësh", "ਕੁਝ ਦਿਨਾਂ ਤੋਂ", "Кілька днів", "Несколько дней"], ["Da più di una settimana", "More than a week", "Más de una semana", "Plus d'une semaine", "أكثر من أسبوع", "一个多星期", "1週間以上前から", "ایک ہفتے سے زیادہ", "De peste o săptămână", "Më shumë se një javë", "ਇੱਕ ਹਫ਼ਤੇ ਤੋਂ ਵੱਧ", "Понад тиждень", "Больше недели"]]},
+    {"g": "Pronto soccorso", "ruoli": "IM", "tipo": "sn", "t": ["Ha la febbre?", "Do you have a fever?", "¿Tiene fiebre?", "Avez-vous de la fièvre ?", "هل لديك حمى؟", "您发烧吗？", "熱がありますか？", "کیا آپ کو بخار ہے؟", "Aveți febră?", "Keni temperaturë?", "ਕੀ ਤੁਹਾਨੂੰ ਬੁਖਾਰ ਹੈ?", "У Вас температура?", "У Вас температура?"]},
+    {"g": "Pronto soccorso", "ruoli": "IM", "tipo": "sn", "t": ["Ha vomitato?", "Have you vomited?", "¿Ha vomitado?", "Avez-vous vomi ?", "هل تقيأت؟", "您吐过吗？", "吐きましたか？", "کیا آپ نے قے کی ہے؟", "Ați vomitat?", "Keni vjellë?", "ਕੀ ਤੁਹਾਨੂੰ ਉਲਟੀ ਆਈ ਹੈ?", "У Вас було блювання?", "У Вас была рвота?"]},
+    {"g": "Pronto soccorso", "ruoli": "ISM", "t": ["Si sdrai qui, per favore.", "Please lie down here.", "Túmbese aquí, por favor.", "Allongez-vous ici, s'il vous plaît.", "استلقِ هنا من فضلك.", "请躺在这里。", "ここに横になってください。", "براہ کرم یہاں لیٹ جائیں۔", "Întindeți-vă aici, vă rog.", "Shtrihuni këtu, ju lutem.", "ਕਿਰਪਾ ਕਰਕੇ ਇੱਥੇ ਲੇਟ ਜਾਓ।", "Ляжте сюди, будь ласка.", "Лягте сюда, пожалуйста."]},
+    {"g": "Pronto soccorso", "ruoli": "ISA", "t": ["Deve aspettare il suo turno: la chiameremo noi.", "Please wait your turn: we will call you.", "Debe esperar su turno: le llamaremos.", "Veuillez attendre votre tour : nous vous appellerons.", "يجب أن تنتظر دورك: سنناديك.", "请等候，轮到您时我们会叫您。", "順番をお待ちください。お呼びします。", "اپنی باری کا انتظار کریں: ہم آپ کو بلائیں گے۔", "Trebuie să așteptați la rând: vă vom chema noi.", "Duhet të prisni radhën: do t'ju thërrasim ne.", "ਆਪਣੀ ਵਾਰੀ ਦੀ ਉਡੀਕ ਕਰੋ: ਅਸੀਂ ਤੁਹਾਨੂੰ ਬੁਲਾਵਾਂਗੇ।", "Зачекайте своєї черги: ми Вас покличемо.", "Подождите своей очереди: мы Вас позовём."]},
+    {"g": "Esami e cure", "ruoli": "I", "t": ["Le metto una flebo.", "I'm going to put you on a drip.", "Le voy a poner un gotero.", "Je vais vous poser une perfusion.", "سأضع لك محلولاً في الوريد.", "我给您输液。", "点滴をします。", "میں آپ کو ڈرپ لگاتا ہوں۔", "Vă pun o perfuzie.", "Do t'ju vendos një serum.", "ਮੈਂ ਤੁਹਾਨੂੰ ਡ੍ਰਿੱਪ ਲਗਾਉਂਦਾ ਹਾਂ।", "Я поставлю Вам крапельницю.", "Я поставлю Вам капельницу."]},
+    {"g": "Esami e cure", "ruoli": "I", "t": ["Le faccio un'iniezione. Sentirà una piccola puntura.", "I'm going to give you an injection. You will feel a small prick.", "Le voy a poner una inyección. Notará un pequeño pinchazo.", "Je vais vous faire une piqûre. Vous allez sentir une petite piqûre.", "سأعطيك حقنة. ستشعر بوخزة صغيرة.", "我给您打一针，会有一点点疼。", "注射をします。少しチクッとします。", "میں آپ کو انجکشن لگاتا ہوں۔ ہلکی سی چبھن محسوس ہوگی۔", "Vă fac o injecție. Veți simți o mică înțepătură.", "Do t'ju bëj një gjilpërë. Do të ndieni një shpim të vogël.", "ਮੈਂ ਤੁਹਾਨੂੰ ਟੀਕਾ ਲਗਾਉਂਦਾ ਹਾਂ। ਥੋੜ੍ਹੀ ਜਿਹੀ ਚੁਭਨ ਹੋਵੇਗੀ।", "Я зроблю Вам укол. Буде трохи неприємно.", "Я сделаю Вам укол. Будет немного неприятно."]},
+    {"g": "Esami e cure", "ruoli": "I", "t": ["Le misuro la glicemia: è una puntura sul dito.", "I'm going to check your blood sugar: it's a prick on your finger.", "Le voy a medir el azúcar: es un pinchazo en el dedo.", "Je vais mesurer votre glycémie : c'est une piqûre au bout du doigt.", "سأقيس نسبة السكر في الدم: وخزة صغيرة في الإصبع.", "我给您测血糖，要在手指上扎一下。", "血糖を測ります。指先に針を刺します。", "میں آپ کی شوگر چیک کرتا ہوں: انگلی پر ہلکی سی سوئی لگے گی۔", "Vă măsor glicemia: este o înțepătură în deget.", "Do t'ju mas sheqerin në gjak: është një shpim në gisht.", "ਮੈਂ ਤੁਹਾਡੀ ਸ਼ੂਗਰ ਚੈੱਕ ਕਰਦਾ ਹਾਂ: ਉਂਗਲ 'ਤੇ ਹਲਕੀ ਜਿਹੀ ਸੂਈ ਲੱਗੇਗੀ।", "Я виміряю Вам цукор у крові: це укол у палець.", "Я измерю Вам сахар в крови: это укол в палец."]},
+    {"g": "Esami e cure", "ruoli": "I", "t": ["Stenda il braccio e stringa il pugno.", "Stretch out your arm and make a fist.", "Estire el brazo y apriete el puño.", "Tendez le bras et serrez le poing.", "مدّ ذراعك واقبض يدك.", "请伸直手臂，握紧拳头。", "腕を伸ばして、手を握ってください。", "اپنا بازو سیدھا کریں اور مٹھی بند کریں۔", "Întindeți brațul și strângeți pumnul.", "Shtrijeni krahun dhe shtrëngoni grushtin.", "ਆਪਣੀ ਬਾਂਹ ਸਿੱਧੀ ਕਰੋ ਅਤੇ ਮੁੱਠੀ ਬੰਦ ਕਰੋ।", "Випряміть руку і стисніть кулак.", "Выпрямите руку и сожмите кулак."]},
+    {"g": "Esami e cure", "ruoli": "I", "t": ["Prenda questa medicina con un po' d'acqua.", "Take this medicine with a little water.", "Tómese este medicamento con un poco de agua.", "Prenez ce médicament avec un peu d'eau.", "تناول هذا الدواء مع قليل من الماء.", "请用一点水把这个药吃下去。", "この薬を少しの水で飲んでください。", "یہ دوا تھوڑے سے پانی کے ساتھ لیں۔", "Luați acest medicament cu puțină apă.", "Merreni këtë ilaç me pak ujë.", "ਇਹ ਦਵਾਈ ਥੋੜ੍ਹੇ ਜਿਹੇ ਪਾਣੀ ਨਾਲ ਲਓ।", "Прийміть ці ліки, запивши трохи води.", "Примите это лекарство, запив небольшим количеством воды."]},
+    {"g": "Esami e cure", "ruoli": "I", "tipo": "sn", "t": ["Ha già preso le medicine oggi?", "Have you already taken your medicines today?", "¿Ya ha tomado hoy sus medicamentos?", "Avez-vous déjà pris vos médicaments aujourd'hui ?", "هل تناولت أدويتك اليوم؟", "您今天已经吃过药了吗？", "今日はもう薬を飲みましたか？", "کیا آپ نے آج اپنی دوائیں لے لی ہیں؟", "Ați luat deja medicamentele astăzi?", "I keni marrë tashmë ilaçet sot?", "ਕੀ ਤੁਸੀਂ ਅੱਜ ਆਪਣੀਆਂ ਦਵਾਈਆਂ ਲੈ ਲਈਆਂ ਹਨ?", "Ви вже прийняли сьогодні ліки?", "Вы уже принимали сегодня лекарства?"]},
+    {"g": "Esami e cure", "ruoli": "I", "t": ["Devo cambiarle la medicazione.", "I need to change your dressing.", "Tengo que cambiarle el vendaje.", "Je dois changer votre pansement.", "يجب أن أغيّر لك الضماد.", "我要给您换药。", "ガーゼを交換します。", "مجھے آپ کی پٹی بدلنی ہے۔", "Trebuie să vă schimb pansamentul.", "Duhet t'jua ndërroj fashën.", "ਮੈਂ ਤੁਹਾਡੀ ਪੱਟੀ ਬਦਲਣੀ ਹੈ।", "Мені потрібно змінити Вам пов'язку.", "Мне нужно сменить Вам повязку."]},
+    {"g": "Esami e cure", "ruoli": "IS", "t": ["Deve raccogliere l'urina in questo contenitore.", "Please collect your urine in this container.", "Debe recoger la orina en este recipiente.", "Vous devez recueillir votre urine dans ce récipient.", "يجب أن تجمع البول في هذا الوعاء.", "请把尿液接到这个容器里。", "この容器に尿をとってください。", "پیشاب اس برتن میں جمع کریں۔", "Trebuie să colectați urina în acest recipient.", "Duhet ta mblidhni urinën në këtë enë.", "ਪਿਸ਼ਾਬ ਇਸ ਡੱਬੇ ਵਿੱਚ ਇਕੱਠਾ ਕਰੋ।", "Зберіть сечу в цей контейнер.", "Соберите мочу в этот контейнер."]},
+    {"g": "Esami e cure", "ruoli": "ISA", "t": ["Se sente dolore o qualcosa di strano, suoni il campanello.", "If you feel pain or anything unusual, press the call button.", "Si siente dolor o algo raro, toque el timbre.", "Si vous avez mal ou ressentez quelque chose d'inhabituel, appuyez sur la sonnette.", "إذا شعرت بألم أو بشيء غير عادي، اضغط على الجرس.", "如果感到疼痛或不舒服，请按呼叫铃。", "痛みや変わったことがあれば、ナースコールを押してください。", "اگر درد ہو یا کچھ عجیب محسوس ہو تو گھنٹی دبائیں۔", "Dacă simțiți durere sau ceva ciudat, apăsați butonul de apel.", "Nëse ndieni dhimbje ose diçka të çuditshme, shtypni zilen.", "ਜੇ ਦਰਦ ਹੋਵੇ ਜਾਂ ਕੁਝ ਅਜੀਬ ਮਹਿਸੂਸ ਹੋਵੇ ਤਾਂ ਘੰਟੀ ਦਬਾਓ।", "Якщо відчуєте біль або щось незвичне, натисніть кнопку виклику.", "Если почувствуете боль или что-то необычное, нажмите кнопку вызова."]},
+    {"g": "Igiene e movimento", "ruoli": "S", "t": ["Adesso la aiutiamo a lavarsi.", "We're going to help you wash now.", "Ahora le ayudamos a lavarse.", "Nous allons vous aider à faire votre toilette.", "سنساعدك الآن على الاغتسال.", "现在我们帮您洗漱。", "これから体を洗うお手伝いをします。", "اب ہم نہانے میں آپ کی مدد کرتے ہیں۔", "Acum vă ajutăm să vă spălați.", "Tani do t'ju ndihmojmë të laheni.", "ਹੁਣ ਅਸੀਂ ਨਹਾਉਣ ਵਿੱਚ ਤੁਹਾਡੀ ਮਦਦ ਕਰਦੇ ਹਾਂ।", "Зараз ми допоможемо Вам помитися.", "Сейчас мы поможем Вам помыться."]},
+    {"g": "Igiene e movimento", "ruoli": "S", "t": ["La giriamo sul fianco.", "We're going to turn you onto your side.", "Le vamos a girar de lado.", "Nous allons vous tourner sur le côté.", "سنقلبك على جنبك.", "我们帮您翻身侧躺。", "体を横向きにします。", "ہم آپ کو کروٹ دلاتے ہیں۔", "Vă întoarcem pe o parte.", "Do t'ju kthejmë në anë.", "ਅਸੀਂ ਤੁਹਾਨੂੰ ਪਾਸਾ ਦਿਵਾਉਂਦੇ ਹਾਂ।", "Ми повернемо Вас на бік.", "Мы повернём Вас на бок."]},
+    {"g": "Igiene e movimento", "ruoli": "IS", "t": ["Si sieda sul bordo del letto.", "Sit on the edge of the bed.", "Siéntese en el borde de la cama.", "Asseyez-vous au bord du lit.", "اجلس على حافة السرير.", "请坐到床边。", "ベッドの端に座ってください。", "بستر کے کنارے پر بیٹھ جائیں۔", "Așezați-vă pe marginea patului.", "Uluni në buzë të shtratit.", "ਬਿਸਤਰੇ ਦੇ ਕਿਨਾਰੇ 'ਤੇ ਬੈਠ ਜਾਓ।", "Сядьте на край ліжка.", "Сядьте на край кровати."]},
+    {"g": "Igiene e movimento", "ruoli": "IS", "tipo": "sn", "t": ["Riesce ad alzarsi da solo?", "Can you get up on your own?", "¿Puede levantarse solo?", "Pouvez-vous vous lever seul ?", "هل تستطيع النهوض وحدك؟", "您能自己站起来吗？", "一人で立てますか？", "کیا آپ خود اٹھ سکتے ہیں؟", "Vă puteți ridica singur?", "Mund të ngriheni vetë?", "ਕੀ ਤੁਸੀਂ ਆਪੇ ਉੱਠ ਸਕਦੇ ਹੋ?", "Ви можете встати самостійно?", "Вы можете встать сами?"]},
+    {"g": "Igiene e movimento", "ruoli": "IS", "t": ["Si appoggi a me.", "Lean on me.", "Apóyese en mí.", "Appuyez-vous sur moi.", "استند عليّ.", "请扶着我。", "私につかまってください。", "میرا سہارا لیں۔", "Sprijiniți-vă de mine.", "Mbështetuni tek unë.", "ਮੇਰਾ ਸਹਾਰਾ ਲਓ।", "Спирайтеся на мене.", "Обопритесь на меня."]},
+    {"g": "Igiene e movimento", "ruoli": "S", "t": ["Le cambio il pannolone.", "I'm going to change your incontinence pad.", "Le voy a cambiar el pañal.", "Je vais changer votre protection.", "سأغيّر لك الحفاض.", "我给您换纸尿裤。", "おむつを交換します。", "میں آپ کا ڈائپر بدلتا ہوں۔", "Vă schimb scutecul.", "Do t'jua ndërroj pampersin.", "ਮੈਂ ਤੁਹਾਡਾ ਡਾਇਪਰ ਬਦਲਦਾ ਹਾਂ।", "Я зміню Вам підгузок.", "Я поменяю Вам подгузник."]},
+    {"g": "Igiene e movimento", "ruoli": "S", "t": ["Le rifaccio il letto.", "I'm going to make your bed.", "Le voy a hacer la cama.", "Je vais refaire votre lit.", "سأرتّب سريرك.", "我给您整理床铺。", "ベッドを整えます。", "میں آپ کا بستر ٹھیک کرتا ہوں۔", "Vă fac patul.", "Do t'jua rregulloj shtratin.", "ਮੈਂ ਤੁਹਾਡਾ ਬਿਸਤਰਾ ਠੀਕ ਕਰਦਾ ਹਾਂ।", "Я застелю Вам ліжко.", "Я перестелю Вам постель."]},
+    {"g": "Igiene e movimento", "ruoli": "IS", "tipo": "sn", "t": ["Vuole la sedia a rotelle?", "Would you like a wheelchair?", "¿Quiere la silla de ruedas?", "Voulez-vous un fauteuil roulant ?", "هل تريد كرسياً متحركاً؟", "您需要轮椅吗？", "車いすを使いますか？", "کیا آپ کو وہیل چیئر چاہیے؟", "Doriți un scaun cu rotile?", "Dëshironi një karrige me rrota?", "ਕੀ ਤੁਹਾਨੂੰ ਵ੍ਹੀਲਚੇਅਰ ਚਾਹੀਦੀ ਹੈ?", "Вам потрібен інвалідний візок?", "Вам нужна инвалидная коляска?"]},
+    {"g": "Igiene e movimento", "ruoli": "SA", "t": ["Attenzione: il pavimento è bagnato.", "Careful: the floor is wet.", "Cuidado: el suelo está mojado.", "Attention : le sol est mouillé.", "انتبه: الأرض مبللة.", "小心，地面湿滑。", "床がぬれています。気をつけてください。", "احتیاط کریں: فرش گیلا ہے۔", "Atenție: podeaua este udă.", "Kujdes: dyshemeja është e lagur.", "ਧਿਆਨ ਰੱਖੋ: ਫ਼ਰਸ਼ ਗਿੱਲਾ ਹੈ।", "Обережно: підлога мокра.", "Осторожно: пол мокрый."]},
+    {"g": "Prima e dopo l'operazione", "ruoli": "IM", "t": ["Da mezzanotte non mangi e non beva niente.", "From midnight, do not eat or drink anything.", "Desde medianoche no coma ni beba nada.", "À partir de minuit, ne mangez et ne buvez rien.", "من منتصف الليل لا تأكل ولا تشرب شيئاً.", "从午夜开始，请不要吃东西，也不要喝水。", "夜12時以降は、何も食べたり飲んだりしないでください。", "آدھی رات کے بعد کچھ نہ کھائیں اور نہ پئیں۔", "De la miezul nopții nu mâncați și nu beți nimic.", "Nga mesnata mos hani dhe mos pini asgjë.", "ਅੱਧੀ ਰਾਤ ਤੋਂ ਬਾਅਦ ਕੁਝ ਨਾ ਖਾਓ ਅਤੇ ਨਾ ਪੀਓ।", "Після опівночі нічого не їжте і не пийте.", "После полуночи ничего не ешьте и не пейте."]},
+    {"g": "Prima e dopo l'operazione", "ruoli": "IS", "t": ["Si tolga gioielli, protesi dentarie e occhiali.", "Please remove jewellery, dentures and glasses.", "Quítese las joyas, la dentadura postiza y las gafas.", "Retirez vos bijoux, votre dentier et vos lunettes.", "انزع المجوهرات وطقم الأسنان والنظارات.", "请取下首饰、假牙和眼镜。", "アクセサリー、入れ歯、めがねを外してください。", "زیورات، مصنوعی دانت اور عینک اتار دیں۔", "Scoateți bijuteriile, proteza dentară și ochelarii.", "Hiqni stolitë, protezën e dhëmbëve dhe syzet.", "ਗਹਿਣੇ, ਨਕਲੀ ਦੰਦ ਅਤੇ ਐਨਕਾਂ ਉਤਾਰ ਦਿਓ।", "Зніміть прикраси, зубні протези й окуляри.", "Снимите украшения, зубные протезы и очки."]},
+    {"g": "Prima e dopo l'operazione", "ruoli": "IS", "t": ["Indossi questo camice.", "Please put on this gown.", "Póngase esta bata.", "Mettez cette blouse.", "البس هذا الرداء.", "请穿上这件病号服。", "このガウンを着てください。", "یہ گاؤن پہن لیں۔", "Îmbrăcați acest halat.", "Vishni këtë këmishë spitali.", "ਇਹ ਗਾਊਨ ਪਾ ਲਓ।", "Одягніть цю сорочку.", "Наденьте эту рубашку."]},
+    {"g": "Prima e dopo l'operazione", "ruoli": "IM", "t": ["L'operazione è andata bene.", "The operation went well.", "La operación ha ido bien.", "L'opération s'est bien passée.", "جرت العملية بشكل جيد.", "手术很顺利。", "手術はうまくいきました。", "آپریشن ٹھیک ہو گیا۔", "Operația a decurs bine.", "Operacioni shkoi mirë.", "ਆਪ੍ਰੇਸ਼ਨ ਠੀਕ ਹੋ ਗਿਆ।", "Операція пройшла добре.", "Операция прошла хорошо."]},
+    {"g": "Prima e dopo l'operazione", "ruoli": "IM", "tipo": "sn", "t": ["Ha dolore alla ferita?", "Does the wound hurt?", "¿Le duele la herida?", "Avez-vous mal à la plaie ?", "هل يؤلمك الجرح؟", "伤口疼吗？", "傷口は痛みますか？", "کیا زخم میں درد ہے؟", "Vă doare rana?", "Ju dhemb plaga?", "ਕੀ ਜ਼ਖ਼ਮ ਵਿੱਚ ਦਰਦ ਹੈ?", "Болить рана?", "Болит рана?"]},
+    {"g": "Prima e dopo l'operazione", "ruoli": "IM", "tipo": "sn", "t": ["Ha fatto aria? È andato di corpo?", "Have you passed wind? Have you had a bowel movement?", "¿Ha expulsado gases? ¿Ha hecho de vientre?", "Avez-vous eu des gaz ? Êtes-vous allé à la selle ?", "هل خرجت منك غازات؟ هل تبرّزت؟", "您排气了吗？大便了吗？", "おならは出ましたか？便は出ましたか？", "کیا ہوا خارج ہوئی ہے؟ کیا آپ رفع حاجت کر چکے ہیں؟", "Ați eliminat gaze? Ați avut scaun?", "Keni nxjerrë gazra? Keni bërë nevojën?", "ਕੀ ਹਵਾ ਨਿਕਲੀ ਹੈ? ਕੀ ਤੁਸੀਂ ਟੱਟੀ ਗਏ ਹੋ?", "У Вас відходили гази? Був стілець?", "У Вас отходили газы? Был стул?"]},
+    {"g": "Prima e dopo l'operazione", "ruoli": "ISM", "t": ["Muova le gambe e i piedi.", "Move your legs and feet.", "Mueva las piernas y los pies.", "Bougez les jambes et les pieds.", "حرّك ساقيك وقدميك.", "请活动一下腿和脚。", "足を動かしてください。", "اپنی ٹانگیں اور پاؤں ہلائیں۔", "Mișcați picioarele.", "Lëvizni këmbët dhe shputat.", "ਆਪਣੀਆਂ ਲੱਤਾਂ ਅਤੇ ਪੈਰ ਹਿਲਾਓ।", "Порухайте ногами і ступнями.", "Подвигайте ногами и ступнями."]},
+    {"g": "Visita medica", "ruoli": "M", "t": ["Respiri profondamente.", "Breathe in deeply.", "Respire hondo.", "Respirez profondément.", "تنفّس بعمق.", "请深呼吸。", "深く息を吸ってください。", "گہری سانس لیں۔", "Respirați adânc.", "Merrni frymë thellë.", "ਡੂੰਘਾ ਸਾਹ ਲਓ।", "Глибоко вдихніть.", "Глубоко вдохните."]},
+    {"g": "Visita medica", "ruoli": "M", "t": ["Apra la bocca.", "Open your mouth.", "Abra la boca.", "Ouvrez la bouche.", "افتح فمك.", "请张开嘴。", "口を開けてください。", "منہ کھولیں۔", "Deschideți gura.", "Hapni gojën.", "ਮੂੰਹ ਖੋਲ੍ਹੋ।", "Відкрийте рот.", "Откройте рот."]},
+    {"g": "Visita medica", "ruoli": "M", "t": ["Si spogli fino alla vita, per favore.", "Please undress to the waist.", "Desvístase hasta la cintura, por favor.", "Déshabillez-vous jusqu'à la taille, s'il vous plaît.", "اخلع ملابسك حتى الخصر من فضلك.", "请把上衣脱掉。", "上半身の服を脱いでください。", "براہ کرم کمر تک کپڑے اتار دیں۔", "Vă rog, dezbrăcați-vă până la brâu.", "Ju lutem, zhvishuni deri në bel.", "ਕਿਰਪਾ ਕਰਕੇ ਕਮਰ ਤੱਕ ਕੱਪੜੇ ਉਤਾਰ ਦਿਓ।", "Роздягніться до пояса, будь ласка.", "Разденьтесь до пояса, пожалуйста."]},
+    {"g": "Visita medica", "ruoli": "M", "tipo": "sn", "t": ["Fuma?", "Do you smoke?", "¿Fuma?", "Vous fumez ?", "هل تدخّن؟", "您抽烟吗？", "たばこを吸いますか？", "کیا آپ سگریٹ پیتے ہیں؟", "Fumați?", "Pini duhan?", "ਕੀ ਤੁਸੀਂ ਸਿਗਰਟ ਪੀਂਦੇ ਹੋ?", "Ви курите?", "Вы курите?"]},
+    {"g": "Visita medica", "ruoli": "M", "tipo": "sn", "t": ["Beve alcolici?", "Do you drink alcohol?", "¿Bebe alcohol?", "Buvez-vous de l'alcool ?", "هل تشرب الكحول؟", "您喝酒吗？", "お酒を飲みますか？", "کیا آپ شراب پیتے ہیں؟", "Consumați alcool?", "Pini alkool?", "ਕੀ ਤੁਸੀਂ ਸ਼ਰਾਬ ਪੀਂਦੇ ਹੋ?", "Ви вживаєте алкоголь?", "Вы употребляете алкоголь?"]},
+    {"g": "Visita medica", "ruoli": "IM", "t": ["Dobbiamo fare altri esami.", "We need to do more tests.", "Tenemos que hacer más pruebas.", "Nous devons faire d'autres examens.", "يجب أن نجري فحوصات أخرى.", "我们需要再做一些检查。", "ほかの検査も必要です。", "ہمیں مزید ٹیسٹ کرنے ہیں۔", "Trebuie să mai facem niște analize.", "Duhet të bëjmë ekzaminime të tjera.", "ਸਾਨੂੰ ਹੋਰ ਟੈਸਟ ਕਰਨੇ ਪੈਣਗੇ।", "Нам потрібно зробити ще обстеження.", "Нам нужно провести ещё обследования."]},
+    {"g": "Visita medica", "ruoli": "IM", "t": ["I risultati arriveranno domani.", "The results will be ready tomorrow.", "Los resultados estarán mañana.", "Les résultats arriveront demain.", "ستصدر النتائج غداً.", "结果明天出来。", "結果は明日出ます。", "نتائج کل آئیں گے۔", "Rezultatele vor fi gata mâine.", "Rezultatet do të dalin nesër.", "ਨਤੀਜੇ ਕੱਲ੍ਹ ਆਉਣਗੇ।", "Результати будуть завтра.", "Результаты будут завтра."]},
+    {"g": "Visita medica", "ruoli": "M", "t": ["Deve firmare il consenso: le spieghiamo tutto con un interprete.", "You need to sign the consent form: we will explain everything with an interpreter.", "Debe firmar el consentimiento: se lo explicaremos todo con un intérprete.", "Vous devez signer le consentement : nous vous expliquerons tout avec un interprète.", "يجب أن توقّع على الموافقة: سنشرح لك كل شيء بمساعدة مترجم.", "您需要签署知情同意书，我们会请翻译为您解释清楚。", "同意書にサインが必要です。通訳を通してすべて説明します。", "آپ کو رضامندی فارم پر دستخط کرنے ہیں: ہم مترجم کے ذریعے سب کچھ سمجھائیں گے۔", "Trebuie să semnați consimțământul: vă explicăm totul cu un interpret.", "Duhet të nënshkruani pëlqimin: do t'jua shpjegojmë gjithçka me një përkthyes.", "ਤੁਹਾਨੂੰ ਸਹਿਮਤੀ ਫ਼ਾਰਮ 'ਤੇ ਦਸਤਖ਼ਤ ਕਰਨੇ ਪੈਣਗੇ: ਅਸੀਂ ਦੁਭਾਸ਼ੀਏ ਰਾਹੀਂ ਸਭ ਕੁਝ ਸਮਝਾਵਾਂਗੇ।", "Вам потрібно підписати згоду: ми все пояснимо через перекладача.", "Вам нужно подписать согласие: мы всё объясним через переводчика."]},
+    {"g": "Dimissione", "ruoli": "ISAM", "t": ["Oggi torna a casa.", "You're going home today.", "Hoy se va a casa.", "Aujourd'hui, vous rentrez chez vous.", "اليوم تعود إلى البيت.", "您今天可以回家了。", "今日、退院です。", "آج آپ گھر جا رہے ہیں۔", "Astăzi mergeți acasă.", "Sot ktheheni në shtëpi.", "ਅੱਜ ਤੁਸੀਂ ਘਰ ਜਾ ਰਹੇ ਹੋ।", "Сьогодні Ви повертаєтеся додому.", "Сегодня Вы едете домой."]},
+    {"g": "Dimissione", "ruoli": "IS", "tipo": "sn", "t": ["Qualcuno viene a prenderla?", "Is someone coming to pick you up?", "¿Viene alguien a recogerle?", "Quelqu'un vient vous chercher ?", "هل سيأتي أحد ليأخذك؟", "有人来接您吗？", "誰か迎えに来ますか？", "کیا کوئی آپ کو لینے آ رہا ہے؟", "Vine cineva să vă ia?", "A po vjen dikush t'ju marrë?", "ਕੀ ਕੋਈ ਤੁਹਾਨੂੰ ਲੈਣ ਆ ਰਿਹਾ ਹੈ?", "За Вами хтось приїде?", "За Вами кто-нибудь приедет?"]},
+    {"g": "Dimissione", "ruoli": "IM", "t": ["Questa è la lettera di dimissione: la porti al suo medico di famiglia.", "This is your discharge letter: take it to your family doctor.", "Este es el informe de alta: lléveselo a su médico de cabecera.", "Voici votre lettre de sortie : apportez-la à votre médecin traitant.", "هذه رسالة الخروج: أعطها لطبيب العائلة.", "这是出院小结，请交给您的家庭医生。", "退院の書類です。かかりつけ医に渡してください。", "یہ ڈسچارج لیٹر ہے: اسے اپنے فیملی ڈاکٹر کو دکھائیں۔", "Aceasta este scrisoarea de externare: duceți-o medicului de familie.", "Kjo është letra e daljes nga spitali: çojeni te mjeku i familjes.", "ਇਹ ਛੁੱਟੀ ਦਾ ਪੱਤਰ ਹੈ: ਇਸਨੂੰ ਆਪਣੇ ਫ਼ੈਮਿਲੀ ਡਾਕਟਰ ਕੋਲ ਲੈ ਜਾਓ।", "Це виписка: віднесіть її своєму сімейному лікарю.", "Это выписка: отнесите её своему семейному врачу."]},
+    {"g": "Dimissione", "ruoli": "IM", "t": ["Prenda le medicine come è scritto qui.", "Take your medicines as written here.", "Tome los medicamentos como está escrito aquí.", "Prenez vos médicaments comme c'est écrit ici.", "تناول الأدوية كما هو مكتوب هنا.", "请按照这里写的方法吃药。", "ここに書いてあるとおりに薬を飲んでください。", "دوائیں ویسے ہی لیں جیسے یہاں لکھا ہے۔", "Luați medicamentele așa cum scrie aici.", "Merrini ilaçet siç është shkruar këtu.", "ਦਵਾਈਆਂ ਉਵੇਂ ਹੀ ਲਓ ਜਿਵੇਂ ਇੱਥੇ ਲਿਖਿਆ ਹੈ।", "Приймайте ліки так, як тут написано.", "Принимайте лекарства так, как здесь написано."]},
+    {"g": "Dimissione", "ruoli": "IM", "t": ["Se ha febbre o dolore forte, torni in Pronto soccorso.", "If you have a fever or severe pain, come back to the Emergency Department.", "Si tiene fiebre o dolor fuerte, vuelva a Urgencias.", "En cas de fièvre ou de forte douleur, revenez aux urgences.", "إذا أصبت بحمى أو ألم شديد، عد إلى قسم الطوارئ.", "如果发烧或疼得厉害，请回急诊室。", "熱や強い痛みがあれば、救急外来に来てください。", "اگر بخار ہو یا شدید درد ہو تو ایمرجنسی میں واپس آئیں۔", "Dacă aveți febră sau dureri mari, reveniți la Urgențe.", "Nëse keni temperaturë ose dhimbje të forta, kthehuni në Urgjencë.", "ਜੇ ਬੁਖਾਰ ਜਾਂ ਤੇਜ਼ ਦਰਦ ਹੋਵੇ ਤਾਂ ਐਮਰਜੈਂਸੀ ਵਿੱਚ ਵਾਪਸ ਆਓ।", "Якщо буде температура або сильний біль, поверніться до приймального відділення.", "Если будет температура или сильная боль, вернитесь в приёмное отделение."]},
+    {"g": "Mamme e bambini", "ruoli": "ISM", "tipo": "sn", "t": ["Il bambino ha mangiato?", "Has your child eaten?", "¿El niño ha comido?", "L'enfant a-t-il mangé ?", "هل أكل الطفل؟", "孩子吃东西了吗？", "お子さんは食べましたか？", "کیا بچے نے کھانا کھایا ہے؟", "Copilul a mâncat?", "A ka ngrënë fëmija?", "ਕੀ ਬੱਚੇ ਨੇ ਖਾਣਾ ਖਾਧਾ ਹੈ?", "Дитина їла?", "Ребёнок ел?"]},
+    {"g": "Mamme e bambini", "ruoli": "IM", "tipo": "sn", "t": ["Il bambino ha la febbre?", "Does your child have a fever?", "¿El niño tiene fiebre?", "L'enfant a-t-il de la fièvre ?", "هل لدى الطفل حمى؟", "孩子发烧吗？", "お子さんに熱はありますか？", "کیا بچے کو بخار ہے؟", "Copilul are febră?", "A ka temperaturë fëmija?", "ਕੀ ਬੱਚੇ ਨੂੰ ਬੁਖਾਰ ਹੈ?", "У дитини температура?", "У ребёнка температура?"]},
+    {"g": "Mamme e bambini", "ruoli": "ISM", "tipo": "sn", "t": ["Il bambino ha fatto la pipì?", "Has your child passed urine?", "¿El niño ha hecho pis?", "L'enfant a-t-il fait pipi ?", "هل تبوّل الطفل؟", "孩子尿尿了吗？", "お子さんはおしっこをしましたか？", "کیا بچے نے پیشاب کیا ہے؟", "Copilul a făcut pipi?", "A ka bërë çiş fëmija?", "ਕੀ ਬੱਚੇ ਨੇ ਪਿਸ਼ਾਬ ਕੀਤਾ ਹੈ?", "Дитина пісяла?", "Ребёнок писал?"]},
+    {"g": "Mamme e bambini", "ruoli": "IM", "tipo": "sn", "t": ["Ha le contrazioni?", "Are you having contractions?", "¿Tiene contracciones?", "Avez-vous des contractions ?", "هل لديك انقباضات (طَلق)؟", "您有宫缩吗？", "陣痛はありますか？", "کیا آپ کو دردِ زہ ہو رہا ہے؟", "Aveți contracții?", "Keni kontraksione?", "ਕੀ ਤੁਹਾਨੂੰ ਜਣੇਪੇ ਦੀਆਂ ਪੀੜਾਂ ਹੋ ਰਹੀਆਂ ਹਨ?", "У Вас є перейми?", "У Вас схватки?"]},
+    {"g": "Mamme e bambini", "ruoli": "IM", "tipo": "sn", "t": ["Le si sono rotte le acque?", "Has your water broken?", "¿Ha roto aguas?", "Avez-vous perdu les eaux ?", "هل نزل ماء الرحم؟", "您破水了吗？", "破水しましたか？", "کیا پانی کی تھیلی پھٹ گئی ہے؟", "Vi s-a rupt apa?", "A ju kanë plasur ujërat?", "ਕੀ ਪਾਣੀ ਦੀ ਥੈਲੀ ਫਟ ਗਈ ਹੈ?", "У Вас відійшли води?", "У Вас отошли воды?"]},
+    {"g": "Mamme e bambini", "ruoli": "I", "t": ["Può allattare il bambino adesso.", "You can breastfeed your baby now.", "Ya puede dar el pecho al bebé.", "Vous pouvez allaiter votre bébé maintenant.", "يمكنك إرضاع طفلك الآن.", "您现在可以给宝宝喂奶了。", "今、赤ちゃんに授乳できます。", "اب آپ بچے کو دودھ پلا سکتی ہیں۔", "Acum puteți alăpta copilul.", "Tani mund ta ushqeni foshnjën me gji.", "ਹੁਣ ਤੁਸੀਂ ਬੱਚੇ ਨੂੰ ਦੁੱਧ ਪਿਲਾ ਸਕਦੇ ਹੋ।", "Тепер Ви можете погодувати дитину груддю.", "Теперь Вы можете покормить ребёнка грудью."]},
+    {"g": "Familiari", "ruoli": "ISM", "t": ["Il medico vuole parlare con un familiare.", "The doctor would like to speak with a family member.", "El médico quiere hablar con un familiar.", "Le médecin souhaite parler à un membre de la famille.", "الطبيب يريد التحدث مع أحد أفراد العائلة.", "医生想和一位家属谈谈。", "医師がご家族とお話ししたいそうです。", "ڈاکٹر گھر کے کسی فرد سے بات کرنا چاہتے ہیں۔", "Medicul vrea să vorbească cu o rudă.", "Mjeku dëshiron të flasë me një të afërm.", "ਡਾਕਟਰ ਪਰਿਵਾਰ ਦੇ ਕਿਸੇ ਮੈਂਬਰ ਨਾਲ ਗੱਲ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹਨ।", "Лікар хоче поговорити з кимось із рідних.", "Врач хочет поговорить с кем-то из родственников."]},
+    {"g": "Familiari", "ruoli": "ISA", "tipo": "sn", "t": ["Può lasciarci un numero di telefono?", "Could you leave us a phone number?", "¿Nos puede dejar un número de teléfono?", "Pouvez-vous nous laisser un numéro de téléphone ?", "هل يمكنك أن تترك لنا رقم هاتف؟", "您能给我们留一个电话号码吗？", "電話番号を教えていただけますか？", "کیا آپ ہمیں فون نمبر دے سکتے ہیں؟", "Ne puteți lăsa un număr de telefon?", "Mund të na lini një numër telefoni?", "ਕੀ ਤੁਸੀਂ ਸਾਨੂੰ ਫ਼ੋਨ ਨੰਬਰ ਦੇ ਸਕਦੇ ਹੋ?", "Можете залишити нам номер телефону?", "Можете оставить нам номер телефона?"]},
+    {"g": "Familiari", "ruoli": "ISA", "t": ["Il paziente è stato trasferito in un altro reparto.", "The patient has been moved to another ward.", "El paciente ha sido trasladado a otra planta.", "Le patient a été transféré dans un autre service.", "تم نقل المريض إلى قسم آخر.", "病人已经转到另一个科室了。", "患者さんは別の病棟に移りました。", "مریض کو دوسرے وارڈ میں منتقل کر دیا گیا ہے۔", "Pacientul a fost transferat pe altă secție.", "Pacienti është transferuar në një repart tjetër.", "ਮਰੀਜ਼ ਨੂੰ ਦੂਜੇ ਵਾਰਡ ਵਿੱਚ ਭੇਜ ਦਿੱਤਾ ਗਿਆ ਹੈ।", "Пацієнта перевели в інше відділення.", "Пациента перевели в другое отделение."]}
+  ];
+  // Ogni frase va in fondo al suo argomento; gli argomenti nuovi in fondo all'elenco.
+  FRASI_NUOVE.forEach(function (n) {
+    var inizio = -1;
+    FRASI.forEach(function (f, i) { if (f.gruppo === n.g) inizio = i; });
+    if (inizio === -1) { FRASI.push({ gruppo: n.g, ruoli: GRUPPI_NUOVI[n.g] || n.ruoli }); inizio = FRASI.length - 1; }
+    var fine = inizio + 1;
+    while (fine < FRASI.length && !FRASI[fine].gruppo) fine++;
+    var f = { ruoli: n.ruoli, t: n.t };
+    if (n.tipo) f.tipo = n.tipo;
+    if (n.scelte) f.scelte = n.scelte;
+    FRASI.splice(fine, 0, f);
+  });
+  // Aggiunge ogni lingua in fondo, nell'ordine di LINGUE (dopo il giapponese).
+  [URDU, ROMENO, ALBANESE, PUNJABI, UCRAINO, RUSSO].forEach(function (L, k) {
+    var n = 7 + k;   // posizione di questa lingua nelle frasi
+    SI.push(L.__si); NO.push(L.__no); DOLORE_0.push(L.__d0); DOLORE_10.push(L.__d10);
+    TABELLA.forEach(function (r) { r.push(L[r[1]] || r[2]); });
+    FRASI.forEach(function (f) {
+      if (!f.t || f.t.length > n) return;   // le frasi nuove hanno già tutte le lingue
+      f.t.push(L[f.t[0]] || f.t[1]);
+      (f.scelte || []).forEach(function (x) { x.push(L[x[0]] || x[1]); });
+    });
+  });
+
+  var lingua = 1;   // posizione nella riga delle frasi (1 = English)
+  try { var s = +localStorage.getItem('trad_lingua'); if (s >= 1 && s <= LINGUE.length) lingua = s; } catch (e) {}
+  var aperta = null;
+  var MARCHIO_SVG = '<svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg>';
+  // [codice, nome breve sul bottone, nome intero]
+  var RUOLI = [['', 'Tutti', 'Tutti'], ['I', 'Inf.', 'Infermiere'], ['S', 'OSS', 'OSS'], ['A', 'OA', 'OA'], ['M', 'Med.', 'Medico']];
+  var ruolo = '';
+  try { var r0 = localStorage.getItem('trad_ruolo'); if (r0 && 'ISAM'.indexOf(r0) !== -1) ruolo = r0; } catch (e) {}
+  function scegliRuolo(r) {
+    if (daTrascinamento()) return;
+    ruolo = r;
+    try { localStorage.setItem('trad_ruolo', r); } catch (e) {}
+    disegna();
+  }
+
+  function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function info() { return LINGUE[lingua - 1]; }
+
+  // Ordine personale di lingue, ruoli e argomenti + frasi preferite.
+  // Tutto salvato sul telefono di chi lo usa.
+  function leggi(chiave, predefinito) {
+    try { var v = JSON.parse(localStorage.getItem(chiave)); return Array.isArray(v) ? v : predefinito; } catch (e) { return predefinito; }
+  }
+  function salva(chiave, valore) { try { localStorage.setItem(chiave, JSON.stringify(valore)); } catch (e) {} }
+  function ordinaSecondo(lista, ordine) {
+    return lista.slice().sort(function (a, b) {
+      var ia = ordine.indexOf(a), ib = ordine.indexOf(b);
+      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    });
+  }
+  var ordLingue = leggi('trad_ordine_lingue', []);
+  var ordRuoli = leggi('trad_ordine_ruoli', []);
+  var ordGruppi = leggi('trad_ordine_gruppi', []);
+  var preferite = leggi('trad_preferite', []);
+  var ordina = false;
+  var viste = { lingue: [], ruoli: [], gruppi: [] };
+
+  function alternaOrdina() { ordina = !ordina; disegna(); }
+  function sposta(riga, k, dir) {
+    var lista = viste[riga].slice();
+    var j = k + dir;
+    if (j < 0 || j >= lista.length) return;
+    var x = lista[k]; lista[k] = lista[j]; lista[j] = x;
+    if (riga === 'lingue') { ordLingue = lista; salva('trad_ordine_lingue', lista); }
+    if (riga === 'ruoli') { ordRuoli = lista; salva('trad_ordine_ruoli', lista); }
+    if (riga === 'gruppi') { ordGruppi = lista; salva('trad_ordine_gruppi', lista); }
+    disegna();
+  }
+  function alternaPreferita(i) {
+    var it = FRASI[i].t[0], k = preferite.indexOf(it);
+    if (k === -1) preferite.push(it); else preferite.splice(k, 1);
+    salva('trad_preferite', preferite);
+    disegna();
+  }
+  // Bottone con le frecce ‹ › intorno quando si sta ordinando
+  // Bottone trascinabile: tieni premuto e sposta col dito (vedi attivaTrascina)
+  function chip(riga, k, html) {
+    return html.replace('class="', 'data-k="' + String(viste[riga][k]).replace(/"/g, '&quot;') + '" class="trascina ');
+  }
+  function rigaFrase(f, i) {
+    var stella = preferite.indexOf(f.t[0]) !== -1;
+    return '<div class="riga-frase"><button type="button" class="frase" onclick="apri(' + i + ')">' + esc(f.t[0]) +
+      '<small lang="' + info().id + '"' + (info().rtl ? ' dir="rtl"' : '') + '>' + esc(f.t[lingua]) + '</small></button>' +
+      '<button type="button" class="stella' + (stella ? ' piena' : '') + '" aria-pressed="' + stella + '" aria-label="' + (stella ? 'Togli dai preferiti' : 'Aggiungi ai preferiti') + '" onclick="alternaPreferita(' + i + ')">' + (stella ? '★' : '☆') + '</button></div>';
+  }
+
+  function disegna() {
+    // Lingue
+    viste.lingue = ordinaSecondo(LINGUE.map(function (l, i) { return i + 1; }), ordLingue);
+    document.getElementById('lingue').innerHTML = viste.lingue.map(function (n, k) {
+      var l = LINGUE[n - 1];
+      return chip('lingue', k, '<button type="button" class="' + (n === lingua ? 'attiva' : '') + '" lang="' + l.id + '" onclick="scegliLingua(' + n + ')">' + l.nome + '</button>');
+    }).join('');
+    // Chi sei
+    viste.ruoli = ordinaSecondo(RUOLI.map(function (r) { return r[0]; }), ordRuoli);
+    document.getElementById('ruoli').innerHTML = viste.ruoli.map(function (codice, k) {
+      var r = RUOLI.filter(function (x) { return x[0] === codice; })[0];
+      return chip('ruoli', k, '<button type="button" class="' + (codice === ruolo ? 'attiva' : '') + '" title="' + r[2] + '" aria-label="' + r[2] + '" onclick="scegliRuolo(\'' + codice + '\')">' + r[1] + '</button>');
+    }).join('');
+    document.body.setAttribute('data-ruolo', ruolo);
+    // Argomenti che hanno almeno una frase per il ruolo scelto, nell'ordine scelto
+    var disponibili = [], nomeGruppo = '', rg = '';
+    FRASI.forEach(function (f) {
+      if (f.gruppo) { nomeGruppo = f.gruppo; rg = f.ruoli; return; }
+      if (ruolo && (f.ruoli || rg).indexOf(ruolo) === -1) return;
+      if (disponibili.indexOf(nomeGruppo) === -1) disponibili.push(nomeGruppo);
+    });
+    viste.gruppi = ordinaSecondo(disponibili, ordGruppi.concat(disponibili.filter(function (g) { return ordGruppi.indexOf(g) === -1; })));
+    if (gruppo === '__pref' && !preferite.length) gruppo = '';
+    if (gruppo && gruppo !== '__pref' && disponibili.indexOf(gruppo) === -1) gruppo = '';
+    var fissi = '<button type="button" class="' + (gruppo === '' ? 'attiva' : '') + '" onclick="scegliGruppo(\'\')">Tutti gli argomenti</button>' +
+      (preferite.length ? '<button type="button" class="' + (gruppo === '__pref' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__pref\')">★ Le mie frasi</button>' : '');
+    document.getElementById('gruppi').innerHTML = fissi + viste.gruppi.map(function (g, k) {
+      return chip('gruppi', k, '<button type="button" class="' + (g === gruppo ? 'attiva' : '') + '" onclick="scegliGruppo(' + JSON.stringify(g).replace(/"/g, '&quot;') + ')">' + esc(g) + '</button>');
+    }).join('');
+    // Frasi: prima le preferite, poi gli argomenti nell'ordine scelto
+    var html = '';
+    if (preferite.length && (gruppo === '' || gruppo === '__pref')) {
+      var pref = '';
+      FRASI.forEach(function (f, i) { if (!f.gruppo && preferite.indexOf(f.t[0]) !== -1) pref += rigaFrase(f, i); });
+      if (pref) html += '<h2 class="titolo-pref">★ Le mie frasi</h2>' + pref;
+    }
+    if (gruppo !== '__pref') {
+      var perGruppo = {}, ruoliGruppo = '', gruppoAttuale = '';
+      FRASI.forEach(function (f, i) {
+        if (f.gruppo) { ruoliGruppo = f.ruoli; gruppoAttuale = f.gruppo; return; }
+        if (ruolo && (f.ruoli || ruoliGruppo).indexOf(ruolo) === -1) return;
+        if (gruppo && gruppoAttuale !== gruppo) return;
+        (perGruppo[gruppoAttuale] = perGruppo[gruppoAttuale] || []).push(rigaFrase(f, i));
+      });
+      viste.gruppi.forEach(function (g) { if (perGruppo[g]) html += '<h2>' + esc(g) + '</h2>' + perGruppo[g].join(''); });
+    }
+    html += '<footer class="firma">' + MARCHIO_SVG +
+      '<span class="firma-etichetta">Ideazione e design</span>' +
+      '<span class="firma-nome">Massimiliano Previtali</span>' +
+      '<span class="firma-nota">© 2026 · Traduzioni da far controllare a un mediatore culturale.</span></footer>';
+    document.getElementById('elenco').innerHTML = html;
+    attivaTrascina();
+  }
+
+  // Tieni premuto un bottone (lingua, ruolo, argomento) e trascinalo per
+  // cambiargli posto. L'ordine resta salvato sul telefono.
+  var ordinatori = [], appenaTrascinato = 0;
+  function attivaTrascina() {
+    if (typeof Sortable === 'undefined') return;
+    ordinatori.forEach(function (o) { o.destroy(); });
+    ordinatori = [['lingue', 'trad_ordine_lingue'], ['ruoli', 'trad_ordine_ruoli'], ['gruppi', 'trad_ordine_gruppi']].map(function (r) {
+      return Sortable.create(document.getElementById(r[0]), {
+        draggable: '.trascina', animation: 150, delay: 220, delayOnTouchOnly: true, forceFallback: true,
+        fallbackTolerance: 4, ghostClass: 'fantasma', chosenClass: 'preso', scroll: true, bubbleScroll: true,
+        onEnd: function () {
+          appenaTrascinato = Date.now();
+          var ordine = Array.prototype.map.call(document.querySelectorAll('#' + r[0] + ' .trascina'), function (b) {
+            var v = b.getAttribute('data-k'); return r[0] === 'lingue' ? +v : v;
+          });
+          if (r[0] === 'lingue') ordLingue = ordine;
+          if (r[0] === 'ruoli') ordRuoli = ordine;
+          if (r[0] === 'gruppi') ordGruppi = ordine;
+          salva(r[1], ordine);
+          setTimeout(disegna, 0);
+        }
+      });
+    });
+  }
+  function daTrascinamento() { return Date.now() - appenaTrascinato < 400; }
+
+  var gruppo = '', GRUPPI_VISTI = [];
+  try { gruppo = localStorage.getItem('trad_gruppo') || ''; } catch (e) {}
+  function scegliGruppo(g) {
+    if (daTrascinamento()) return;
+    gruppo = g;
+    try { localStorage.setItem('trad_gruppo', gruppo); } catch (e) {}
+    disegna();
+    window.scrollTo(0, 0);
+  }
+
+  function scegliLingua(n) {
+    if (daTrascinamento()) return;
+    lingua = n;
+    try { localStorage.setItem('trad_lingua', String(n)); } catch (e) {}
+    disegna();
+  }
+
+  function apri(i) {
+    var f = FRASI[i]; aperta = f;
+    var t = document.getElementById('g-testo');
+    t.textContent = f.t[lingua];
+    t.setAttribute('lang', info().id);
+    t.setAttribute('dir', info().rtl ? 'rtl' : 'ltr');
+    document.getElementById('g-it').textContent = f.t[0];
+    var r = document.getElementById('g-risposte');
+    var rtl = info().rtl ? ' dir="rtl"' : '';
+    if (f.tipo === 'sn') {
+      r.innerHTML = '<div class="risposte due"' + rtl + '>' +
+        '<button type="button" onclick="risposta(\'Sì\')">✓ ' + SI[lingua] + '</button>' +
+        '<button type="button" class="no" onclick="risposta(\'No\')">✕ ' + NO[lingua] + '</button></div>';
+    } else if (f.scelte) {
+      r.innerHTML = '<div class="risposte"' + rtl + '>' + f.scelte.map(function (s, k) {
+        return '<button type="button" class="' + (k === f.scelte.length - 1 ? 'altra' : '') + '" onclick="risposta(\'' + s[0].replace(/'/g, "\\'") + '\')">' + esc(s[lingua]) + '</button>';
+      }).join('') + '</div>';
+    } else if (f.tipo === 'dolore') {
+      var colori = ['#2e9e44', '#4fa83d', '#79b236', '#a3b92f', '#c9b82a', '#e0a526', '#e58a24', '#e36c22', '#d9501f', '#c9351f', '#b01c1c'];
+      var b = '';
+      for (var n = 0; n <= 10; n++) b += '<button type="button" style="background:' + colori[n] + '" onclick="risposta(\'Dolore ' + n + ' su 10\')">' + n + '</button>';
+      r.innerHTML = '<div class="scala" dir="ltr">' + b + '</div><div class="scala-etichette" dir="ltr"><span>0 = ' + esc(DOLORE_0[lingua]) + '</span><span>10 = ' + esc(DOLORE_10[lingua]) + '</span></div>';
+    } else if (f.tipo === 'tabella') {
+      casella = -1;
+      r.innerHTML = '<div class="tabella"' + rtl + '>' + TABELLA.map(function (c, k) {
+        return '<button type="button" id="casella-' + k + '" onclick="scegliCasella(' + k + ')"><span class="simbolo" aria-hidden="true">' + c[0] + '</span>' +
+          '<b lang="' + info().id + '">' + esc(c[lingua + 1]) + '</b><small>' + esc(c[1]) + '</small></button>';
+      }).join('') + '</div>' +
+        '<div class="scorri"><button type="button" onclick="avantiCasella()">▶ Avanti</button><button type="button" class="questa" onclick="scegliCasella(casella)">✓ Questa!</button></div>' +
+        '<p class="aiuto-tabella">Tocca <b>Avanti</b>: le caselle si accendono una alla volta e il telefono le legge nella lingua del paziente. Quando il paziente chiude gli occhi, tocca <b>Questa!</b> Se il paziente può indicare, tocca direttamente la casella.</p>';
+    } else r.innerHTML = '';
+    document.getElementById('g-risposta').style.display = 'none';
+    document.getElementById('grande').classList.add('aperto');
+    document.getElementById('grande').scrollTop = 0;
+    parla();
+  }
+
+  // Risposta del paziente: grande, in italiano, per chi assiste.
+  function risposta(it) {
+    var g = document.getElementById('g-risposta');
+    g.innerHTML = '<small>Il paziente ha risposto:</small>' + esc(it);
+    g.style.display = 'block';
+    g.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+
+  // Tabella: accende la casella successiva e la legge a voce.
+  function avantiCasella() {
+    if (casella >= 0) document.getElementById('casella-' + casella).classList.remove('accesa');
+    casella = (casella + 1) % TABELLA.length;
+    var el = document.getElementById('casella-' + casella);
+    el.classList.add('accesa');
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    parlaTesto(TABELLA[casella][lingua + 1]);
+  }
+  function scegliCasella(k) {
+    if (k < 0) return;
+    if (casella >= 0) document.getElementById('casella-' + casella).classList.remove('accesa');
+    casella = k;
+    document.getElementById('casella-' + k).classList.add('accesa');
+    risposta(TABELLA[k][1]);
+  }
+
+  function chiudi() {
+    document.getElementById('grande').classList.remove('aperto');
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    if (window.TTS && window.TTS.stop) { try { window.TTS.stop(); } catch (e) {} }
+    aperta = null;
+  }
+
+  function parla() {
+    if (aperta) parlaTesto(aperta.t[aperta.tipo === 'tabella' ? lingua : lingua]);
+  }
+  function parlaTesto(testo) {
+    // Nell'app Android la voce passa dal plugin TTS (la voce del telefono);
+    // nel browser si usa speechSynthesis.
+    if (window.TTS && window.TTS.speak) {
+      try { window.TTS.speak({ text: testo.replace(/\.\.\.|……/g, ''), locale: info().voce, rate: 0.9 }, function () {}, function () {}); } catch (e) {}
+      return;
+    }
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(testo.replace(/\.\.\.|……/g, ''));
+    u.lang = info().voce; u.rate = 0.9;
+    var v = speechSynthesis.getVoices().filter(function (x) { return x.lang && x.lang.replace('_', '-').indexOf(info().id) === 0; });
+    if (v.length) u.voice = v[0];
+    speechSynthesis.speak(u);
+  }
+  if ('speechSynthesis' in window) speechSynthesis.getVoices();
+
+  // Tasto Indietro di Android: chiude la frase aperta invece di uscire.
+  window.addEventListener('popstate', function () { if (aperta) chiudi(); });
+  // App Android: il tasto Indietro chiude la frase aperta; se non c'è niente di aperto, esce.
+  document.addEventListener('backbutton', function (e) {
+    e.preventDefault();
+    if (aperta) chiudi(); else if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
+  }, false);
+  var apriOriginale = apri;
+  apri = function (i) { apriOriginale(i); try { history.pushState({ f: i }, ''); } catch (e) {} };
+  var chiudiOriginale = chiudi;
+  chiudi = function () { var era = aperta; chiudiOriginale(); if (era && history.state && history.state.f !== undefined) history.back(); };
+
+  disegna();
+</script>
+</body>
+</html>
