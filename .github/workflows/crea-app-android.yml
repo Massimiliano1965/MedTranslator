@@ -1,0 +1,40 @@
+# MedTranslator — © 2026 Massimiliano Previtali. Tutti i diritti riservati.
+# Costruisce l'app Android (APK) su GitHub a ogni modifica.
+# Per scaricarla: GitHub → Actions → "Crea app Android" → l'ultima riga verde
+# → in fondo, "Artifacts" → MedTranslator-app.
+name: Crea app Android
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Installa Cordova
+        run: npm install -g cordova@12
+      - name: Prepara Android e la voce
+        run: |
+          cordova telemetry off
+          cordova platform add android@13
+          cordova plugin add cordova-plugin-tts-advanced
+      - name: Costruisci l'app
+        run: cordova build android
+      - name: Rinomina l'app
+        run: cp platforms/android/app/build/outputs/apk/debug/app-debug.apk MedTranslator.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MedTranslator-app
+          path: MedTranslator.apk
