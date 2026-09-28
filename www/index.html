@@ -88,6 +88,18 @@
     background: var(--chip); color: var(--testo);
   }
   .btn-lente svg { width: 100%; height: 100%; display: block; }
+  /* Giorno / notte: automatico (segue il telefono), sempre giorno, sempre notte */
+  .btn-tema {
+    flex: none; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%;
+    background: var(--chip); font-size: 19px; line-height: 36px; text-align: center;
+  }
+  .btn-tema small { font-size: 9px; font-weight: 800; position: relative; top: -1px; margin-left: -2px; color: var(--testo); }
+  .avviso {
+    position: fixed; left: 50%; top: calc(70px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); z-index: 30;
+    background: var(--testo); color: var(--sfondo); padding: 8px 16px; border-radius: 999px; font-weight: 700; font-size: 15px;
+    pointer-events: none; opacity: 0; transition: opacity .2s; white-space: nowrap;
+  }
+  .avviso.visibile { opacity: 1; }
   .cerca { display: none; gap: 8px; align-items: center; margin: 0 0 6px; padding: 0 16px; }
   body.cercando .cerca { display: flex; }
   body.cercando .testata, body.cercando .gruppi { display: none; }
@@ -110,7 +122,7 @@
   }
   .lingue::-webkit-scrollbar, .gruppi::-webkit-scrollbar { display: none; }
   .lingue button {
-    flex: none; border: 1.5px solid var(--blu); background: transparent; color: var(--blu); white-space: nowrap;
+    flex: none; border: 0; background: linear-gradient(135deg, var(--lg1), var(--lg2)); color: var(--testo); white-space: nowrap; box-shadow: var(--ombra);
     border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 15px; font-weight: 700;
   }
   .lingue button.attiva { background: var(--blu); color: #fff; }
@@ -126,7 +138,7 @@
   .riga-frase { display: flex; gap: 6px; align-items: stretch; margin: 0 0 8px; }
   .riga-frase .frase { margin: 0; flex: 1; min-width: 0; }
   .stella {
-    flex: none; width: 48px; border: 0; border-radius: 14px; background: rgba(245,196,0,0.14);
+    flex: none; width: 48px; border: 0; border-radius: 16px; background: linear-gradient(135deg, rgba(245,196,0,0.10), rgba(245,196,0,0.20)); box-shadow: var(--ombra);
     color: var(--tenue); font-size: 24px; line-height: 1; cursor: pointer;
   }
   .stella { color: #d4a300; }
@@ -151,7 +163,7 @@
      così il bottone spostato resta sempre in vista */
   .frase {
     display: block; width: 100%; text-align: left; margin: 0 0 8px; padding: 13px 16px;
-    background: var(--carta); color: var(--testo); border: 2px solid var(--bordo); border-radius: 14px;
+    background: linear-gradient(135deg, var(--lg1), var(--lg2)); color: var(--testo); border: 2px solid transparent; border-radius: 16px;
     box-shadow: var(--ombra); font: inherit; font-size: 18px; font-weight: 700; cursor: pointer;
   }
   .frase > span { display: block; }
@@ -187,12 +199,16 @@
   .bv-lingue b { font-size: 16px; line-height: 1.2; white-space: nowrap; letter-spacing: -0.2px; }
   .bv-lingue small { font-size: 12.5px; color: var(--tenue); }
   .bv-lingue button.attiva { border-color: var(--blu); background: var(--blu-chiaro); }
-  .bv-lingue button.attiva .sigla { background: var(--blu); }
+  .bv-lingue .sigla.bandiera { background: #fff; overflow: hidden; font-size: 24px; line-height: 1; box-shadow: 0 0 0 2px #fff, var(--ombra); }
+  /* la bandiera (emoji) ingrandita dal centro, così il cerchietto mostra il centro della bandiera */
+  .bv-lingue .sigla.bandiera span { display: block; line-height: 1; transform: scale(1.8); }
+  .bv-lingue .sigla.arabo { background: #007a3d; font-size: 20px; box-shadow: 0 0 0 2px #fff; }
+  .bv-lingue button.attiva .sigla { box-shadow: 0 0 0 3px var(--blu); }
   .bv-ruoli { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .bv-ruolo {
     --c: #1b86c2;
     display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 18px 8px 16px;
-    background: var(--carta); color: var(--testo); border: 2px solid var(--bordo); border-top: 8px solid var(--c);
+    background: linear-gradient(135deg, var(--lg1), var(--lg2)); color: var(--testo); border: 2px solid transparent; border-top: 8px solid var(--c);
     border-radius: 18px; box-shadow: var(--ombra); font: inherit; cursor: pointer;
   }
   .bv-ruolo:active { transform: scale(.97); }
@@ -220,8 +236,8 @@
   #grande.aperto { display: flex; }
   .barra { display: flex; justify-content: space-between; gap: 10px; }
   .barra button {
-    border: 1px solid var(--bordo); border-radius: 999px; padding: 11px 20px; font: inherit; font-size: 17px; font-weight: 700;
-    background: var(--carta); color: var(--testo);
+    border: 0; border-radius: 999px; padding: 11px 20px; font: inherit; font-size: 17px; font-weight: 700;
+    background: linear-gradient(135deg, var(--lg1), var(--lg2)); color: var(--testo); box-shadow: var(--ombra);
   }
   .barra .ascolta { background: var(--blu); border-color: var(--blu); color: #fff; }
   #g-testo { font-size: 34px; font-weight: 700; line-height: 1.3; margin: 28px 0 14px; text-wrap: balance; }
@@ -251,7 +267,7 @@
   .tabella { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
   .tabella button {
     display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 8px;
-    background: var(--carta); color: var(--testo); border: 3px solid var(--bordo); border-radius: 16px; font: inherit;
+    background: linear-gradient(135deg, var(--lg1), var(--lg2)); color: var(--testo); border: 3px solid transparent; border-radius: 16px; box-shadow: var(--ombra); font: inherit;
   }
   .tabella button:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .tabella .simbolo { font-size: 40px; line-height: 1.1; }
@@ -268,7 +284,7 @@
   .tre { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
   .tre button {
     display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 4px;
-    background: var(--carta); color: var(--testo); border: 3px solid var(--bordo); border-radius: 16px; font: inherit; min-width: 0;
+    background: linear-gradient(135deg, var(--lg1), var(--lg2)); color: var(--testo); border: 3px solid transparent; border-radius: 16px; box-shadow: var(--ombra); font: inherit; min-width: 0;
   }
   .tre .figura { width: 100%; max-width: 76px; aspect-ratio: 1; height: auto; padding: 3px; background: #fff; border-radius: 12px; }
   .tre b { font-size: 17px; line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
@@ -296,7 +312,7 @@
 <body>
 <header>
   <div class="testata">
-    <svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg>
+    <button type="button" class="btn-tema" id="btn-tema" onclick="cambiaTema()"></button>
     <h1>MedTranslator</h1>
     <button type="button" class="btn-lente" onclick="apriCerca()" aria-label="Cerca una frase"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M15.5 15.5 L21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
     <button type="button" class="btn-ruolo" id="btn-ruolo" onclick="apriBenvenuto()"></button>
@@ -324,6 +340,7 @@
   </div>
 </div>
 
+<div class="avviso" id="avviso" role="status"></div>
 <div id="grande" role="dialog" aria-modal="true">
   <div class="barra">
     <button type="button" onclick="chiudi()">✕ Chiudi</button>
@@ -357,7 +374,8 @@
   var TUTTE = [{ id: 'it', nome: 'Italiano', voce: 'it-IT' }].concat(LINGUE);
   // Per la scelta della lingua dell'operatore: nome in italiano e iniziale nella sua scrittura
   var NOMI_IT = ['Italiano', 'Inglese', 'Spagnolo', 'Francese', 'Arabo', 'Cinese', 'Giapponese', 'Urdu', 'Romeno', 'Albanese', 'Punjabi', 'Ucraino', 'Russo'];
-  var SIGLE = ['It', 'En', 'Es', 'Fr', 'ع', '中', '日', 'اُر', 'Ro', 'Sq', 'ਪੰ', 'Ук', 'Ру'];
+  // Bandiera nel cerchietto. Arabo: nessuna bandiera vale per tutti i paesi arabi → lettera ع su verde.
+  var BANDIERE = ['🇮🇹', '🇬🇧', '🇪🇸', '🇫🇷', '', '🇨🇳', '🇯🇵', '🇵🇰', '🇷🇴', '🇦🇱', '🇮🇳', '🇺🇦', '🇷🇺'];
   // Risposte Sì / No
   var SI = ['Sì', 'Yes', 'Sí', 'Oui', 'نعم', '是', 'はい'];
   var NO = ['No', 'No', 'No', 'Non', 'لا', '否', 'いいえ'];
@@ -1220,7 +1238,7 @@
     }).join('');
     document.getElementById('bv-lingue').innerHTML = TUTTE.map(function (l, n) {
       return '<button type="button" class="' + (n === op ? 'attiva' : '') + '" onclick="scegliOperatore(' + n + ')">' +
-        '<span class="sigla" lang="' + l.id + '" aria-hidden="true">' + SIGLE[n] + '</span>' +
+        (BANDIERE[n] ? '<span class="sigla bandiera" aria-hidden="true"><span>' + BANDIERE[n] + '</span></span>' : '<span class="sigla arabo" lang="ar" aria-hidden="true">ع</span>') +
         '<span class="nomi"><b lang="' + l.id + '">' + l.nome + '</b><small>' + NOMI_IT[n] + '</small></span></button>';
     }).join('');
     document.getElementById('bv-firma').innerHTML = FIRMA;
@@ -1578,6 +1596,31 @@
     speechSynthesis.speak(u);
   }
   if ('speechSynthesis' in window) speechSynthesis.getVoices();
+
+  // Giorno / notte. "auto" segue il tema del telefono; si può forzare giorno o notte
+  // (es. da una stanza buia alla sala operatoria illuminata). Resta salvato.
+  var TEMI = [['auto', '🌓', 'Automatico (come il telefono)'], ['light', '☀️', 'Sempre giorno'], ['dark', '🌙', 'Sempre notte']];
+  var tema = 'auto';
+  try { var t0 = localStorage.getItem('trad_tema'); if (t0 === 'light' || t0 === 'dark') tema = t0; } catch (e) {}
+  function applicaTema() {
+    if (tema === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', tema);
+    var t = TEMI.filter(function (x) { return x[0] === tema; })[0];
+    var b = document.getElementById('btn-tema');
+    b.innerHTML = t[1] + (tema === 'auto' ? '<small>A</small>' : '');
+    b.setAttribute('aria-label', 'Giorno o notte: ' + t[2] + '. Tocca per cambiare');
+    return t;
+  }
+  var tempoAvviso;
+  function cambiaTema() {
+    var i = TEMI.map(function (x) { return x[0]; }).indexOf(tema);
+    tema = TEMI[(i + 1) % TEMI.length][0];
+    try { localStorage.setItem('trad_tema', tema); } catch (e) {}
+    var t = applicaTema(), a = document.getElementById('avviso');
+    a.textContent = t[1] + ' ' + t[2]; a.classList.add('visibile');
+    clearTimeout(tempoAvviso); tempoAvviso = setTimeout(function () { a.classList.remove('visibile'); }, 1600);
+  }
+  applicaTema();
 
   // Tasto Indietro di Android: chiude la frase aperta invece di uscire.
   window.addEventListener('popstate', function () { if (aperta) chiudi(); });
