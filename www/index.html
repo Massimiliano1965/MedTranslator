@@ -197,6 +197,8 @@
   .bv h1 { margin: 12px 0 4px; font-size: 32px; font-weight: 800; text-align: center; line-height: 1.15; }
   .bv-sotto { margin: 0 0 26px; text-align: center; color: var(--tenue); font-size: 17px; }
   .bv h2 { text-align: center; margin: 0 0 12px; font-size: 15px; }
+  /* "Che lavoro fai?" più grande; scroll-margin: quando ci si arriva da solo resta un po' di spazio sopra */
+  .bv h2.bv-lavoro { font-size: 24px; font-weight: 800; margin-bottom: 14px; scroll-margin-top: 16px; }
   /* Lingua dell'operatore: schede morbide su 2 colonne, cerchietto a sinistra */
   .bv-lingue { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 26px; }
   .bv-lingue button {
@@ -347,7 +349,7 @@
     <p class="bv-sotto">Frasi pronte per comunicare con i pazienti</p>
     <h2>🌐 La tua lingua · Your language</h2>
     <div class="bv-lingue" id="bv-lingue"></div>
-    <h2>Che lavoro fai?</h2>
+    <h2 id="bv-lavoro" class="bv-lavoro">Che lavoro fai?</h2>
     <div class="bv-ruoli" id="bv-ruoli"></div>
     <button type="button" class="bv-tutti" onclick="scegliRuolo('')">Vedi tutte le frasi</button>
     <div id="bv-firma"></div>
@@ -1682,7 +1684,10 @@
   var benvenutoAperto = false;
   // Schermata di benvenuto: si apre all'avvio e toccando il ruolo in alto.
   function apriBenvenuto() {
-    document.getElementById('bv-ruoli').innerHTML = RUOLI.map(function (r) {
+    // Ordine dei riquadri: in alto Medico e Infermiere, in basso Operatore alberghiero e OSS.
+    document.getElementById('bv-ruoli').innerHTML = ['M', 'I', 'A', 'S'].map(function (c) {
+      return RUOLI.filter(function (r) { return r[0] === c; })[0];
+    }).map(function (r) {
       return '<button type="button" class="bv-ruolo r-' + r[0] + (r[0] === ruolo ? ' ultimo' : '') + '" onclick="scegliRuolo(\'' + r[0] + '\')">' +
         '<span class="simbolo" aria-hidden="true">' + r[3] + '</span><b>' + r[2] + '</b><small>' + r[4] + '</small></button>';
     }).join('');
@@ -1704,6 +1709,11 @@
     if (lingua === op) lingua = op === 0 ? 1 : 0;
     try { localStorage.setItem('trad_operatore', String(op)); localStorage.setItem('trad_lingua', String(lingua)); } catch (e) {}
     apriBenvenuto();
+    // Scelta la lingua, la schermata scende da sola a "Che lavoro fai?"
+    setTimeout(function () {
+      var h = document.getElementById('bv-lavoro');
+      if (h && h.scrollIntoView) h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
   }
   function scegliRuolo(r) {
     ruolo = r;
