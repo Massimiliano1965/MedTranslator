@@ -26,7 +26,8 @@ Ordine delle lingue (colonne delle frasi): it, en, es, fr, ar, zh, ja, ur, ro, s
 - Le prime 7 sono scritte dentro ogni frase (`FRASI`); urdu, romeno, albanese, punjabi (gurmukhi), ucraino e russo
   stanno nei dizionari `URDU`/`ROMENO`/`ALBANESE`/`PUNJABI`/`UCRAINO`/`RUSSO` (chiave = frase italiana)
   e vengono aggiunte in fondo alle frasi. Le frasi aggiunte dopo (`FRASI_NUOVE`) hanno già tutte le 13 colonne.
-- IL GIAPPONESE È PER MASSI: non toccarlo mai (né togliere né cambiare le frasi giapponesi esistenti).
+- IL GIAPPONESE È PER MASSI (motivo personale, molto importante): la LINGUA giapponese deve restare sempre nell'app.
+  Le frasi (giapponese compreso) si possono correggere, cambiare o togliere come tutte le altre.
 - Altre lingue: le decide Massi.
 - Le traduzioni vanno controllate da madrelingua (colleghi, mediatori culturali) prima di distribuire l'app.
   Frasi cliniche (digiuno, farmaci, consenso): un errore può fare danni.
