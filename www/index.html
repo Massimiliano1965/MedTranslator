@@ -361,7 +361,23 @@
       '<path d="M60 90 L50 44 H78 L72 90 Z" fill="#f28c28" ' + L + '/><path d="M58 44 Q56 30 62 22 M64 44 Q66 30 72 26" fill="none" stroke="#34a847" stroke-width="4" stroke-linecap="round"/>';
     var grano = '<path d="M50 26 V86" stroke="#12331d" stroke-width="3" stroke-linecap="round"/><g fill="#e8b23c" stroke="#12331d" stroke-width="2"><ellipse cx="44" cy="32" rx="5" ry="8" transform="rotate(-25 44 32)"/><ellipse cx="56" cy="32" rx="5" ry="8" transform="rotate(25 56 32)"/>' +
       '<ellipse cx="44" cy="47" rx="5" ry="8" transform="rotate(-25 44 47)"/><ellipse cx="56" cy="47" rx="5" ry="8" transform="rotate(25 56 47)"/><ellipse cx="50" cy="20" rx="5" ry="8"/></g>' + croce();
+    var fumo = function (x) { return '<path d="M' + x + ' 34 Q' + (x - 4) + ' 28 ' + x + ' 22 Q' + (x + 4) + ' 16 ' + x + ' 10" fill="none" stroke="#9aa5a0" stroke-width="3" stroke-linecap="round"/>'; };
+    var acqua = '<rect x="42" y="16" width="16" height="14" fill="#dff1fb" ' + L + '/><rect x="39" y="7" width="22" height="10" rx="3" fill="#4fb3ea" ' + L + '/>' +
+      '<rect x="32" y="30" width="36" height="64" rx="10" fill="#dff1fb"/><path d="M32 52 H68 V84 Q68 94 58 94 H42 Q32 94 32 84 Z" fill="#4fb3ea"/>' +
+      '<rect x="32" y="30" width="36" height="64" rx="10" fill="none" ' + L + '/><path d="M40 40 V48" stroke="#fff" stroke-width="4" stroke-linecap="round"/>';
+    var tazza = function (liquido) {
+      return '<path d="M74 52 Q90 52 88 64 Q86 74 72 72" fill="none" ' + L + '/><path d="M22 46 H76 V70 Q76 88 58 88 H40 Q22 88 22 70 Z" fill="#fff" ' + L + '/>' +
+        '<ellipse cx="49" cy="46" rx="27" ry="6" fill="' + liquido + '" ' + L + '/><ellipse cx="49" cy="93" rx="38" ry="5" fill="#fff" ' + L + '/>';
+    };
+    var caffe = fumo(40) + fumo(52) + fumo(64) + '<path d="M30 56 H68 V68 Q68 84 49 84 Q30 84 30 68 Z" fill="#fff" stroke="none"/>' +
+      '<path d="M66 58 Q80 58 78 67 Q76 75 64 73" fill="none" ' + L + '/><path d="M30 54 H68 V68 Q68 84 49 84 Q30 84 30 68 Z" fill="#fff" ' + L + '/>' +
+      '<ellipse cx="49" cy="54" rx="19" ry="5" fill="#5a3a22" ' + L + '/><ellipse cx="49" cy="90" rx="32" ry="5" fill="#fff" ' + L + '/>';
+    var te = fumo(40) + fumo(56) + tazza('#c9782c') + '<path d="M30 46 Q20 56 18 64" fill="none" stroke="#12331d" stroke-width="2"/><rect x="9" y="63" width="18" height="20" rx="2" fill="#34a847" ' + L + '/>';
+    var fiore = '';
+    for (var a = 0; a < 360; a += 45) fiore += '<ellipse cx="78" cy="14" rx="5" ry="9" transform="rotate(' + a + ' 78 23)" fill="#fff" stroke="#12331d" stroke-width="2"/>';
+    var camomilla = fumo(38) + tazza('#f3d36b') + fiore + '<circle cx="78" cy="23" r="7" fill="#ffc83d" stroke="#12331d" stroke-width="2"/>';
     var F = {
+      'Acqua': acqua, 'Caffè': caffe, 'Tè': te, 'Camomilla': camomilla, 'Fame': fame,
       'Sì': si, 'No': no, 'Dolore': dolore, 'Sete': sete, 'Freddo': freddo, 'Caldo': caldo, 'Bagno': bagno, 'Paura': paura,
       'Chiamare un familiare': famiglia, 'Ho freddo': freddo, 'Ho caldo': caldo, 'Sto bene': bene, 'Ho sete': sete, 'Ho fame': fame,
       'Sale': sale, 'Pepe': pepe, 'Senza maiale': maiale, 'Vegetariano': verdure, 'Senza glutine': grano
@@ -421,11 +437,11 @@
       scelte: [["Ho freddo", "I'm cold", "Tengo frío", "J'ai froid", "أشعر بالبرد", "我冷", "寒い"], ["Ho caldo", "I'm hot", "Tengo calor", "J'ai chaud", "أشعر بالحر", "我热", "暑い"], ["Sto bene", "I'm fine", "Estoy bien", "Ça va", "أنا بخير", "还好", "大丈夫です"]] },
     { ruoli: 'IM', tipo: 'sn', t: ["Ha difficoltà a respirare?", "Do you have trouble breathing?", "¿Le cuesta respirar?", "Avez-vous du mal à respirer ?", "هل لديك صعوبة في التنفس؟", "您呼吸困难吗？", "息苦しいですか？"] },
 
-    { gruppo: 'Paziente che non può parlare', ruoli: 'ISM' },
+    { gruppo: 'Paziente che non può parlare', ruoli: 'ISAM' },
     { ruoli: 'ISM', tipo: 'tabella', t: ["Tabella a immagini: indico una casella, il paziente chiude gli occhi", "Close your eyes when I point to the right one.", "Cierre los ojos cuando señale lo correcto.", "Fermez les yeux quand je montre la bonne case.", "أغمض عينيك عندما أشير إلى الخيار الصحيح.", "我指到正确的那一项时，请闭上眼睛。", "正しいものを指したら、目を閉じてください。"] },
-    { ruoli: 'ISM', tipo: 'sn', t: ["Se non può parlare: chiuda gli occhi una volta per SÌ, due volte per NO.", "If you cannot speak: close your eyes once for YES, twice for NO.", "Si no puede hablar: cierre los ojos una vez para SÍ, dos veces para NO.", "Si vous ne pouvez pas parler : fermez les yeux une fois pour OUI, deux fois pour NON.", "إذا لم تستطع الكلام: أغمض عينيك مرة واحدة تعني نعم، ومرتين تعني لا.", "如果您不能说话：闭眼一次表示“是”，闭眼两次表示“不是”。", "話せない場合：「はい」は目を1回閉じてください。「いいえ」は2回閉じてください。"] },
+    { ruoli: 'ISAM', tipo: 'sn', t: ["Se non può parlare: chiuda gli occhi una volta per SÌ, due volte per NO.", "If you cannot speak: close your eyes once for YES, twice for NO.", "Si no puede hablar: cierre los ojos una vez para SÍ, dos veces para NO.", "Si vous ne pouvez pas parler : fermez les yeux une fois pour OUI, deux fois pour NON.", "إذا لم تستطع الكلام: أغمض عينيك مرة واحدة تعني نعم، ومرتين تعني لا.", "如果您不能说话：闭眼一次表示“是”，闭眼两次表示“不是”。", "話せない場合：「はい」は目を1回閉じてください。「いいえ」は2回閉じてください。"] },
     { ruoli: 'ISM', tipo: 'sn', t: ["Se non può parlare: stringa la mia mano una volta per SÌ, due volte per NO.", "If you cannot speak: squeeze my hand once for YES, twice for NO.", "Si no puede hablar: apriete mi mano una vez para SÍ, dos veces para NO.", "Si vous ne pouvez pas parler : serrez ma main une fois pour OUI, deux fois pour NON.", "إذا لم تستطع الكلام: اضغط على يدي مرة واحدة تعني نعم، ومرتين تعني لا.", "如果您不能说话：捏我的手一次表示“是”，两次表示“不是”。", "話せない場合：「はい」は私の手を1回握ってください。「いいえ」は2回握ってください。"] },
-    { ruoli: 'ISM', tipo: 'sn', t: ["Se non può parlare: muova la testa su e giù per SÌ, a destra e sinistra per NO.", "If you cannot speak: nod your head for YES, shake it for NO.", "Si no puede hablar: mueva la cabeza arriba y abajo para SÍ, a los lados para NO.", "Si vous ne pouvez pas parler : hochez la tête pour OUI, secouez-la pour NON.", "إذا لم تستطع الكلام: حرّك رأسك لأعلى ولأسفل تعني نعم، ولليمين واليسار تعني لا.", "如果您不能说话：点头表示“是”，摇头表示“不是”。", "話せない場合：「はい」はうなずいてください。「いいえ」は首を横に振ってください。"] },
+    { ruoli: 'ISAM', tipo: 'sn', t: ["Se non può parlare: muova la testa su e giù per SÌ, a destra e sinistra per NO.", "If you cannot speak: nod your head for YES, shake it for NO.", "Si no puede hablar: mueva la cabeza arriba y abajo para SÍ, a los lados para NO.", "Si vous ne pouvez pas parler : hochez la tête pour OUI, secouez-la pour NON.", "إذا لم تستطع الكلام: حرّك رأسك لأعلى ولأسفل تعني نعم، ولليمين واليسار تعني لا.", "如果您不能说话：点头表示“是”，摇头表示“不是”。", "話せない場合：「はい」はうなずいてください。「いいえ」は首を横に振ってください。"] },
 
     { gruppo: 'Bisogni', ruoli: 'IS' },
     { ruoli: 'IS', tipo: 'sn', t: ["Ha bisogno del bagno?", "Do you need the toilet?", "¿Necesita ir al baño?", "Avez-vous besoin d'aller aux toilettes ?", "هل تريد الذهاب إلى الحمّام؟", "您要上厕所吗？", "トイレに行きたいですか？"] },
@@ -967,6 +983,7 @@
   // (it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru).
   var GRUPPI_NUOVI = {"Pronto soccorso": "ISAM", "Igiene e movimento": "IS", "Prima e dopo l'operazione": "ISM", "Dimissione": "ISAM", "Mamme e bambini": "ISM"};
   var FRASI_NUOVE = [
+    {"g": "Pasti e bevande", "ruoli": "SA", "tipo": "tabella", "tab": "bevande", "t": ["Scheda bevande e pasti: il paziente indica col dito", "Point to what you would like, without touching the phone.", "Señale con el dedo lo que desea, sin tocar el teléfono.", "Montrez du doigt ce que vous désirez, sans toucher le téléphone.", "أشر بإصبعك إلى ما تريد، دون لمس الهاتف.", "请用手指指出您想要的，不要触碰手机。", "ご希望のものを指で示してください。スマートフォンには触れないでください。", "انگلی سے اشارہ کریں کہ آپ کیا چاہتے ہیں، فون کو ہاتھ نہ لگائیں۔", "Arătați cu degetul ce doriți, fără să atingeți telefonul.", "Tregoni me gisht çfarë dëshironi, pa e prekur telefonin.", "ਉਂਗਲ ਨਾਲ ਦੱਸੋ ਕਿ ਤੁਸੀਂ ਕੀ ਚਾਹੁੰਦੇ ਹੋ, ਫ਼ੋਨ ਨੂੰ ਹੱਥ ਨਾ ਲਾਓ।", "Покажіть пальцем, що ви бажаєте, не торкаючись телефону.", "Покажите пальцем, что вы хотите, не прикасаясь к телефону."]},
     {"g": "Accoglienza", "ruoli": "ISAM", "t": ["Non capisco. Può ripetere?", "I don't understand. Could you repeat that?", "No entiendo. ¿Puede repetirlo?", "Je ne comprends pas. Pouvez-vous répéter ?", "لا أفهم. هل يمكنك أن تعيد؟", "我听不懂。请您再说一遍。", "わかりません。もう一度言ってください。", "میں سمجھا نہیں۔ کیا آپ دوبارہ کہہ سکتے ہیں؟", "Nu înțeleg. Puteți repeta?", "Nuk kuptoj. Mund ta përsërisni?", "ਮੈਨੂੰ ਸਮਝ ਨਹੀਂ ਆਈ। ਕੀ ਤੁਸੀਂ ਦੁਬਾਰਾ ਦੱਸ ਸਕਦੇ ਹੋ?", "Я не розумію. Можете повторити?", "Я не понимаю. Можете повторить?"]},
     {"g": "Accoglienza", "ruoli": "ISAM", "t": ["Me lo mostri con le mani.", "Please show me with your hands.", "Muéstremelo con las manos.", "Montrez-le-moi avec les mains.", "أرني ذلك بيديك من فضلك.", "请用手比给我看。", "手で示してください。", "مجھے ہاتھ کے اشارے سے بتائیں۔", "Arătați-mi cu mâinile.", "Ma tregoni me duar.", "ਮੈਨੂੰ ਹੱਥਾਂ ਨਾਲ ਇਸ਼ਾਰਾ ਕਰਕੇ ਦੱਸੋ।", "Покажіть мені руками.", "Покажите мне руками."]},
     {"g": "Accoglienza", "ruoli": "ISA", "t": ["Questo è il suo letto.", "This is your bed.", "Esta es su cama.", "Voici votre lit.", "هذا سريرك.", "这是您的床。", "こちらがあなたのベッドです。", "یہ آپ کا بستر ہے۔", "Acesta este patul dumneavoastră.", "Ky është shtrati juaj.", "ਇਹ ਤੁਹਾਡਾ ਬਿਸਤਰਾ ਹੈ।", "Це Ваше ліжко.", "Это Ваша кровать."]},
@@ -1040,6 +1057,7 @@
     while (fine < FRASI.length && !FRASI[fine].gruppo) fine++;
     var f = { ruoli: n.ruoli, t: n.t };
     if (n.tipo) f.tipo = n.tipo;
+    if (n.tab) f.tab = n.tab;
     if (n.scelte) f.scelte = n.scelte;
     FRASI.splice(fine, 0, f);
   });
@@ -1054,6 +1072,31 @@
       (f.scelte || []).forEach(function (x) { x.push(L[x[0]] || x[1]); });
     });
   });
+
+  // Scheda bevande e pasti: [simbolo, it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru]
+  // Sì, No e Sete sono le stesse caselle della tabella a immagini.
+  var TABELLA_BEVANDE = [TABELLA[0], TABELLA[1],
+    ['🍽️', 'Fame', 'Hunger', 'Hambre', 'Faim', 'جوع', '饿', 'お腹が空いた', 'بھوک', 'Foame', 'Uri', 'ਭੁੱਖ', 'Голод', 'Голод'],
+    TABELLA[3],
+    ['🚰', 'Acqua', 'Water', 'Agua', 'Eau', 'ماء', '水', '水', 'پانی', 'Apă', 'Ujë', 'ਪਾਣੀ', 'Вода', 'Вода'],
+    ['☕', 'Caffè', 'Coffee', 'Café', 'Café', 'قهوة', '咖啡', 'コーヒー', 'کافی', 'Cafea', 'Kafe', 'ਕੌਫ਼ੀ', 'Кава', 'Кофе'],
+    ['🍵', 'Tè', 'Tea', 'Té', 'Thé', 'شاي', '茶', '紅茶', 'چائے', 'Ceai', 'Çaj', 'ਚਾਹ', 'Чай', 'Чай'],
+    ['🌼', 'Camomilla', 'Camomile tea', 'Manzanilla', 'Camomille', 'بابونج', '洋甘菊茶', 'カモミールティー', 'بابونے کی چائے', 'Ceai de mușețel', 'Çaj kamomili', 'ਕੈਮੋਮਾਈਲ ਚਾਹ', 'Ромашковий чай', 'Ромашковый чай']
+  ];
+  var TABELLE = { base: TABELLA, bevande: TABELLA_BEVANDE };
+  var tabAttiva = TABELLA;
+  // Tabella bevande per il paziente che non può parlare: stessa frase a voce
+  // della tabella a immagini ("chiuda gli occhi quando indico quella giusta").
+  (function () {
+    for (var i = 0; i < FRASI.length; i++) {
+      var f = FRASI[i];
+      if (f.tipo === 'tabella' && !f.tab) {
+        FRASI.splice(i + 1, 0, { ruoli: 'SA', tipo: 'tabella', tab: 'bevande',
+          t: ['Tabella bevande e pasti: indico una casella, il paziente chiude gli occhi'].concat(f.t.slice(1)) });
+        return;
+      }
+    }
+  })();
 
   var lingua = 1;   // posizione nella riga delle frasi (1 = English)
   try { var s = +localStorage.getItem('trad_lingua'); if (s >= 1 && s <= LINGUE.length) lingua = s; } catch (e) {}
@@ -1269,13 +1312,17 @@
       r.innerHTML = '<div class="scala" dir="ltr">' + b + '</div><div class="scala-etichette" dir="ltr"><span>0 = ' + esc(DOLORE_0[lingua]) + '</span><span>10 = ' + esc(DOLORE_10[lingua]) + '</span></div>';
     } else if (f.tipo === 'tabella') {
       casella = -1;
-      r.innerHTML = '<div class="tabella"' + rtl + '>' + TABELLA.map(function (c, k) {
+      tabAttiva = TABELLE[f.tab || 'base'];
+      r.innerHTML = '<div class="tabella"' + rtl + '>' + tabAttiva.map(function (c, k) {
         return '<button type="button" id="casella-' + k + '" onclick="scegliCasella(' + k + ')">' + (FIGURE[c[1]] || '<span class="simbolo" aria-hidden="true">' + c[0] + '</span>') +
           '<b lang="' + info().id + '">' + esc(c[lingua + 1]) + '</b><small>' + esc(c[1]) + '</small></button>';
       }).join('') + '</div>' +
         '<div class="scorri"><button type="button" onclick="avantiCasella()">▶ Avanti</button><button type="button" class="questa" onclick="scegliCasella(casella)">✓ Questa!</button></div>' +
-        '<p class="aiuto-tabella">Tocca <b>Avanti</b>: le caselle si accendono una alla volta e il telefono le legge nella lingua del paziente. Quando il paziente chiude gli occhi, tocca <b>Questa!</b> Se il paziente può indicare, tocca direttamente la casella.</p>';
+        '<p class="aiuto-tabella">Tocca <b>Avanti</b>: le caselle si accendono una alla volta e il telefono le legge nella lingua del paziente. Quando il paziente chiude gli occhi, tocca <b>Questa!</b> Se il paziente può indicare, indica col dito <b>senza toccare il telefono</b>: la casella la tocchi tu.</p>';
     } else r.innerHTML = '';
+    // Il telefono lo tiene sempre l'operatore: il paziente indica o fa cenno, la risposta la tocchi tu.
+    if (f.tipo === 'sn' || f.tipo === 'dolore' || f.scelte)
+      r.innerHTML += '<p class="aiuto-tabella">Il paziente indica o fa cenno, <b>senza toccare il telefono</b>: la risposta la tocchi tu.</p>';
     document.getElementById('g-risposta').style.display = 'none';
     document.getElementById('grande').classList.add('aperto');
     document.getElementById('grande').scrollTop = 0;
@@ -1293,18 +1340,18 @@
   // Tabella: accende la casella successiva e la legge a voce.
   function avantiCasella() {
     if (casella >= 0) document.getElementById('casella-' + casella).classList.remove('accesa');
-    casella = (casella + 1) % TABELLA.length;
+    casella = (casella + 1) % tabAttiva.length;
     var el = document.getElementById('casella-' + casella);
     el.classList.add('accesa');
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    parlaTesto(TABELLA[casella][lingua + 1]);
+    parlaTesto(tabAttiva[casella][lingua + 1]);
   }
   function scegliCasella(k) {
     if (k < 0) return;
     if (casella >= 0) document.getElementById('casella-' + casella).classList.remove('accesa');
     casella = k;
     document.getElementById('casella-' + k).classList.add('accesa');
-    risposta(TABELLA[k][1]);
+    risposta(tabAttiva[k][1]);
   }
 
   function chiudi() {
