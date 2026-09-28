@@ -1253,8 +1253,8 @@
   // "Benvenuto" e si apre l'app. Toccando lo schermo si salta.
   var avvio = (function () {
     var el = document.getElementById('avvio'), box = document.getElementById('saluti');
-    // Il giapponese per primo (è quello di Massi), il francese per ultimo.
-    var SALUTI = [['ja', 'こんにちは'], ['it', 'Ciao'], ['en', 'Hello'], ['es', 'Hola'], ['ar', 'مرحبا', 1],
+    // Italiano per primo, giapponese terzo (è quello di Massi), francese per ultimo.
+    var SALUTI = [['it', 'Ciao'], ['en', 'Hello'], ['ja', 'こんにちは'], ['es', 'Hola'], ['ar', 'مرحبا', 1],
       ['zh', '你好'], ['ur', 'السلام علیکم', 1], ['ro', 'Bună'], ['sq', 'Përshëndetje'],
       ['pa', 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ'], ['uk', 'Вітаю'], ['ru', 'Здравствуйте'], ['fr', 'Bonjour']];
     var timer = [], finito = false, prima = null;
