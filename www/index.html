@@ -179,7 +179,16 @@
   #benvenuto.aperto { display: block; }
   .bv { max-width: 520px; margin: 0 auto; padding: 28px 16px 16px; }
   .bv-logo { display: flex; justify-content: center; }
-  .bv-logo .marchio { width: 64px; height: 64px; }
+  .bv-logo .marchio { width: 96px; height: 96px; filter: drop-shadow(0 4px 10px rgba(11,58,74,.15)); }
+  /* Avvio dell'app: logo con i saluti che scorrono nelle 13 lingue, poi si apre il benvenuto */
+  #avvio {
+    position: fixed; inset: 0; z-index: 60; background: var(--sfondo); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 6px; text-align: center; padding: 24px; transition: opacity .45s;
+  }
+  #avvio.via { opacity: 0; pointer-events: none; }
+  #avvio .marchio { width: 190px; height: 190px; filter: drop-shadow(0 8px 18px rgba(11,58,74,.18)); margin-bottom: 14px; }
+  #avvio h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -.3px; }
+  #avvio p { margin: 0; color: var(--tenue); font-size: 16px; }
   .bv h1 { margin: 12px 0 4px; font-size: 32px; font-weight: 800; text-align: center; line-height: 1.15; }
   .bv-sotto { margin: 0 0 26px; text-align: center; color: var(--tenue); font-size: 17px; }
   .bv h2 { text-align: center; margin: 0 0 12px; font-size: 15px; }
@@ -328,7 +337,7 @@
 
 <div id="benvenuto" role="dialog" aria-modal="true" aria-labelledby="bv-titolo">
   <div class="bv">
-    <div class="bv-logo"><svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg></div>
+    <div class="bv-logo" id="bv-logo"></div>
     <h1 id="bv-titolo">Benvenuto in MedTranslator</h1>
     <p class="bv-sotto">Frasi pronte per parlare con i pazienti stranieri</p>
     <h2>🌐 La tua lingua · Your language</h2>
@@ -340,6 +349,7 @@
   </div>
 </div>
 
+<div id="avvio" onclick="chiudiAvvio()" aria-hidden="true"><div id="avvio-logo"></div><h1>MedTranslator</h1><p>Frasi pronte per parlare con i pazienti</p></div>
 <div class="avviso" id="avviso" role="status"></div>
 <div id="grande" role="dialog" aria-modal="true">
   <div class="barra">
@@ -1215,7 +1225,18 @@
   if (lingua === op) lingua = op === 0 ? 1 : 0;
   var aperta = null;
   var FIRMA;   // firma dell'ideatore (sotto le frasi e nella schermata di benvenuto)
-  var MARCHIO_SVG = '<svg class="marchio" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" style="fill:var(--blu)"/><path d="M8 11.5h9a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-4l-3.5 3v-3H8a0 0 0 0 1 0 0z" fill="#fff" opacity=".55"/><path d="M13 8h8a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3h-1v3l-3.5-3H13a3 3 0 0 1-3-3v-3a3 3 0 0 1 3-3z" fill="#fff"/></svg>';
+  // Logo MedTranslator: due fumetti (dietro le parole in varie lingue, davanti la croce) + onde della voce.
+  // Lo stesso disegno delle icone in res/ (generate dal logo).
+  var LOGO_DEF = '<defs><linearGradient id="mtg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4bb0e6"/><stop offset="1" stop-color="#3cc39a"/></linearGradient><filter id="mto" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0b3a4a" flood-opacity=".18"/></filter></defs>';
+  var LOGO_ARTE = '<g filter="url(#mto)"><rect x="66" y="92" width="248" height="178" rx="64" fill="#fff" opacity=".82"/><path d="M110 252 L84 326 L170 266 Z" fill="#fff" opacity=".82"/><rect x="170" y="212" width="222" height="172" rx="66" fill="#fff"/><path d="M340 368 L384 438 L290 376 Z" fill="#fff"/></g>@@DIETRO@@<path d="M262 254 q0 -12 12 -12 h14 q12 0 12 12 v25 h25 q12 0 12 12 v14 q0 12 -12 12 h-25 v25 q0 12 -12 12 h-14 q-12 0 -12 -12 v-25 h-25 q-12 0 -12 -12 v-14 q0 -12 12 -12 h25 z" fill="url(#mtg)"/><g fill="none" stroke="#fff" stroke-width="20" stroke-linecap="round"><path d="M414 262 q24 36 0 72"/><path d="M450 230 q46 68 0 136"/></g>';
+  var LOGO_PAROLE = '<g font-family="Noto Sans, Noto Sans CJK JP, Noto Sans Arabic, Roboto, Arial, sans-serif" font-weight="700" fill="#2a8fa6" text-anchor="middle"><text x="176" y="133" font-size="28">Ciao · Hello</text><text x="176" y="169" font-size="28">你好 · مرحبا</text><text x="160" y="204" font-size="28">こんにちは</text></g>';
+  // dietro = cosa c'è nel fumetto dietro (di solito le parole; nell'avvio un saluto che cambia)
+  function logoSVG(classe, dietro) {
+    return '<svg class="' + classe + '" viewBox="0 0 512 512" aria-hidden="true">' + LOGO_DEF +
+      '<rect width="512" height="512" rx="112" fill="url(#mtg)"/><g transform="translate(256 256) scale(0.9) translate(-268 -265)">' +
+      LOGO_ARTE.replace('@@DIETRO@@', dietro == null ? LOGO_PAROLE : dietro) + '</g></svg>';
+  }
+  var MARCHIO_SVG = logoSVG('marchio');
   FIRMA = '<footer class="firma">' + MARCHIO_SVG +
     '<span class="firma-etichetta">Ideazione e design</span>' +
     '<span class="firma-nome">Massimiliano Previtali</span>' +
@@ -1242,6 +1263,7 @@
         '<span class="nomi"><b lang="' + l.id + '">' + l.nome + '</b><small>' + NOMI_IT[n] + '</small></span></button>';
     }).join('');
     document.getElementById('bv-firma').innerHTML = FIRMA;
+    document.getElementById('bv-logo').innerHTML = MARCHIO_SVG;
     var b = document.getElementById('benvenuto');
     b.classList.add('aperto'); b.scrollTop = 0;
     document.body.setAttribute('data-ruolo', '');   // benvenuto sempre nel verde di Doko
@@ -1640,6 +1662,36 @@
 
   disegna();
   apriBenvenuto();
+
+  // Avvio: nel fumetto del logo scorrono i saluti nelle 13 lingue (ordine delle colonne), poi sparisce.
+  // Toccando lo schermo si salta.
+  var SALUTI = ['Ciao', 'Hello', 'Hola', 'Bonjour', 'مرحبا', '你好', 'こんにちは', 'سلام', 'Bună', 'Tungjatjeta', 'ਸਤ ਸ੍ਰੀ ਅਕਾਲ', 'Привіт', 'Привет'];
+  var tempoAvvio = null;
+  function chiudiAvvio() {
+    clearInterval(tempoAvvio);
+    var a = document.getElementById('avvio');
+    if (!a || a.classList.contains('via')) return;
+    a.classList.add('via');
+    setTimeout(function () { if (a.parentNode) a.parentNode.removeChild(a); }, 500);
+  }
+  (function () {
+    var saluto = '<text id="avvio-saluto" x="190" y="176" text-anchor="middle" font-weight="800" font-size="56" fill="#2a8fa6" ' +
+      'font-family="Noto Sans, Noto Sans CJK JP, Noto Sans Arabic, Roboto, Arial, sans-serif"></text>';
+    document.getElementById('avvio-logo').innerHTML = logoSVG('marchio', saluto);
+    var t = document.getElementById('avvio-saluto'), k = 0;
+    function mostra() {
+      t.textContent = SALUTI[k];
+      t.setAttribute('font-size', '56');
+      var w = t.getComputedTextLength ? t.getComputedTextLength() : 0;
+      if (w > 210) t.setAttribute('font-size', String(Math.floor(56 * 210 / w)));   // parole lunghe: più piccole
+    }
+    mostra();
+    tempoAvvio = setInterval(function () {
+      k++;
+      if (k >= SALUTI.length) { clearInterval(tempoAvvio); setTimeout(chiudiAvvio, 350); return; }
+      mostra();
+    }, 210);
+  })();
 </script>
 </body>
 </html>

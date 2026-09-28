@@ -12,8 +12,18 @@
     <!-- Solo verticale: il traduttore si usa col telefono in mano, girato verso il paziente. -->
     <preference name="Orientation" value="portrait" />
     <preference name="DisallowOverscroll" value="true" />
-    <preference name="AndroidWindowSplashScreenBackground" value="#ffffff" />
+    <!-- Schermata di avvio (Android 12+): logo al centro su sfondo verdino dell'app.
+         Subito dopo, dentro l'app, parte l'avvio con i saluti nelle 13 lingue. -->
+    <preference name="AndroidWindowSplashScreenBackground" value="#eef8f2" />
+    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/screen/android/splash-icon.png" />
+    <preference name="AndroidWindowSplashScreenAnimationDuration" value="300" />
     <platform name="android">
         <allow-intent href="market:*" />
+        <!-- Icona: adattiva (sfondo sfumato + disegno) per Android 8+, classica per i telefoni più vecchi -->
+        <icon density="mdpi" src="res/icon/android/mdpi.png" background="res/icon/android/mdpi-background.png" foreground="res/icon/android/mdpi-foreground.png" />
+        <icon density="hdpi" src="res/icon/android/hdpi.png" background="res/icon/android/hdpi-background.png" foreground="res/icon/android/hdpi-foreground.png" />
+        <icon density="xhdpi" src="res/icon/android/xhdpi.png" background="res/icon/android/xhdpi-background.png" foreground="res/icon/android/xhdpi-foreground.png" />
+        <icon density="xxhdpi" src="res/icon/android/xxhdpi.png" background="res/icon/android/xxhdpi-background.png" foreground="res/icon/android/xxhdpi-foreground.png" />
+        <icon density="xxxhdpi" src="res/icon/android/xxxhdpi.png" background="res/icon/android/xxxhdpi-background.png" foreground="res/icon/android/xxxhdpi-foreground.png" />
     </platform>
 </widget>
