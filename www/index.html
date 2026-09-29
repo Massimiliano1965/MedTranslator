@@ -30,6 +30,7 @@
     --blu: #3a9ed6; --blu-chiaro: #dcecf5; --chip: #dcecf5; --rosso: #E53935; --verde: #34a847;
     --sfondo: #eef8f2; --carta: #ffffff; --bordo: #d3e6dc; --testo: #24323a; --tenue: #647580; --testata: #f6fbf8;
     --ombra: 0 2px 6px rgba(36,50,58,0.07); --lg1: #e4f4ec; --lg2: #deedf6;
+    --arg: #f4ead3; --arg-testo: #4a3a14; --arg-attivo: #a8620f; --arg-attivo-testo: #ffffff;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -37,6 +38,7 @@
       --blu: #5cb2ec; --blu-chiaro: #1c2c3d; --chip: #1c2c3d; --rosso: #f0474e; --verde: #45b85a;
       --sfondo: #0e1620; --carta: #16222f; --bordo: #24364a; --testo: #e4edf5; --tenue: #98a9ba; --testata: #111b27;
       --ombra: none; --lg1: #182a2a; --lg2: #1a2838;
+      --arg: #2b2517; --arg-testo: #eadcbc; --arg-attivo: #e3a54a; --arg-attivo-testo: #1b1409;
     }
   }
   :root[data-theme="dark"] {
@@ -44,6 +46,7 @@
     --blu: #5cb2ec; --blu-chiaro: #1c2c3d; --chip: #1c2c3d; --rosso: #f0474e; --verde: #45b85a;
     --sfondo: #0e1620; --carta: #16222f; --bordo: #24364a; --testo: #e4edf5; --tenue: #98a9ba; --testata: #111b27;
     --ombra: none; --lg1: #182a2a; --lg2: #1a2838;
+      --arg: #2b2517; --arg-testo: #eadcbc; --arg-attivo: #e3a54a; --arg-attivo-testo: #1b1409;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
@@ -127,14 +130,17 @@
   }
   .lingue button.attiva { background: var(--blu); color: #fff; }
   .gruppi { margin-top: 6px; }
+  /* Argomenti in color sabbia/ambra, lingue in azzurro: due barre che non si confondono */
   .gruppi button {
-    flex: none; border: 0; background: var(--chip); color: var(--testo); border-radius: 999px;
+    flex: none; border: 0; background: var(--arg); color: var(--arg-testo); border-radius: 999px;
     padding: 4px 10px; font: inherit; font-size: 13.5px; font-weight: 700; white-space: nowrap;
   }
-  .gruppi button.attiva { background: var(--blu); color: #fff; }
+  .gruppi button.attiva { background: var(--arg-attivo); color: var(--arg-attivo-testo); }
   /* Argomenti degli altri ruoli: in fondo, bordo tratteggiato */
   .gruppi .etichetta-altri { flex: none; align-self: center; font-size: 12.5px; color: var(--tenue); margin-left: 4px; }
-  .gruppi button.altro-ruolo { border-style: dashed; opacity: .85; }
+  .gruppi button.altro-ruolo { border: 1.5px dashed var(--arg-attivo); padding: 2.5px 8.5px; opacity: .85; }
+  .gruppi button.indietro { background: transparent; border: 1.5px solid var(--arg-attivo); padding: 2.5px 8.5px; }
+  h2.cat-parole { font-size: 16px; color: var(--arg-attivo); letter-spacing: 0.02em; margin-top: 26px; }
   .gruppi button.altro-ruolo.attiva { opacity: 1; }
   main { padding: 8px 16px 32px; max-width: 640px; margin: 0 auto; }
   h2 { font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; color: var(--tenue); margin: 20px 4px 8px; }
@@ -2047,10 +2053,22 @@
     // Argomenti che sono solo di altri ruoli: si possono aprire lo stesso (in fondo, più chiari)
     var altriGruppi = FRASI.filter(function (f) { return f.gruppo && disponibili.indexOf(f.gruppo) === -1; }).map(function (f) { return f.gruppo; });
     if (gruppo === '__pref' && !preferite.length) gruppo = '';
-    if (gruppo && gruppo !== '__pref' && gruppo !== '__parole' && disponibili.indexOf(gruppo) === -1 && altriGruppi.indexOf(gruppo) === -1) gruppo = '';
+    if (gruppo && gruppo !== '__pref' && gruppo.indexOf('__parole') !== 0 && disponibili.indexOf(gruppo) === -1 && altriGruppi.indexOf(gruppo) === -1) gruppo = '';
     var fissi = '<button type="button" class="' + (gruppo === '' ? 'attiva' : '') + '" onclick="scegliGruppo(\'\')">Tutti gli argomenti</button>' +
       (preferite.length ? '<button type="button" class="' + (gruppo === '__pref' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__pref\')">★ Le mie frasi</button>' : '') +
       '<button type="button" class="' + (gruppo === '__parole' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__parole\')">📖 Parole</button>';
+    var modoParole = gruppo.indexOf('__parole') === 0;
+    if (modoParole) {
+      // Stessa barra, niente riga in più: al posto degli argomenti compaiono le categorie delle parole
+      var cats = [];
+      PAROLE.forEach(function (w) { if (cats.indexOf(w.c) === -1) cats.push(w.c); });
+      document.getElementById('gruppi').innerHTML =
+        '<button type="button" class="indietro" onclick="scegliGruppo(\'\')">‹ Argomenti</button>' +
+        '<button type="button" class="' + (gruppo === '__parole' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__parole\')">📖 Tutte</button>' +
+        cats.map(function (c) {
+          return '<button type="button" class="' + (gruppo === '__parole:' + c ? 'attiva' : '') + '" onclick="scegliGruppo(' + JSON.stringify('__parole:' + c).replace(/"/g, '&quot;') + ')">' + esc(c) + '</button>';
+        }).join('');
+    } else
     document.getElementById('gruppi').innerHTML = fissi + viste.gruppi.map(function (g, k) {
       return chip('gruppi', k, '<button type="button" class="' + (g === gruppo ? 'attiva' : '') + '" onclick="scegliGruppo(' + JSON.stringify(g).replace(/"/g, '&quot;') + ')">' + esc(g) + '</button>');
     }).join('') + (ruolo && altriGruppi.length ? '<span class="etichetta-altri">Altri ruoli:</span>' + altriGruppi.map(function (g) {
@@ -2094,11 +2112,12 @@
       FRASI.forEach(function (f, i) { if (!f.gruppo && preferite.indexOf(f.t[0]) !== -1) pref += rigaFrase(f, i); });
       if (pref) html += '<h2 class="titolo-pref">★ Le mie frasi</h2>' + pref;
     }
-    if (gruppo === '__parole') {
-      // Dizionario: tutte le parole, per categoria
-      var cat = '';
+    if (gruppo.indexOf('__parole') === 0) {
+      // Dizionario: tutte le parole per categoria, oppure solo la categoria scelta
+      var cat = '', solo = gruppo.indexOf(':') !== -1 ? gruppo.slice(gruppo.indexOf(':') + 1) : '';
       PAROLE.forEach(function (w, k) {
-        if (w.c !== cat) { cat = w.c; html += '<h2>' + esc(cat) + '</h2>'; }
+        if (solo && w.c !== solo) return;
+        if (w.c !== cat) { cat = w.c; html += '<h2 class="cat-parole">' + esc(cat) + '</h2>'; }
         html += rigaParola(k);
       });
     } else if (gruppo !== '__pref') {
