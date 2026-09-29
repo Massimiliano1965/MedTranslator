@@ -105,6 +105,10 @@
     background: var(--chip); font-size: 19px; line-height: 36px; text-align: center;
   }
   .btn-tema small { font-size: 9px; font-weight: 800; position: relative; top: -1px; margin-left: -2px; color: var(--testo); }
+  /* La «A» di automatico resta discreta: bianca di giorno, scura di notte */
+  .btn-tema small { color: #ffffff; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-tema small { color: #0e1620; } }
+  :root[data-theme="dark"] .btn-tema small { color: #0e1620; }
   .avviso {
     position: fixed; left: 50%; top: calc(70px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); z-index: 30;
     background: var(--testo); color: var(--sfondo); padding: 8px 16px; border-radius: 999px; font-weight: 700; font-size: 15px;
