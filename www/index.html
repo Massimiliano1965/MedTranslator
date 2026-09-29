@@ -164,6 +164,13 @@
     color: var(--tenue); font-size: 24px; line-height: 1; cursor: pointer;
   }
   .stella { color: #d4a300; }
+  /* Colonna a destra della frase: stella in alto, «ascolta» in basso (senza aprire la scheda grande) */
+  .colonna-az { flex: none; width: 48px; display: flex; flex-direction: column; gap: 6px; }
+  .colonna-az .stella { flex: 1; width: 100%; min-height: 36px; }
+  .colonna-az .ascolta-mini {
+    flex: 1; min-height: 36px; border: 0; border-radius: 16px; background: var(--blu-chiaro); box-shadow: var(--ombra);
+    font-size: 20px; line-height: 1; cursor: pointer; color: var(--blu);
+  }
   .stella.piena { color: #d4a300; background: rgba(245,196,0,0.3); }
   h2.titolo-pref { color: #b88600; }
   /* Tasto Ordina e frecce per spostare lingue, ruoli e argomenti */
@@ -2259,13 +2266,15 @@
   function rigaParola(k) {
     var w = PAROLE[k].t;
     return '<div class="riga-frase"><button type="button" class="frase parola" onclick="apri(PAROLE[' + k + '])"><span' + attrOp() + '>' + esc(w[op]) + '</span>' +
-      '<small lang="' + info().id + '"' + (info().rtl ? ' dir="rtl"' : '') + '>' + esc(w[lingua]) + '</small></button></div>';
+      '<small lang="' + info().id + '"' + (info().rtl ? ' dir="rtl"' : '') + '>' + esc(w[lingua]) + '</small></button>' +
+      '<div class="colonna-az"><button type="button" class="ascolta-mini" aria-label="' + esc(T('ascolta')) + '" onclick="parlaTesto(PAROLE[' + k + '].t[lingua])">🔊</button></div></div>';
   }
   function rigaFrase(f, i) {
     var stella = preferite.indexOf(f.t[0]) !== -1;
     return '<div class="riga-frase"><button type="button" class="frase" onclick="apri(' + i + ')"><span' + attrOp() + '>' + esc(f.t[op]) + '</span>' +
       '<small lang="' + info().id + '"' + (info().rtl ? ' dir="rtl"' : '') + '>' + esc(f.t[lingua]) + '</small></button>' +
-      '<button type="button" class="stella' + (stella ? ' piena' : '') + '" aria-pressed="' + stella + '" aria-label="' + (stella ? T('pref_togli') : T('pref_add')) + '" onclick="alternaPreferita(' + i + ')">' + (stella ? '★' : '☆') + '</button></div>';
+      '<div class="colonna-az"><button type="button" class="stella' + (stella ? ' piena' : '') + '" aria-pressed="' + stella + '" aria-label="' + (stella ? T('pref_togli') : T('pref_add')) + '" onclick="alternaPreferita(' + i + ')">' + (stella ? '★' : '☆') + '</button>' +
+      '<button type="button" class="ascolta-mini" aria-label="' + esc(T('ascolta')) + '" onclick="parlaTesto(FRASI[' + i + '].t[lingua])">🔊</button></div></div>';
   }
 
   function disegna() {
