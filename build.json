@@ -1,0 +1,12 @@
+{
+  "android": {
+    "release": {
+      "keystore": "firma/medtranslator.keystore",
+      "storePassword": "android",
+      "alias": "androiddebugkey",
+      "password": "android",
+      "keystoreType": "PKCS12",
+      "packageType": "apk"
+    }
+  }
+}

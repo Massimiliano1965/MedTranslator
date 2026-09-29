@@ -23,13 +23,9 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
-      - name: Firma sempre uguale e numero di versione che cresce
-        # Stessa firma a ogni costruzione (firma/medtranslator.keystore): il telefono
-        # installa la nuova app SOPRA la vecchia, senza disinstallare.
+      - name: Numero di versione che cresce
         # La versione sale a ogni costruzione (1.0.<numero>), così Android accetta l'aggiornamento.
         run: |
-          mkdir -p ~/.android
-          cp firma/medtranslator.keystore ~/.android/debug.keystore
           sed -i 's/ version="1\.0\.0"/ version="1.0.${{ github.run_number }}"/' config.xml
           grep -o 'version="[^"]*"' config.xml | head -1
       - name: Installa Cordova
@@ -39,14 +35,19 @@ jobs:
           cordova telemetry off
           cordova platform add android@13
           cordova plugin add cordova-plugin-tts-advanced
-      - name: Costruisci l'app
-        run: cordova build android
+      - name: Costruisci l'app (firmata sempre con la stessa firma)
+        # Firma fissa firma/medtranslator.keystore (vedi build.json): il telefono installa
+        # la nuova app SOPRA la vecchia, senza disinstallare.
+        run: cordova build android --release --buildConfig=build.json
       - name: Rinomina l'app
-        run: cp platforms/android/app/build/outputs/apk/debug/app-debug.apk MedTranslator.apk
+        run: cp platforms/android/app/build/outputs/apk/release/app-release.apk MedTranslator.apk
       - name: Controlla la firma
+        # Se la firma non è quella fissa, la costruzione si ferma: meglio nessuna app che un'app da disinstallare.
         run: |
-          "$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)/apksigner" verify --print-certs MedTranslator.apk | grep -i "SHA-256"
-          echo "Deve essere: 61:26:b7:bd:c5:dc:28:bb:5a:73:8d:e0:94:e2:48:98:51:88:75:a9:7a:40:f8:10:c2:f8:05:83:47:b8:e3:4c
+          APKSIGNER="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)/apksigner"
+          FIRMA=$("$APKSIGNER" verify --print-certs MedTranslator.apk | grep -i 'certificate SHA-256' | head -1 | awk '{print $NF}')
+          echo "Firma dell'app: $FIRMA"
+          test "$FIRMA" = "6126b7bdc5dc28bb5a738de094e24898518875a97a40f810c2f8058347b8e34c"
       - uses: actions/upload-artifact@v4
         with:
           name: MedTranslator-app
