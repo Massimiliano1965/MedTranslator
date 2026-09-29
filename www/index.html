@@ -391,6 +391,9 @@
   // Tutte le 15 lingue: la posizione è la colonna nelle frasi (0 = italiano).
   // L'operatore sceglie la sua; il paziente una qualsiasi delle altre.
   var TUTTE = [{ id: 'it', nome: 'Italiano', voce: 'it-IT' }].concat(LINGUE);
+  // Ordine nella scelta della lingua dell'operatore (romeno, arabo, albanese, spagnolo, cinese, ucraino, inglese, francese,
+  // bengalese, tagalog, punjabi, urdu, russo, giapponese)
+  var ORDINE_OPERATORE = ['it', 'ro', 'ar', 'sq', 'es', 'zh', 'uk', 'en', 'fr', 'bn', 'fil', 'pa', 'ur', 'ru', 'ja'];
   // Per la scelta della lingua dell'operatore: nome in italiano e iniziale nella sua scrittura
   var NOMI_IT = ['Italiano', 'Inglese', 'Spagnolo', 'Francese', 'Arabo', 'Cinese', 'Giapponese', 'Urdu', 'Romeno', 'Albanese', 'Punjabi', 'Ucraino', 'Russo', 'Bengalese', 'Tagalog'];
   // Bandiera nel cerchietto. Arabo: nessuna bandiera vale per tutti i paesi arabi → lettera ع su verde.
@@ -1787,7 +1790,14 @@
       return '<button type="button" class="bv-ruolo r-' + r[0] + (r[0] === ruolo ? ' ultimo' : '') + '" onclick="scegliRuolo(\'' + r[0] + '\')">' +
         '<span class="simbolo" aria-hidden="true">' + r[3] + '</span><b>' + r[2] + '</b><small>' + r[4] + '</small></button>';
     }).join('');
-    document.getElementById('bv-lingue').innerHTML = TUTTE.map(function (l, n) {
+    // Lingue dell'operatore: italiano primo, poi le altre in ordine di persone presenti in Italia
+    // (comunità straniere residenti, stima). La posizione nelle frasi (n) non cambia.
+    document.getElementById('bv-lingue').innerHTML = ORDINE_OPERATORE.map(function (id) {
+      for (var n = 0; n < TUTTE.length; n++) if (TUTTE[n].id === id) return n;
+      return -1;
+    }).filter(function (n) { return n >= 0; }).concat(TUTTE.map(function (l, n) { return n; }).filter(function (n) {
+      return ORDINE_OPERATORE.indexOf(TUTTE[n].id) === -1;   // una lingua nuova non in elenco va in fondo
+    })).map(function (n) { var l = TUTTE[n];
       return '<button type="button" class="' + (n === op ? 'attiva' : '') + '" onclick="scegliOperatore(' + n + ')">' +
         (BANDIERE[n] ? '<span class="sigla bandiera" aria-hidden="true"><svg viewBox="0 0 30 30">' + BANDIERE[n] + '</svg></span>' : '<span class="sigla arabo" lang="ar" aria-hidden="true">ع</span>') +
         '<span class="nomi"><b lang="' + l.id + '">' + l.nome + '</b><small>' + NOMI_IT[n] + '</small></span></button>';
