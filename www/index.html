@@ -341,7 +341,7 @@
     <button type="button" class="btn-tema" id="btn-tema" onclick="cambiaTema()"></button>
     <h1>MedTranslator</h1>
     <button type="button" class="btn-lente" onclick="apriCerca()" aria-label="Cerca una frase"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M15.5 15.5 L21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
-    <button type="button" class="btn-ruolo" id="btn-ruolo" onclick="apriBenvenuto()"></button>
+    <button type="button" class="btn-ruolo" id="btn-ruolo" onclick="apriBenvenuto(true)"></button>
   </div>
   <div class="cerca" id="cerca">
     <input type="search" id="cerca-testo" placeholder="Cerca: flebo, cuscino, dolore…" autocomplete="off" enterkeyhint="search" oninput="cercaFrasi(this.value)">
@@ -1916,7 +1916,8 @@
   try { var r0 = localStorage.getItem('trad_ruolo'); if (r0 && 'ISAM'.indexOf(r0) !== -1) ruolo = r0; } catch (e) {}
   var benvenutoAperto = false;
   // Schermata di benvenuto: si apre all'avvio e toccando il ruolo in alto.
-  function apriBenvenuto() {
+  // alLavoro = true: si apre già su «Che lavoro fai?» (dal bottone del ruolo in alto, per cambiare lavoro al volo)
+  function apriBenvenuto(alLavoro) {
     // Ordine dei riquadri: in alto Medico e Infermiere, in basso Operatore alberghiero e OSS.
     document.getElementById('bv-ruoli').innerHTML = ['M', 'I', 'A', 'S'].map(function (c) {
       return RUOLI.filter(function (r) { return r[0] === c; })[0];
@@ -1940,6 +1941,10 @@
     document.getElementById('bv-logo').innerHTML = MARCHIO_SVG;
     var b = document.getElementById('benvenuto');
     b.classList.add('aperto'); b.scrollTop = 0;
+    if (alLavoro === true) {
+      var h = document.getElementById('bv-lavoro');
+      if (h) b.scrollTop = h.getBoundingClientRect().top - b.getBoundingClientRect().top - 16;
+    }
     document.body.setAttribute('data-ruolo', '');   // benvenuto sempre nel verde di Doko
     benvenutoAperto = true;
   }
