@@ -78,7 +78,11 @@
   :root[data-theme="dark"] body[data-ruolo="S"] { --ruolo: #6cc793; } :root[data-theme="dark"] body[data-ruolo="I"] { --ruolo: #b9cadb; }
   .testata { display: flex; align-items: center; gap: 6px; margin: 0 0 6px; padding: 0 16px; }
   .marchio { width: 28px; height: 28px; flex: none; }
-  header h1 { margin: 0; font-size: 17px; font-weight: 800; line-height: 1.1; flex: 1; min-width: 0; white-space: nowrap; }
+  header h1 { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.1; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* Testata stretta (lente + microfono + ruolo): bottoni un po' più piccoli perché il titolo ci stia */
+  .testata { gap: 5px !important; }
+  .testata .btn-lente, .testata .btn-tema { width: 34px !important; height: 34px !important; }
+  @media (max-width: 380px) { header h1 { font-size: 14.5px; } .btn-ruolo { padding: 6px 8px !important; font-size: 13px !important; } }
   /* Bottone del ruolo scelto: toccandolo si torna alla schermata di benvenuto */
   .btn-ruolo {
     flex: none; border: 0; background: var(--ruolo); color: var(--ruolo-testo);
@@ -91,6 +95,10 @@
     background: var(--chip); color: var(--testo);
   }
   .btn-lente svg { width: 100%; height: 100%; display: block; }
+  /* Microfono della ricerca a voce: stesso stile della lente, colore del ruolo */
+  .btn-voce { color: var(--ruolo, var(--blu)) !important; }
+  .cerca .btn-voce svg { width: 22px; height: 22px; display: block; margin: auto; }
+  body.senza-voce .btn-voce { display: none; }
   /* Giorno / notte: automatico (segue il telefono), sempre giorno, sempre notte */
   .btn-tema {
     flex: none; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%;
@@ -341,10 +349,12 @@
     <button type="button" class="btn-tema" id="btn-tema" onclick="cambiaTema()"></button>
     <h1>MedTranslator</h1>
     <button type="button" class="btn-lente" onclick="apriCerca()" aria-label="Cerca una frase"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M15.5 15.5 L21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+    <button type="button" class="btn-lente btn-voce" onclick="cercaAVoce()" aria-label="Cerca a voce"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="currentColor"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5V22M8.5 22h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
     <button type="button" class="btn-ruolo" id="btn-ruolo" onclick="apriBenvenuto(true)"></button>
   </div>
   <div class="cerca" id="cerca">
     <input type="search" id="cerca-testo" placeholder="Cerca: flebo, cuscino, dolore…" autocomplete="off" enterkeyhint="search" oninput="cercaFrasi(this.value)">
+    <button type="button" class="btn-voce" onclick="cercaAVoce()" aria-label="Cerca a voce"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="currentColor"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5V22M8.5 22h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
     <button type="button" onclick="chiudiCerca()" aria-label="Chiudi la ricerca">✕</button>
   </div>
   <div class="lingue" id="lingue"></div>
@@ -2087,10 +2097,17 @@
       // prima quelle del proprio lavoro, poi quelle degli altri. L'elenco normale resta per ruolo.
       var parole = paroleDaCercare(testoCerca), trovate = '', n = 0, rgc = '',
           mie = { esatte: [], simili: [] }, altre = { esatte: [], simili: [] };
+      // Di solito servono TUTTE le parole scritte; se così non si trova niente (per esempio una frase
+      // detta a voce: «mi serve la radiografia»), basta QUALUNQUE parola.
+      var tutte = contaTrovate(parole, true) > 0;
+      var basta = function (testo) {
+        var dentro = function (g) { return g.some(function (p) { return testo.indexOf(p) !== -1; }); };
+        return parole.length && (tutte ? parole.every(dentro) : parole.some(dentro));
+      };
       FRASI.forEach(function (f, i) {
         if (f.gruppo) { rgc = f.ruoli; return; }
         var testo = normalizza(f.t[0] + ' ' + f.t[op] + ' ' + f.t[lingua]);
-        if (!parole.length || !parole.every(function (g) { return g.some(function (p) { return testo.indexOf(p) !== -1; }); })) return;
+        if (!basta(testo)) return;
         var dove = (!ruolo || (f.ruoli || rgc).indexOf(ruolo) !== -1) ? mie : altre;
         // Prima le frasi con proprio le parole scritte, poi quelle trovate con le parole simili
         (parole.every(function (g) { return testo.indexOf(g[0]) !== -1; }) ? dove.esatte : dove.simili).push(rigaFrase(f, i));
@@ -2103,7 +2120,7 @@
       var parTrovate = [];
       PAROLE.forEach(function (w, k) {
         var tp = normalizza(w.t[0] + ' ' + w.t[op] + ' ' + w.t[lingua]);
-        if (parole.length && parole.every(function (g) { return g.some(function (p) { return tp.indexOf(p) !== -1; }); })) parTrovate.push(rigaParola(k));
+        if (basta(tp)) parTrovate.push(rigaParola(k));
       });
       html = (parTrovate.length ? '<h2>📖 ' + (parTrovate.length === 1 ? 'Parola' : 'Parole') + '</h2>' + parTrovate.join('') : '') +
              (n ? '<h2>' + n + (n === 1 ? ' frase trovata' : ' frasi trovate') + '</h2>' + trovate : '');
@@ -2212,6 +2229,71 @@
       return gruppo.map(function (p) { return p.replace('te?', 'te '); });
     });
   }
+  // Quante frasi e parole contengono le parole cercate (tutte = ogni parola, altrimenti almeno una)
+  function contaTrovate(parole, tutte) {
+    if (!parole.length) return 0;
+    var n = 0;
+    var ok = function (testo) {
+      var dentro = function (g) { return g.some(function (p) { return testo.indexOf(p) !== -1; }); };
+      return tutte ? parole.every(dentro) : parole.some(dentro);
+    };
+    FRASI.forEach(function (f) { if (f.t && ok(normalizza(f.t[0] + ' ' + f.t[op] + ' ' + f.t[lingua]))) n++; });
+    PAROLE.forEach(function (w) { if (ok(normalizza(w.t[0] + ' ' + w.t[op] + ' ' + w.t[lingua]))) n++; });
+    return n;
+  }
+
+  // ---------- Ricerca a voce ----------
+  // Tocchi il microfono, dici la parola (nella lingua dell'operatore) e compaiono parole e frasi.
+  // Nell'app usa il riconoscimento vocale del telefono (plugin); nel browser quello di Chrome.
+  var PAROLINE = ['il','lo','la','i','gli','le','un','uno','una','di','del','della','dei','delle','a','al','alla','ai','da','dal','in','nel','nella',
+    'con','su','per','tra','fra','che','e','o','mi','ti','si','ci','ne','ho','ha','hai','serve','servono','devo','deve','vorrei','voglio','dire','parola','frase','come','si','dice'];
+  function testoDaVoce(frasi) {
+    // Tra le proposte del riconoscitore sceglie quella che trova più risultati; toglie le parole inutili
+    var migliore = '', punti = -1;
+    (frasi || []).slice(0, 5).forEach(function (t) {
+      var q = String(t).split(/\s+/).filter(function (w) { return op !== 0 || PAROLINE.indexOf(normalizza(w)) === -1; }).join(' ') || String(t);
+      // vince chi trova risultati con TUTTE le parole; a parità vince la prima proposta (la più probabile)
+      var pp = paroleDaCercare(q), tutte = contaTrovate(pp, true), n = tutte ? 1000 + tutte : contaTrovate(pp, false);
+      if (n > punti) { punti = n; migliore = q; }
+    });
+    return migliore;
+  }
+  function usaVoce(frasi) {
+    var q = testoDaVoce(frasi);
+    if (!q) return;
+    document.body.classList.add('cercando');
+    document.getElementById('cerca-testo').value = q;
+    cercaFrasi(q);
+  }
+  function avvisoVoce(msg) { alert(msg); }
+  function cercaAVoce() {
+    var lang = infoOp().voce;
+    var sr = window.plugins && window.plugins.speechRecognition;
+    if (sr) {
+      var ascolta = function () {
+        sr.startListening(function (m) { usaVoce(m); }, function (e) {
+          if (String(e).indexOf('not available') !== -1 || String(e).indexOf('Not available') !== -1)
+            avvisoVoce('Riconoscimento vocale non disponibile su questo telefono. Controlla che l\'app Google sia installata e attiva.');
+          // annullato dall'utente o nessuna parola capita: nessun messaggio
+        }, { language: lang, matches: 5, prompt: 'Dì la parola da cercare', showPopup: true });
+      };
+      sr.hasPermission(function (ok) {
+        if (ok) ascolta();
+        else sr.requestPermission(function () {
+          sr.hasPermission(function (ok2) { if (ok2) ascolta(); else avvisoVoce('Per cercare a voce serve il permesso del microfono.'); });
+        }, function () { avvisoVoce('Per cercare a voce serve il permesso del microfono.'); });
+      }, function () { ascolta(); });
+      return;
+    }
+    var W = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!W) { avvisoVoce('La ricerca a voce non è disponibile qui.'); return; }
+    var r = new W(); r.lang = lang; r.maxAlternatives = 5; r.interimResults = false;
+    r.onresult = function (ev) { var a = []; for (var k = 0; k < ev.results[0].length; k++) a.push(ev.results[0][k].transcript); usaVoce(a); };
+    try { r.start(); } catch (e) {}
+  }
+  // Nel browser senza riconoscimento vocale il microfono non compare
+  if (!window.cordova && !(window.SpeechRecognition || window.webkitSpeechRecognition)) document.body.classList.add('senza-voce');
+
   function apriCerca() {
     document.body.classList.add('cercando');
     var c = document.getElementById('cerca-testo');

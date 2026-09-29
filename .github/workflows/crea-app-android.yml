@@ -30,11 +30,12 @@ jobs:
           grep -o 'version="[^"]*"' config.xml | head -1
       - name: Installa Cordova
         run: npm install -g cordova@12
-      - name: Prepara Android e la voce
+      - name: Prepara Android, la voce e la ricerca a voce
         run: |
           cordova telemetry off
           cordova platform add android@13
           cordova plugin add cordova-plugin-tts-advanced
+          cordova plugin add cordova-plugin-speechrecognition
       - name: Costruisci l'app (firmata sempre con la stessa firma)
         # Firma fissa firma/medtranslator.keystore (vedi build.json): il telefono installa
         # la nuova app SOPRA la vecchia, senza disinstallare.

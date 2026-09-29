@@ -24,6 +24,13 @@
     <preference name="FadeSplashScreenDuration" value="250" />
     <platform name="android">
         <allow-intent href="market:*" />
+        <!-- Ricerca a voce: Android 11+ deve poter "vedere" il riconoscimento vocale di Google -->
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <queries>
+                <intent><action android:name="android.speech.RecognitionService" /></intent>
+                <intent><action android:name="android.speech.action.RECOGNIZE_SPEECH" /></intent>
+            </queries>
+        </config-file>
         <!-- Icona: adattiva (sfondo sfumato + disegno) per Android 8+, classica per i telefoni più vecchi -->
         <icon density="mdpi" src="res/icon/android/mdpi.png" background="res/icon/android/mdpi-background.png" foreground="res/icon/android/mdpi-foreground.png" />
         <icon density="hdpi" src="res/icon/android/hdpi.png" background="res/icon/android/hdpi-background.png" foreground="res/icon/android/hdpi-foreground.png" />
