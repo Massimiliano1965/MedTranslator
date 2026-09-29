@@ -2272,7 +2272,7 @@
     if (viste.lingue.length && viste.lingue.indexOf(lingua) === -1) lingua = viste.lingue[0];
     document.getElementById('lingue').innerHTML = viste.lingue.map(function (n, k) {
       var l = TUTTE[n];
-      return chip('lingue', k, '<button type="button" class="' + (n === lingua ? 'attiva' : '') + '" lang="' + l.id + '" onclick="scegliLingua(' + n + ')">' + l.nome + '</button>');
+      return chip('lingue', k, '<button type="button" class="' + (n === lingua ? 'attiva' : '') + '"' + attrOp() + ' onclick="scegliLingua(' + n + ')">' + NOMI_OP[op][n] + '</button>');
     }).join('') + '<button type="button" class="piu" onclick="apriPazienti()" aria-label="' + esc(T('pz_titolo')) + '">＋</button>';
     // Chi sei: il ruolo scelto nella schermata di benvenuto
     var rs = RUOLI.filter(function (x) { return x[0] === ruolo; })[0];
