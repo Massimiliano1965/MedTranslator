@@ -1,0 +1,9 @@
+MedTranslator — firma dell'app. © 2026 Massimiliano Previtali. Tutti i diritti riservati.
+
+medtranslator.keystore è la firma con cui GitHub firma SEMPRE l'app (vedi .github/workflows/crea-app-android.yml).
+Grazie a questa firma fissa il telefono installa ogni nuova versione sopra la vecchia, senza disinstallare.
+
+NON cancellare e NON cambiare questo file: con una firma diversa bisognerebbe disinstallare l'app.
+Il progetto su GitHub deve restare PRIVATO (la firma è qui dentro).
+Impronta SHA-256: 61:26:B7:BD:C5:DC:28:BB:5A:73:8D:E0:94:E2:48:98:51:88:75:A9:7A:40:F8:10:C2:F8:05:83:47:B8:E3:4C
+Per il Play Store servirà una firma diversa, da tenere fuori da GitHub.
