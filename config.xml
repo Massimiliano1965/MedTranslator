@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="it.previtali.medtranslator" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android">
     <name>MedTranslator</name>
-    <description>Frasi pronte per parlare con i pazienti stranieri: infermieri, OSS, OA e medici. 12 lingue, a voce e a schermo.</description>
+    <description>Frasi pronte per comunicare con i pazienti: infermieri, OSS, OA e medici. 15 lingue (italiano compreso), a voce e a schermo, dizionario di parole, ricerca scritta e a voce.</description>
     <author>Massimiliano Previtali</author>
     <content src="index.html" />
     <access origin="*" />

@@ -213,6 +213,7 @@
   #avvio h1 { margin: 0 0 4px; font-size: 32px; font-weight: 800; letter-spacing: -.3px; }
   #avvio p { margin: 0; color: #647580; font-size: 16px; }
   .bv h1 { margin: 12px 0 4px; font-size: 32px; font-weight: 800; text-align: center; line-height: 1.15; }
+  .bv-avviso { margin: -14px auto 22px; max-width: 34em; text-align: center; font-size: 13.5px; line-height: 1.35; color: var(--tenue); background: var(--carta); border: 1px solid var(--bordo); border-radius: 12px; padding: 8px 12px; }
   .bv-sotto { margin: 0 0 26px; text-align: center; color: var(--tenue); font-size: 17px; }
   .bv h2 { text-align: center; margin: 0 0 12px; font-size: 15px; }
   /* "Che lavoro fai?" più grande; scroll-margin: quando ci si arriva da solo resta un po' di spazio sopra */
@@ -348,14 +349,14 @@
   <div class="testata">
     <button type="button" class="btn-tema" id="btn-tema" onclick="cambiaTema()"></button>
     <h1>MedTranslator</h1>
-    <button type="button" class="btn-lente" onclick="apriCerca()" aria-label="Cerca una frase"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M15.5 15.5 L21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
-    <button type="button" class="btn-lente btn-voce" onclick="cercaAVoce()" aria-label="Cerca a voce"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="currentColor"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5V22M8.5 22h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+    <button type="button" class="btn-lente" onclick="apriCerca()" data-t-aria="cerca_frase" aria-label="Cerca una frase"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M15.5 15.5 L21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+    <button type="button" class="btn-lente btn-voce" onclick="cercaAVoce()" data-t-aria="cerca_voce" aria-label="Cerca a voce"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="currentColor"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5V22M8.5 22h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
     <button type="button" class="btn-ruolo" id="btn-ruolo" onclick="apriBenvenuto(true)"></button>
   </div>
   <div class="cerca" id="cerca">
-    <input type="search" id="cerca-testo" placeholder="Cerca: flebo, cuscino, dolore…" autocomplete="off" enterkeyhint="search" oninput="cercaFrasi(this.value)">
-    <button type="button" class="btn-voce" onclick="cercaAVoce()" aria-label="Cerca a voce"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="currentColor"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5V22M8.5 22h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
-    <button type="button" onclick="chiudiCerca()" aria-label="Chiudi la ricerca">✕</button>
+    <input type="search" id="cerca-testo" data-t-ph="placeholder" placeholder="Cerca: flebo, cuscino, dolore…" autocomplete="off" enterkeyhint="search" oninput="cercaFrasi(this.value)">
+    <button type="button" class="btn-voce" onclick="cercaAVoce()" data-t-aria="cerca_voce" aria-label="Cerca a voce"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="currentColor"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5V22M8.5 22h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+    <button type="button" onclick="chiudiCerca()" data-t-aria="chiudi_ricerca" aria-label="Chiudi la ricerca">✕</button>
   </div>
   <div class="lingue" id="lingue"></div>
   <div class="gruppi" id="gruppi"></div>
@@ -365,23 +366,24 @@
 <div id="benvenuto" role="dialog" aria-modal="true" aria-labelledby="bv-titolo">
   <div class="bv">
     <div class="bv-logo" id="bv-logo"></div>
-    <h1 id="bv-titolo">Benvenuto in MedTranslator</h1>
-    <p class="bv-sotto">Frasi pronte per comunicare con i pazienti</p>
-    <h2>🌐 La tua lingua · Your language</h2>
+    <h1 id="bv-titolo" data-t="titolo_bv">Benvenuto in MedTranslator</h1>
+    <p class="bv-sotto" data-t="sotto">Frasi pronte per comunicare con i pazienti</p>
+    <p class="bv-avviso" data-t="avviso_resp">Strumento di aiuto: non sostituisce il mediatore culturale né il consenso informato.</p>
+    <h2 id="bv-tua-lingua">🌐 La tua lingua · Your language</h2>
     <div class="bv-lingue" id="bv-lingue"></div>
-    <h2 id="bv-lavoro" class="bv-lavoro">Che lavoro fai?</h2>
+    <h2 id="bv-lavoro" class="bv-lavoro" data-t="lavoro">Che lavoro fai?</h2>
     <div class="bv-ruoli" id="bv-ruoli"></div>
-    <button type="button" class="bv-tutti" onclick="scegliRuolo('')">Vedi tutte le frasi</button>
+    <button type="button" class="bv-tutti" onclick="scegliRuolo('')" data-t="tutte_frasi">Vedi tutte le frasi</button>
     <div id="bv-firma"></div>
   </div>
 </div>
 
-<div id="avvio" onclick="chiudiAvvio()" aria-hidden="true"><div id="avvio-logo"></div><div class="avvio-testi"><h1>MedTranslator</h1><p>Frasi pronte per comunicare con i pazienti</p></div></div>
+<div id="avvio" onclick="chiudiAvvio()" aria-hidden="true"><div id="avvio-logo"></div><div class="avvio-testi"><h1>MedTranslator</h1><p data-t="sotto">Frasi pronte per comunicare con i pazienti</p></div></div>
 <div class="avviso" id="avviso" role="status"></div>
 <div id="grande" role="dialog" aria-modal="true">
   <div class="barra">
-    <button type="button" onclick="chiudi()">✕ Chiudi</button>
-    <button type="button" class="ascolta" onclick="parla()">🔊 Ascolta</button>
+    <button type="button" onclick="chiudi()">✕ <span data-t="chiudi">Chiudi</span></button>
+    <button type="button" class="ascolta" onclick="parla()">🔊 <span data-t="ascolta">Ascolta</span></button>
   </div>
   <div id="g-testo"></div>
   <p id="g-it"></p>
@@ -1910,11 +1912,128 @@
       '<rect width="512" height="512" rx="112" fill="url(#mtg)"/><g transform="translate(256 256) scale(0.9) translate(-268 -265)">' +
       LOGO_ARTE.replace('@@DIETRO@@', dietro == null ? LOGO_PAROLE : dietro) + '</g></svg>';
   }
+  // ---------- Scritte dell'app nella lingua dell'operatore ----------
+  // Ogni riga: [it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru, bn, fil]. Aggiunte il 29/09/2026: DA FAR CONTROLLARE.
+  var UI = {
+    "titolo_bv": ["Benvenuto in MedTranslator", "Welcome to MedTranslator", "Bienvenido a MedTranslator", "Bienvenue dans MedTranslator", "مرحبًا بك في MedTranslator", "欢迎使用 MedTranslator", "MedTranslatorへようこそ", "MedTranslator میں خوش آمدید", "Bun venit în MedTranslator", "Mirë se vini në MedTranslator", "MedTranslator ਵਿੱਚ ਜੀ ਆਇਆਂ ਨੂੰ", "Ласкаво просимо до MedTranslator", "Добро пожаловать в MedTranslator", "MedTranslator-এ স্বাগতম", "Maligayang pagdating sa MedTranslator"],
+    "sotto": ["Frasi pronte per comunicare con i pazienti", "Ready-made phrases to communicate with patients", "Frases listas para comunicarse con los pacientes", "Phrases prêtes pour communiquer avec les patients", "عبارات جاهزة للتواصل مع المرضى", "与患者沟通的常用语句", "患者さんと話すための定型フレーズ", "مریضوں سے بات کرنے کے لیے تیار جملے", "Fraze gata făcute pentru a comunica cu pacienții", "Fraza të gatshme për të komunikuar me pacientët", "ਮਰੀਜ਼ਾਂ ਨਾਲ ਗੱਲ ਕਰਨ ਲਈ ਤਿਆਰ ਵਾਕ", "Готові фрази для спілкування з пацієнтами", "Готовые фразы для общения с пациентами", "রোগীদের সাথে কথা বলার জন্য তৈরি বাক্য", "Mga handang parirala para makipag-usap sa mga pasyente"],
+    "tua_lingua": ["La tua lingua", "Your language", "Tu idioma", "Ta langue", "لغتك", "你的语言", "あなたの言語", "آپ کی زبان", "Limba ta", "Gjuha jote", "ਤੁਹਾਡੀ ਭਾਸ਼ਾ", "Твоя мова", "Твой язык", "তোমার ভাষা", "Iyong wika"],
+    "lavoro": ["Che lavoro fai?", "What is your job?", "¿Cuál es tu trabajo?", "Quel est ton métier ?", "ما هي وظيفتك؟", "你的工作是什么？", "あなたの職種は？", "آپ کا کام کیا ہے؟", "Ce meserie ai?", "Çfarë pune bën?", "ਤੁਸੀਂ ਕੀ ਕੰਮ ਕਰਦੇ ਹੋ?", "Яка твоя робота?", "Кем ты работаешь?", "তুমি কী কাজ করো?", "Ano ang trabaho mo?"],
+    "tutte_frasi": ["Vedi tutte le frasi", "See all phrases", "Ver todas las frases", "Voir toutes les phrases", "عرض كل العبارات", "查看所有语句", "すべてのフレーズを見る", "تمام جملے دیکھیں", "Vezi toate frazele", "Shiko të gjitha frazat", "ਸਾਰੇ ਵਾਕ ਵੇਖੋ", "Переглянути всі фрази", "Посмотреть все фразы", "সব বাক্য দেখো", "Tingnan ang lahat ng parirala"],
+    "avviso_resp": ["Strumento di aiuto: non sostituisce il mediatore culturale né il consenso informato.", "A helping tool: it does not replace the cultural mediator or informed consent.", "Herramienta de ayuda: no sustituye al mediador cultural ni al consentimiento informado.", "Outil d'aide : il ne remplace ni le médiateur culturel ni le consentement éclairé.", "أداة مساعدة: لا تغني عن الوسيط الثقافي ولا عن الموافقة المستنيرة.", "辅助工具：不能代替文化调解员，也不能代替知情同意。", "補助ツールです：文化仲介者やインフォームド・コンセントの代わりにはなりません。", "مددگار آلہ: یہ ثقافتی ثالث یا باخبر رضامندی کا متبادل نہیں ہے۔", "Instrument de ajutor: nu înlocuiește mediatorul cultural și nici consimțământul informat.", "Mjet ndihmës: nuk zëvendëson ndërmjetësin kulturor as pëlqimin e informuar.", "ਮਦਦ ਦਾ ਸਾਧਨ: ਇਹ ਸੱਭਿਆਚਾਰਕ ਵਿਚੋਲੇ ਜਾਂ ਸੂਚਿਤ ਸਹਿਮਤੀ ਦੀ ਥਾਂ ਨਹੀਂ ਲੈਂਦਾ।", "Допоміжний інструмент: не замінює культурного медіатора та інформовану згоду.", "Вспомогательный инструмент: не заменяет культурного медиатора и информированное согласие.", "সহায়ক টুল: এটি সাংস্কৃতিক মধ্যস্থতাকারী বা অবহিত সম্মতির বিকল্প নয়।", "Pantulong na kasangkapan: hindi nito pinapalitan ang cultural mediator o ang informed consent."],
+    "ideazione": ["Ideazione e design", "Concept and design", "Idea y diseño", "Conception et design", "الفكرة والتصميم", "构思与设计", "企画・デザイン", "خیال اور ڈیزائن", "Concept și design", "Ideja dhe dizajni", "ਵਿਚਾਰ ਅਤੇ ਡਿਜ਼ਾਈਨ", "Ідея та дизайн", "Идея и дизайн", "ধারণা ও নকশা", "Konsepto at disenyo"],
+    "nota_firma": ["Traduzioni da far controllare a un mediatore culturale.", "Translations to be checked by a cultural mediator.", "Traducciones que debe revisar un mediador cultural.", "Traductions à faire vérifier par un médiateur culturel.", "ترجمات يجب أن يراجعها وسيط ثقافي.", "译文需由文化调解员核对。", "翻訳は文化仲介者の確認が必要です。", "ترجمے کسی ثقافتی ثالث سے چیک کروانے ہیں۔", "Traduceri de verificat de un mediator cultural.", "Përkthime për t'u kontrolluar nga një ndërmjetës kulturor.", "ਅਨੁਵਾਦ ਸੱਭਿਆਚਾਰਕ ਵਿਚੋਲੇ ਤੋਂ ਜਾਂਚ ਕਰਵਾਉਣੇ ਹਨ।", "Переклади має перевірити культурний медіатор.", "Переводы должен проверить культурный медиатор.", "অনুবাদগুলো একজন সাংস্কৃতিক মধ্যস্থতাকারীকে দিয়ে যাচাই করাতে হবে।", "Mga salin na dapat suriin ng isang cultural mediator."],
+    "cerca_frase": ["Cerca una frase", "Search for a phrase", "Buscar una frase", "Chercher une phrase", "ابحث عن عبارة", "搜索语句", "フレーズを検索", "جملہ تلاش کریں", "Caută o frază", "Kërko një frazë", "ਵਾਕ ਲੱਭੋ", "Шукати фразу", "Искать фразу", "বাক্য খোঁজো", "Maghanap ng parirala"],
+    "cerca_voce": ["Cerca a voce", "Voice search", "Buscar por voz", "Recherche vocale", "البحث بالصوت", "语音搜索", "音声で検索", "آواز سے تلاش کریں", "Caută vocal", "Kërko me zë", "ਆਵਾਜ਼ ਨਾਲ ਲੱਭੋ", "Голосовий пошук", "Голосовой поиск", "কণ্ঠে খোঁজো", "Maghanap gamit ang boses"],
+    "placeholder": ["Cerca: flebo, cuscino, dolore…", "Search: drip, pillow, pain…", "Buscar: suero, almohada, dolor…", "Chercher : perfusion, oreiller, douleur…", "ابحث: محلول، وسادة، ألم…", "搜索：输液、枕头、疼痛…", "検索：点滴、枕、痛み…", "تلاش: ڈرپ، تکیہ، درد…", "Caută: perfuzie, pernă, durere…", "Kërko: serum, jastëk, dhimbje…", "ਲੱਭੋ: ਡ੍ਰਿੱਪ, ਸਿਰਹਾਣਾ, ਦਰਦ…", "Пошук: крапельниця, подушка, біль…", "Поиск: капельница, подушка, боль…", "খোঁজো: স্যালাইন, বালিশ, ব্যথা…", "Hanapin: suwero, unan, sakit…"],
+    "chiudi_ricerca": ["Chiudi la ricerca", "Close search", "Cerrar la búsqueda", "Fermer la recherche", "إغلاق البحث", "关闭搜索", "検索を閉じる", "تلاش بند کریں", "Închide căutarea", "Mbyll kërkimin", "ਖੋਜ ਬੰਦ ਕਰੋ", "Закрити пошук", "Закрыть поиск", "খোঁজা বন্ধ করো", "Isara ang paghahanap"],
+    "chiudi": ["Chiudi", "Close", "Cerrar", "Fermer", "إغلاق", "关闭", "閉じる", "بند کریں", "Închide", "Mbyll", "ਬੰਦ ਕਰੋ", "Закрити", "Закрыть", "বন্ধ", "Isara"],
+    "ascolta": ["Ascolta", "Listen", "Escuchar", "Écouter", "استمع", "播放", "聞く", "سنیں", "Ascultă", "Dëgjo", "ਸੁਣੋ", "Слухати", "Слушать", "শোনো", "Pakinggan"],
+    "tutti": ["Tutti", "All", "Todos", "Tous", "الكل", "全部", "すべて", "سب", "Toți", "Të gjithë", "ਸਾਰੇ", "Усі", "Все", "সবাই", "Lahat"],
+    "tutti_argomenti": ["Tutti gli argomenti", "All topics", "Todos los temas", "Tous les sujets", "كل المواضيع", "全部主题", "すべてのテーマ", "تمام موضوعات", "Toate subiectele", "Të gjitha temat", "ਸਾਰੇ ਵਿਸ਼ੇ", "Усі теми", "Все темы", "সব বিষয়", "Lahat ng paksa"],
+    "mie_frasi": ["Le mie frasi", "My phrases", "Mis frases", "Mes phrases", "عباراتي", "我的语句", "マイフレーズ", "میرے جملے", "Frazele mele", "Frazat e mia", "ਮੇਰੇ ਵਾਕ", "Мої фрази", "Мои фразы", "আমার বাক্য", "Aking mga parirala"],
+    "parole": ["Parole", "Words", "Palabras", "Mots", "كلمات", "词语", "単語", "الفاظ", "Cuvinte", "Fjalë", "ਸ਼ਬਦ", "Слова", "Слова", "শব্দ", "Mga salita"],
+    "parola": ["Parola", "Word", "Palabra", "Mot", "كلمة", "词语", "単語", "لفظ", "Cuvânt", "Fjalë", "ਸ਼ਬਦ", "Слово", "Слово", "শব্দ", "Salita"],
+    "argomenti": ["Argomenti", "Topics", "Temas", "Sujets", "المواضيع", "主题", "テーマ", "موضوعات", "Subiecte", "Temat", "ਵਿਸ਼ੇ", "Теми", "Темы", "বিষয়", "Mga paksa"],
+    "tutte": ["Tutte", "All", "Todas", "Tous", "الكل", "全部", "すべて", "سب", "Toate", "Të gjitha", "ਸਾਰੇ", "Усі", "Все", "সব", "Lahat"],
+    "altri_ruoli": ["Altri ruoli:", "Other roles:", "Otros puestos:", "Autres rôles :", "أدوار أخرى:", "其他岗位：", "他の職種：", "دوسرے کردار:", "Alte roluri:", "Role të tjera:", "ਹੋਰ ਭੂਮਿਕਾਵਾਂ:", "Інші ролі:", "Другие роли:", "অন্য ভূমিকা:", "Ibang tungkulin:"],
+    "frasi_altri": ["Frasi di altri ruoli", "Phrases from other roles", "Frases de otros puestos", "Phrases d'autres rôles", "عبارات من أدوار أخرى", "其他岗位的语句", "他の職種のフレーズ", "دوسرے کرداروں کے جملے", "Fraze din alte roluri", "Fraza nga role të tjera", "ਹੋਰ ਭੂਮਿਕਾਵਾਂ ਦੇ ਵਾਕ", "Фрази інших ролей", "Фразы других ролей", "অন্য ভূমিকার বাক্য", "Mga parirala ng ibang tungkulin"],
+    "trovate": ["frasi trovate", "phrases found", "frases encontradas", "phrases trouvées", "عبارات موجودة", "条语句", "件のフレーズ", "جملے ملے", "fraze găsite", "fraza u gjetën", "ਵਾਕ ਮਿਲੇ", "фраз знайдено", "фраз найдено", "টি বাক্য পাওয়া গেছে", "parirala ang nakita"],
+    "trovata": ["frase trovata", "phrase found", "frase encontrada", "phrase trouvée", "عبارة موجودة", "条语句", "件のフレーズ", "جملہ ملا", "frază găsită", "frazë u gjet", "ਵਾਕ ਮਿਲਿਆ", "фразу знайдено", "фраза найдена", "টি বাক্য পাওয়া গেছে", "parirala ang nakita"],
+    "nessun_risultato": ["Nessun risultato per", "No results for", "No hay resultados para", "Aucun résultat pour", "لا توجد نتائج لـ", "没有找到", "検索結果なし：", "کوئی نتیجہ نہیں:", "Niciun rezultat pentru", "Asnjë rezultat për", "ਕੋਈ ਨਤੀਜਾ ਨਹੀਂ:", "Нічого не знайдено для", "Ничего не найдено для", "কোনো ফলাফল নেই:", "Walang resulta para sa"],
+    "prova": ["Prova con un'altra parola.", "Try another word.", "Prueba con otra palabra.", "Essaie un autre mot.", "جرّب كلمة أخرى.", "换个词试试。", "別の言葉で試してください。", "کوئی اور لفظ آزمائیں۔", "Încearcă alt cuvânt.", "Provo një fjalë tjetër.", "ਕੋਈ ਹੋਰ ਸ਼ਬਦ ਅਜ਼ਮਾਓ।", "Спробуй інше слово.", "Попробуй другое слово.", "অন্য শব্দ দিয়ে চেষ্টা করো।", "Subukan ang ibang salita."],
+    "voce_no": ["Riconoscimento vocale non disponibile su questo telefono. Controlla che l'app Google sia installata e attiva.", "Voice recognition is not available on this phone. Check that the Google app is installed and enabled.", "El reconocimiento de voz no está disponible en este teléfono. Comprueba que la app de Google esté instalada y activada.", "La reconnaissance vocale n'est pas disponible sur ce téléphone. Vérifie que l'application Google est installée et activée.", "التعرّف على الصوت غير متاح على هذا الهاتف. تأكد من تثبيت تطبيق Google وتفعيله.", "此手机无法使用语音识别。请确认已安装并启用 Google 应用。", "この電話では音声認識が使えません。Googleアプリがインストールされ、有効か確認してください。", "اس فون پر آواز کی شناخت دستیاب نہیں۔ دیکھیں کہ Google ایپ انسٹال اور فعال ہے۔", "Recunoașterea vocală nu este disponibilă pe acest telefon. Verifică dacă aplicația Google este instalată și activă.", "Njohja e zërit nuk është e disponueshme në këtë telefon. Kontrollo që aplikacioni Google të jetë i instaluar dhe aktiv.", "ਇਸ ਫ਼ੋਨ 'ਤੇ ਆਵਾਜ਼ ਪਛਾਣ ਉਪਲਬਧ ਨਹੀਂ। ਵੇਖੋ ਕਿ Google ਐਪ ਇੰਸਟਾਲ ਅਤੇ ਚਾਲੂ ਹੈ।", "Розпізнавання голосу недоступне на цьому телефоні. Перевір, чи встановлено й увімкнено застосунок Google.", "Распознавание голоса недоступно на этом телефоне. Проверь, что приложение Google установлено и включено.", "এই ফোনে কণ্ঠস্বর শনাক্তকরণ নেই। Google অ্যাপ ইনস্টল ও চালু আছে কি না দেখো।", "Hindi available ang voice recognition sa teleponong ito. Tiyaking naka-install at naka-on ang Google app."],
+    "voce_perm": ["Per cercare a voce serve il permesso del microfono.", "Voice search needs permission to use the microphone.", "Para buscar por voz hace falta el permiso del micrófono.", "Pour la recherche vocale, il faut autoriser le micro.", "يحتاج البحث بالصوت إلى إذن الميكروفون.", "语音搜索需要麦克风权限。", "音声検索にはマイクの許可が必要です。", "آواز سے تلاش کے لیے مائیکروفون کی اجازت چاہیے۔", "Pentru căutarea vocală este nevoie de permisiunea pentru microfon.", "Për kërkimin me zë duhet leja e mikrofonit.", "ਆਵਾਜ਼ ਨਾਲ ਲੱਭਣ ਲਈ ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਦੀ ਇਜਾਜ਼ਤ ਚਾਹੀਦੀ ਹੈ।", "Для голосового пошуку потрібен дозвіл на мікрофон.", "Для голосового поиска нужно разрешение на микрофон.", "কণ্ঠে খোঁজার জন্য মাইক্রোফোনের অনুমতি লাগবে।", "Kailangan ng pahintulot sa mikropono para sa voice search."],
+    "voce_qui": ["La ricerca a voce non è disponibile qui.", "Voice search is not available here.", "La búsqueda por voz no está disponible aquí.", "La recherche vocale n'est pas disponible ici.", "البحث بالصوت غير متاح هنا.", "这里无法使用语音搜索。", "ここでは音声検索は使えません。", "یہاں آواز سے تلاش دستیاب نہیں۔", "Căutarea vocală nu este disponibilă aici.", "Kërkimi me zë nuk është i disponueshëm këtu.", "ਇੱਥੇ ਆਵਾਜ਼ ਨਾਲ ਖੋਜ ਉਪਲਬਧ ਨਹੀਂ।", "Голосовий пошук тут недоступний.", "Голосовой поиск здесь недоступен.", "এখানে কণ্ঠে খোঁজা যাবে না।", "Hindi available dito ang voice search."],
+    "voce_prompt": ["Dì la parola da cercare", "Say the word to search for", "Di la palabra que buscas", "Dis le mot à chercher", "قل الكلمة التي تبحث عنها", "请说出要搜索的词", "検索する言葉を話してください", "تلاش کے لیے لفظ بولیں", "Spune cuvântul de căutat", "Thuaj fjalën që kërkon", "ਲੱਭਣ ਵਾਲਾ ਸ਼ਬਦ ਬੋਲੋ", "Скажи слово для пошуку", "Скажи слово для поиска", "যে শব্দ খুঁজবে তা বলো", "Sabihin ang salitang hahanapin"],
+    "avanti": ["Avanti", "Next", "Siguiente", "Suivant", "التالي", "下一个", "次へ", "اگلا", "Înainte", "Tjetra", "ਅੱਗੇ", "Далі", "Дальше", "পরেরটি", "Susunod"],
+    "questa": ["Questa!", "This one!", "¡Esta!", "Celle-ci !", "هذه!", "就这个！", "これ！", "یہ والا!", "Aceasta!", "Kjo!", "ਇਹ ਵਾਲਾ!", "Ось це!", "Вот это!", "এটা!", "Ito!"],
+    "aiuto_tabella": ["Tocca <b>{A}</b>: le caselle si accendono una alla volta e il telefono le legge nella lingua del paziente. Quando il paziente chiude gli occhi, tocca <b>{Q}</b> Se il paziente può indicare, indica col dito <b>senza toccare il telefono</b>: la casella la tocchi tu.", "Tap <b>{A}</b>: the boxes light up one at a time and the phone reads them in the patient's language. When the patient closes their eyes, tap <b>{Q}</b> If the patient can point, they point with a finger <b>without touching the phone</b>: you tap the box.", "Toca <b>{A}</b>: las casillas se encienden una a una y el teléfono las lee en el idioma del paciente. Cuando el paciente cierre los ojos, toca <b>{Q}</b> Si el paciente puede señalar, que señale con el dedo <b>sin tocar el teléfono</b>: la casilla la tocas tú.", "Touche <b>{A}</b> : les cases s'allument une par une et le téléphone les lit dans la langue du patient. Quand le patient ferme les yeux, touche <b>{Q}</b> Si le patient peut montrer, il montre du doigt <b>sans toucher le téléphone</b> : c'est toi qui touches la case.", "اضغط <b>{A}</b>: تضيء الخانات واحدة تلو الأخرى ويقرؤها الهاتف بلغة المريض. عندما يغمض المريض عينيه، اضغط <b>{Q}</b> إذا كان المريض يستطيع الإشارة، فليُشر بإصبعه <b>دون لمس الهاتف</b>: وأنت تضغط على الخانة.", "点 <b>{A}</b>：格子会一个一个亮起，手机用患者的语言读出来。患者闭眼时，点 <b>{Q}</b> 如果患者能指，就让他用手指指出来，<b>不要碰手机</b>：由你来点格子。", "<b>{A}</b> をタップ：マスが一つずつ光り、患者さんの言語で読み上げます。患者さんが目を閉じたら <b>{Q}</b> をタップ。指させる場合は<b>電話に触れずに</b>指で示してもらい、マスはあなたがタップします。", "<b>{A}</b> دبائیں: خانے ایک ایک کر کے روشن ہوتے ہیں اور فون انہیں مریض کی زبان میں پڑھتا ہے۔ جب مریض آنکھیں بند کرے تو <b>{Q}</b> دبائیں۔ اگر مریض اشارہ کر سکے تو انگلی سے اشارہ کرے، <b>فون کو چھوئے بغیر</b>: خانہ آپ دبائیں۔", "Atinge <b>{A}</b>: căsuțele se aprind pe rând și telefonul le citește în limba pacientului. Când pacientul închide ochii, atinge <b>{Q}</b> Dacă pacientul poate arăta, arată cu degetul <b>fără să atingă telefonul</b>: căsuța o atingi tu.", "Prek <b>{A}</b>: kutitë ndizen një nga një dhe telefoni i lexon në gjuhën e pacientit. Kur pacienti mbyll sytë, prek <b>{Q}</b> Nëse pacienti mund të tregojë, tregon me gisht <b>pa e prekur telefonin</b>: kutinë e prek ti.", "<b>{A}</b> ਦਬਾਓ: ਖਾਨੇ ਇੱਕ-ਇੱਕ ਕਰਕੇ ਜਗਦੇ ਹਨ ਅਤੇ ਫ਼ੋਨ ਉਨ੍ਹਾਂ ਨੂੰ ਮਰੀਜ਼ ਦੀ ਭਾਸ਼ਾ ਵਿੱਚ ਪੜ੍ਹਦਾ ਹੈ। ਜਦੋਂ ਮਰੀਜ਼ ਅੱਖਾਂ ਬੰਦ ਕਰੇ, <b>{Q}</b> ਦਬਾਓ। ਜੇ ਮਰੀਜ਼ ਇਸ਼ਾਰਾ ਕਰ ਸਕਦਾ ਹੈ ਤਾਂ ਉਂਗਲ ਨਾਲ ਕਰੇ, <b>ਫ਼ੋਨ ਨੂੰ ਛੂਹੇ ਬਿਨਾਂ</b>: ਖਾਨਾ ਤੁਸੀਂ ਦਬਾਓ।", "Торкнися <b>{A}</b>: клітинки загоряються по черзі, і телефон читає їх мовою пацієнта. Коли пацієнт заплющить очі, торкнися <b>{Q}</b> Якщо пацієнт може показати, хай покаже пальцем, <b>не торкаючись телефону</b>: клітинку торкаєшся ти.", "Нажми <b>{A}</b>: клетки загораются по одной, и телефон читает их на языке пациента. Когда пациент закроет глаза, нажми <b>{Q}</b> Если пациент может показать, пусть покажет пальцем, <b>не касаясь телефона</b>: клетку нажимаешь ты.", "<b>{A}</b> চাপো: ঘরগুলো একটা একটা করে জ্বলে ওঠে আর ফোন রোগীর ভাষায় পড়ে শোনায়। রোগী চোখ বন্ধ করলে <b>{Q}</b> চাপো। রোগী দেখাতে পারলে আঙুল দিয়ে দেখাক, <b>ফোন না ছুঁয়ে</b>: ঘরটা তুমি চাপবে।", "I-tap ang <b>{A}</b>: isa-isang umiilaw ang mga kahon at binabasa ito ng telepono sa wika ng pasyente. Kapag pumikit ang pasyente, i-tap ang <b>{Q}</b> Kung kayang tumuro ng pasyente, ituro niya gamit ang daliri <b>nang hindi hinahawakan ang telepono</b>: ikaw ang magta-tap sa kahon."],
+    "aiuto_risposte": ["Il paziente indica o fa cenno, <b>senza toccare il telefono</b>: la risposta la tocchi tu.", "The patient points or nods, <b>without touching the phone</b>: you tap the answer.", "El paciente señala o hace un gesto, <b>sin tocar el teléfono</b>: la respuesta la tocas tú.", "Le patient montre ou fait un signe, <b>sans toucher le téléphone</b> : c'est toi qui touches la réponse.", "يشير المريض أو يومئ، <b>دون لمس الهاتف</b>: وأنت تضغط على الإجابة.", "患者用手指或点头示意，<b>不碰手机</b>：由你来点答案。", "患者さんは指さすか合図をします（<b>電話には触れません</b>）。答えはあなたがタップします。", "مریض اشارہ کرتا ہے، <b>فون کو چھوئے بغیر</b>: جواب آپ دبائیں۔", "Pacientul arată sau face un semn, <b>fără să atingă telefonul</b>: răspunsul îl atingi tu.", "Pacienti tregon ose bën shenjë, <b>pa e prekur telefonin</b>: përgjigjen e prek ti.", "ਮਰੀਜ਼ ਇਸ਼ਾਰਾ ਕਰਦਾ ਹੈ, <b>ਫ਼ੋਨ ਨੂੰ ਛੂਹੇ ਬਿਨਾਂ</b>: ਜਵਾਬ ਤੁਸੀਂ ਦਬਾਓ।", "Пацієнт показує або киває, <b>не торкаючись телефону</b>: відповідь торкаєшся ти.", "Пациент показывает или кивает, <b>не касаясь телефона</b>: ответ нажимаешь ты.", "রোগী আঙুল দিয়ে দেখায় বা ইশারা করে, <b>ফোন না ছুঁয়ে</b>: উত্তরটা তুমি চাপবে।", "Tumuturo o sumesenyas ang pasyente, <b>nang hindi hinahawakan ang telepono</b>: ikaw ang magta-tap ng sagot."],
+    "pref_add": ["Aggiungi ai preferiti", "Add to favourites", "Añadir a favoritos", "Ajouter aux favoris", "إضافة إلى المفضلة", "加入收藏", "お気に入りに追加", "پسندیدہ میں شامل کریں", "Adaugă la favorite", "Shto te të preferuarat", "ਮਨਪਸੰਦ ਵਿੱਚ ਜੋੜੋ", "Додати в обране", "Добавить в избранное", "প্রিয়তে যোগ করো", "Idagdag sa paborito"],
+    "pref_togli": ["Togli dai preferiti", "Remove from favourites", "Quitar de favoritos", "Retirer des favoris", "إزالة من المفضلة", "取消收藏", "お気に入りから削除", "پسندیدہ سے ہٹائیں", "Scoate de la favorite", "Hiq nga të preferuarat", "ਮਨਪਸੰਦ ਵਿੱਚੋਂ ਹਟਾਓ", "Прибрати з обраного", "Убрать из избранного", "প্রিয় থেকে সরাও", "Alisin sa paborito"],
+    "tema_auto": ["Automatico (come il telefono)", "Automatic (like the phone)", "Automático (como el teléfono)", "Automatique (comme le téléphone)", "تلقائي (مثل الهاتف)", "自动（跟随手机）", "自動（電話と同じ）", "خودکار (فون کی طرح)", "Automat (ca telefonul)", "Automatik (si telefoni)", "ਆਟੋਮੈਟਿਕ (ਫ਼ੋਨ ਵਾਂਗ)", "Автоматично (як у телефоні)", "Автоматически (как в телефоне)", "স্বয়ংক্রিয় (ফোনের মতো)", "Awtomatiko (gaya ng telepono)"],
+    "tema_giorno": ["Sempre giorno", "Always day", "Siempre día", "Toujours jour", "نهار دائمًا", "始终日间", "常に昼", "ہمیشہ دن", "Mereu zi", "Gjithmonë ditë", "ਹਮੇਸ਼ਾ ਦਿਨ", "Завжди день", "Всегда день", "সবসময় দিন", "Palaging araw"],
+    "tema_notte": ["Sempre notte", "Always night", "Siempre noche", "Toujours nuit", "ليل دائمًا", "始终夜间", "常に夜", "ہمیشہ رات", "Mereu noapte", "Gjithmonë natë", "ਹਮੇਸ਼ਾ ਰਾਤ", "Завжди ніч", "Всегда ночь", "সবসময় রাত", "Palaging gabi"],
+    "r_I": ["Infermiere", "Nurse", "Enfermero/a", "Infirmier/ère", "ممرض/ة", "护士", "看護師", "نرس", "Asistent medical", "Infermier", "ਨਰਸ", "Медсестра / медбрат", "Медсестра / медбрат", "নার্স", "Nars"],
+    "r_I_b": ["Infermiere", "Nurse", "Enfermero/a", "Infirmier/ère", "ممرض/ة", "护士", "看護師", "نرس", "Asistent", "Infermier", "ਨਰਸ", "Медсестра", "Медсестра", "নার্স", "Nars"],
+    "r_I_d": ["Terapie, parametri, dolore", "Treatments, vital signs, pain", "Tratamientos, constantes, dolor", "Traitements, constantes, douleur", "العلاجات، العلامات الحيوية، الألم", "治疗、生命体征、疼痛", "治療・バイタル・痛み", "علاج، اہم علامات، درد", "Tratamente, parametri, durere", "Terapi, parametra, dhimbje", "ਇਲਾਜ, ਜ਼ਰੂਰੀ ਮਾਪ, ਦਰਦ", "Лікування, показники, біль", "Лечение, показатели, боль", "চিকিৎসা, মাপজোখ, ব্যথা", "Gamutan, vital signs, sakit"],
+    "r_S": ["Operatore socio-sanitario", "Healthcare assistant", "Auxiliar de enfermería", "Aide-soignant(e)", "مساعد تمريض", "护理员", "看護助手", "نرسنگ اسسٹنٹ", "Infirmier auxiliar", "Ndihmës infermier", "ਨਰਸਿੰਗ ਸਹਾਇਕ", "Молодший медперсонал", "Младший медперсонал", "স্বাস্থ্যসেবা সহকারী", "Nursing aide"],
+    "r_S_b": ["OSS", "Assistant", "Auxiliar", "Aide-soignant", "مساعد تمريض", "护理员", "看護助手", "اسسٹنٹ", "Infirmier", "Ndihmës", "ਸਹਾਇਕ", "Доглядач", "Санитар", "সহকারী", "Aide"],
+    "r_S_d": ["Igiene, bisogni, pasti", "Hygiene, needs, meals", "Higiene, necesidades, comidas", "Hygiène, besoins, repas", "النظافة، الاحتياجات، الوجبات", "清洁、需求、用餐", "清潔・ニーズ・食事", "صفائی، ضروریات، کھانا", "Igienă, nevoi, mese", "Higjienë, nevoja, ushqim", "ਸਫ਼ਾਈ, ਲੋੜਾਂ, ਖਾਣਾ", "Гігієна, потреби, харчування", "Гигиена, потребности, питание", "পরিচ্ছন্নতা, প্রয়োজন, খাবার", "Kalinisan, pangangailangan, pagkain"],
+    "r_A": ["Operatore alberghiero", "Catering staff", "Personal de hostelería", "Agent hôtelier", "موظف خدمة الطعام", "送餐员", "配膳スタッフ", "کھانے کا عملہ", "Personal de hotelărie", "Punonjës i ushqimit", "ਖਾਣਾ ਵਰਤਾਉਣ ਵਾਲਾ ਸਟਾਫ਼", "Працівник харчоблоку", "Работник пищеблока", "খাবার পরিবেশন কর্মী", "Taga-hain ng pagkain"],
+    "r_A_b": ["OA", "Catering", "Hostelería", "Hôtelier", "الطعام", "送餐", "配膳", "کھانا", "Hotelărie", "Ushqimi", "ਖਾਣਾ", "Харчоблок", "Пищеблок", "খাবার", "Pagkain"],
+    "r_A_d": ["Pasti e bevande", "Meals and drinks", "Comidas y bebidas", "Repas et boissons", "الوجبات والمشروبات", "饭菜和饮料", "食事と飲み物", "کھانا اور مشروبات", "Mese și băuturi", "Ushqim dhe pije", "ਖਾਣਾ ਅਤੇ ਪੀਣ ਵਾਲੀਆਂ ਚੀਜ਼ਾਂ", "Їжа та напої", "Еда и напитки", "খাবার ও পানীয়", "Pagkain at inumin"],
+    "r_M": ["Medico", "Doctor", "Médico", "Médecin", "طبيب", "医生", "医師", "ڈاکٹر", "Medic", "Mjek", "ਡਾਕਟਰ", "Лікар", "Врач", "ডাক্তার", "Doktor"],
+    "r_M_b": ["Medico", "Doctor", "Médico", "Médecin", "طبيب", "医生", "医師", "ڈاکٹر", "Medic", "Mjek", "ਡਾਕਟਰ", "Лікар", "Врач", "ডাক্তার", "Doktor"],
+    "r_M_d": ["Visita, esami, consenso", "Examination, tests, consent", "Consulta, pruebas, consentimiento", "Examen, analyses, consentement", "الفحص، التحاليل، الموافقة", "检查、化验、同意书", "診察・検査・同意", "معائنہ، ٹیسٹ، رضامندی", "Consultație, analize, consimțământ", "Vizitë, ekzaminime, pëlqim", "ਜਾਂਚ, ਟੈਸਟ, ਸਹਿਮਤੀ", "Огляд, аналізи, згода", "Осмотр, анализы, согласие", "পরীক্ষা, টেস্ট, সম্মতি", "Pagsusuri, tests, pahintulot"]
+  };
+  // Nomi di argomenti e categorie delle parole (la chiave resta il nome italiano)
+  var UI_GRUPPI = {
+    "Saluti": ["Saluti", "Greetings", "Saludos", "Salutations", "التحية", "问候", "あいさつ", "سلام دعا", "Saluturi", "Përshëndetje", "ਨਮਸਕਾਰ", "Привітання", "Приветствия", "শুভেচ্ছা", "Pagbati"],
+    "Accoglienza": ["Accoglienza", "Admission", "Acogida", "Accueil", "الاستقبال", "入院接待", "受け入れ", "داخلہ", "Primire", "Pritja", "ਦਾਖ਼ਲਾ", "Прийом", "Приём", "ভর্তি", "Pagtanggap"],
+    "Pasti e bevande": ["Pasti e bevande", "Meals and drinks", "Comidas y bebidas", "Repas et boissons", "الوجبات والمشروبات", "饭菜和饮料", "食事と飲み物", "کھانا اور مشروبات", "Mese și băuturi", "Ushqim dhe pije", "ਖਾਣਾ ਅਤੇ ਪੀਣ", "Їжа та напої", "Еда и напитки", "খাবার ও পানীয়", "Pagkain at inumin"],
+    "Dolore e come sta": ["Dolore e come sta", "Pain and how you feel", "Dolor y cómo está", "Douleur et état", "الألم والحالة", "疼痛和感受", "痛みと体調", "درد اور طبیعت", "Durere și stare", "Dhimbja dhe gjendja", "ਦਰਦ ਅਤੇ ਹਾਲ", "Біль і самопочуття", "Боль и самочувствие", "ব্যথা ও অবস্থা", "Sakit at pakiramdam"],
+    "Paziente che non può parlare": ["Paziente che non può parlare", "Patient who cannot speak", "Paciente que no puede hablar", "Patient qui ne peut pas parler", "مريض لا يستطيع الكلام", "不能说话的患者", "話せない患者さん", "بول نہ سکنے والا مریض", "Pacient care nu poate vorbi", "Pacient që nuk flet dot", "ਬੋਲ ਨਾ ਸਕਣ ਵਾਲਾ ਮਰੀਜ਼", "Пацієнт, який не може говорити", "Пациент, который не может говорить", "যে রোগী কথা বলতে পারে না", "Pasyenteng hindi makapagsalita"],
+    "Bisogni": ["Bisogni", "Needs", "Necesidades", "Besoins", "الاحتياجات", "需求", "必要なこと", "ضروریات", "Nevoi", "Nevojat", "ਲੋੜਾਂ", "Потреби", "Потребности", "প্রয়োজন", "Pangangailangan"],
+    "Esami e cure": ["Esami e cure", "Tests and treatment", "Pruebas y tratamientos", "Examens et soins", "الفحوص والعلاج", "检查和治疗", "検査と治療", "ٹیسٹ اور علاج", "Analize și îngrijiri", "Ekzaminime dhe kura", "ਟੈਸਟ ਅਤੇ ਇਲਾਜ", "Обстеження і лікування", "Обследования и лечение", "পরীক্ষা ও চিকিৎসা", "Pagsusuri at gamutan"],
+    "Visita medica": ["Visita medica", "Medical examination", "Visita médica", "Visite médicale", "الكشف الطبي", "医生查房", "診察", "ڈاکٹری معائنہ", "Consultație medicală", "Vizita mjekësore", "ਡਾਕਟਰੀ ਜਾਂਚ", "Лікарський огляд", "Врачебный осмотр", "ডাক্তারি পরীক্ষা", "Pagsusuri ng doktor"],
+    "Familiari": ["Familiari", "Family", "Familiares", "Famille", "العائلة", "家属", "ご家族", "گھر والے", "Familia", "Familjarët", "ਪਰਿਵਾਰ", "Родичі", "Родственники", "পরিবার", "Pamilya"],
+    "Medicine": ["Medicine", "Medicines", "Medicamentos", "Médicaments", "الأدوية", "药物", "お薬", "دوائیں", "Medicamente", "Ilaçet", "ਦਵਾਈਆਂ", "Ліки", "Лекарства", "ওষুধ", "Mga gamot"],
+    "Igiene e movimento": ["Igiene e movimento", "Hygiene and mobility", "Higiene y movilidad", "Hygiène et mobilité", "النظافة والحركة", "清洁和活动", "清潔と移動", "صفائی اور چلنا پھرنا", "Igienă și mobilizare", "Higjiena dhe lëvizja", "ਸਫ਼ਾਈ ਅਤੇ ਹਿਲਜੁਲ", "Гігієна і рух", "Гигиена и движение", "পরিচ্ছন্নতা ও চলাফেরা", "Kalinisan at paggalaw"],
+    "Pronto soccorso": ["Pronto soccorso", "Emergency department", "Urgencias", "Urgences", "الطوارئ", "急诊", "救急", "ایمرجنسی", "Urgențe", "Urgjenca", "ਐਮਰਜੈਂਸੀ", "Невідкладна допомога", "Неотложная помощь", "জরুরি বিভাগ", "Emergency"],
+    "Prima e dopo l'operazione": ["Prima e dopo l'operazione", "Before and after surgery", "Antes y después de la operación", "Avant et après l'opération", "قبل العملية وبعدها", "手术前后", "手術の前後", "آپریشن سے پہلے اور بعد", "Înainte și după operație", "Para dhe pas operacionit", "ਆਪ੍ਰੇਸ਼ਨ ਤੋਂ ਪਹਿਲਾਂ ਅਤੇ ਬਾਅਦ", "До і після операції", "До и после операции", "অপারেশনের আগে ও পরে", "Bago at pagkatapos ng operasyon"],
+    "Dimissione": ["Dimissione", "Discharge", "Alta", "Sortie", "الخروج من المستشفى", "出院", "退院", "ڈسچارج", "Externare", "Dalja nga spitali", "ਛੁੱਟੀ", "Виписка", "Выписка", "ছুটি", "Paglabas sa ospital"],
+    "Mamme e bambini": ["Mamme e bambini", "Mothers and children", "Madres y niños", "Mamans et enfants", "الأمهات والأطفال", "母婴", "ママと子ども", "مائیں اور بچے", "Mame și copii", "Nënat dhe fëmijët", "ਮਾਵਾਂ ਅਤੇ ਬੱਚੇ", "Мами і діти", "Мамы и дети", "মা ও শিশু", "Mga ina at bata"],
+    "Trapianto": ["Trapianto", "Transplant", "Trasplante", "Greffe", "زراعة الأعضاء", "器官移植", "移植", "ٹرانسپلانٹ", "Transplant", "Transplanti", "ਟ੍ਰਾਂਸਪਲਾਂਟ", "Трансплантація", "Трансплантация", "অঙ্গ প্রতিস্থাপন", "Transplant"],
+    "Esami": ["Esami", "Tests", "Pruebas", "Examens", "الفحوص", "检查", "検査", "ٹیسٹ", "Analize", "Ekzaminime", "ਟੈਸਟ", "Обстеження", "Обследования", "পরীক্ষা", "Mga pagsusuri"],
+    "Medicine e cure": ["Medicine e cure", "Medicines and care", "Medicamentos y cuidados", "Médicaments et soins", "الأدوية والعلاج", "药物和护理", "薬と処置", "دوائیں اور علاج", "Medicamente și îngrijiri", "Ilaçe dhe kura", "ਦਵਾਈਆਂ ਅਤੇ ਦੇਖਭਾਲ", "Ліки і догляд", "Лекарства и уход", "ওষুধ ও চিকিৎসা", "Gamot at pag-aalaga"],
+    "Corpo": ["Corpo", "Body", "Cuerpo", "Corps", "الجسم", "身体", "体", "جسم", "Corp", "Trupi", "ਸਰੀਰ", "Тіло", "Тело", "শরীর", "Katawan"],
+    "Sintomi": ["Sintomi", "Symptoms", "Síntomas", "Symptômes", "الأعراض", "症状", "症状", "علامات", "Simptome", "Simptomat", "ਲੱਛਣ", "Симптоми", "Симптомы", "উপসর্গ", "Mga sintomas"],
+    "Luoghi": ["Luoghi", "Places", "Lugares", "Lieux", "الأماكن", "地点", "場所", "جگہیں", "Locuri", "Vende", "ਥਾਵਾਂ", "Місця", "Места", "জায়গা", "Mga lugar"],
+    "Oggetti": ["Oggetti", "Objects", "Objetos", "Objets", "الأشياء", "物品", "物", "چیزیں", "Obiecte", "Sende", "ਚੀਜ਼ਾਂ", "Речі", "Вещи", "জিনিসপত্র", "Mga gamit"],
+    "Persone": ["Persone", "People", "Personas", "Personnes", "الأشخاص", "人员", "人", "لوگ", "Persoane", "Njerëz", "ਲੋਕ", "Люди", "Люди", "মানুষ", "Mga tao"],
+    "Tempo": ["Tempo", "Time", "Tiempo", "Temps", "الوقت", "时间", "時間", "وقت", "Timp", "Koha", "ਸਮਾਂ", "Час", "Время", "সময়", "Oras"],
+    "Cibo e bevande": ["Cibo e bevande", "Food and drinks", "Comida y bebida", "Nourriture et boissons", "الطعام والشراب", "食物和饮料", "食べ物と飲み物", "کھانا پینا", "Mâncare și băuturi", "Ushqim dhe pije", "ਖਾਣ-ਪੀਣ", "Їжа і напої", "Еда и напитки", "খাবার ও পানীয়", "Pagkain at inumin"]
+  };
+  // Nomi delle lingue scritti nella lingua dell'operatore: NOMI_OP[operatore][lingua]
+  var NOMI_OP = [
+    ["Italiano", "Inglese", "Spagnolo", "Francese", "Arabo", "Cinese", "Giapponese", "Urdu", "Romeno", "Albanese", "Punjabi", "Ucraino", "Russo", "Bengalese", "Tagalog"],
+    ["Italian", "English", "Spanish", "French", "Arabic", "Chinese", "Japanese", "Urdu", "Romanian", "Albanian", "Punjabi", "Ukrainian", "Russian", "Bengali", "Tagalog"],
+    ["Italiano", "Inglés", "Español", "Francés", "Árabe", "Chino", "Japonés", "Urdu", "Rumano", "Albanés", "Panyabí", "Ucraniano", "Ruso", "Bengalí", "Tagalo"],
+    ["Italien", "Anglais", "Espagnol", "Français", "Arabe", "Chinois", "Japonais", "Ourdou", "Roumain", "Albanais", "Pendjabi", "Ukrainien", "Russe", "Bengali", "Tagalog"],
+    ["الإيطالية", "الإنجليزية", "الإسبانية", "الفرنسية", "العربية", "الصينية", "اليابانية", "الأردية", "الرومانية", "الألبانية", "البنجابية", "الأوكرانية", "الروسية", "البنغالية", "التاغالوغية"],
+    ["意大利语", "英语", "西班牙语", "法语", "阿拉伯语", "中文", "日语", "乌尔都语", "罗马尼亚语", "阿尔巴尼亚语", "旁遮普语", "乌克兰语", "俄语", "孟加拉语", "他加禄语"],
+    ["イタリア語", "英語", "スペイン語", "フランス語", "アラビア語", "中国語", "日本語", "ウルドゥー語", "ルーマニア語", "アルバニア語", "パンジャブ語", "ウクライナ語", "ロシア語", "ベンガル語", "タガログ語"],
+    ["اطالوی", "انگریزی", "ہسپانوی", "فرانسیسی", "عربی", "چینی", "جاپانی", "اردو", "رومانیائی", "البانوی", "پنجابی", "یوکرینی", "روسی", "بنگالی", "تگالوگ"],
+    ["Italiană", "Engleză", "Spaniolă", "Franceză", "Arabă", "Chineză", "Japoneză", "Urdu", "Română", "Albaneză", "Punjabi", "Ucraineană", "Rusă", "Bengaleză", "Tagalog"],
+    ["Italisht", "Anglisht", "Spanjisht", "Frëngjisht", "Arabisht", "Kinezisht", "Japonisht", "Urdu", "Rumanisht", "Shqip", "Panxhabisht", "Ukrainisht", "Rusisht", "Bengalisht", "Tagalog"],
+    ["ਇਤਾਲਵੀ", "ਅੰਗਰੇਜ਼ੀ", "ਸਪੇਨੀ", "ਫ਼ਰਾਂਸੀਸੀ", "ਅਰਬੀ", "ਚੀਨੀ", "ਜਪਾਨੀ", "ਉਰਦੂ", "ਰੋਮਾਨੀਆਈ", "ਅਲਬਾਨੀਆਈ", "ਪੰਜਾਬੀ", "ਯੂਕਰੇਨੀ", "ਰੂਸੀ", "ਬੰਗਾਲੀ", "ਤਾਗਾਲੋਗ"],
+    ["Італійська", "Англійська", "Іспанська", "Французька", "Арабська", "Китайська", "Японська", "Урду", "Румунська", "Албанська", "Панджабі", "Українська", "Російська", "Бенгальська", "Тагальська"],
+    ["Итальянский", "Английский", "Испанский", "Французский", "Арабский", "Китайский", "Японский", "Урду", "Румынский", "Албанский", "Панджаби", "Украинский", "Русский", "Бенгальский", "Тагальский"],
+    ["ইতালীয়", "ইংরেজি", "স্প্যানিশ", "ফরাসি", "আরবি", "চীনা", "জাপানি", "উর্দু", "রোমানীয়", "আলবেনীয়", "পাঞ্জাবি", "ইউক্রেনীয়", "রুশ", "বাংলা", "তাগালগ"],
+    ["Italyano", "Ingles", "Espanyol", "Pranses", "Arabe", "Tsino", "Hapon", "Urdu", "Romanian", "Albanian", "Punjabi", "Ukrainian", "Ruso", "Bengali", "Tagalog"]
+  ];
+  function T(k) { var r = UI[k]; return r ? (r[op] || r[0]) : k; }
+  function TG(g) { var r = UI_GRUPPI[g]; return r ? (r[op] || r[0]) : g; }
+  // Mette nella lingua dell'operatore le scritte fisse della pagina (data-t = testo, data-t-aria, data-t-ph = segnaposto)
+  function traduciUI() {
+    document.documentElement.lang = infoOp().id;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (e) { e.textContent = T(e.getAttribute('data-t')); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t-aria]'), function (e) { e.setAttribute('aria-label', T(e.getAttribute('data-t-aria'))); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t-ph]'), function (e) { e.setAttribute('placeholder', T(e.getAttribute('data-t-ph'))); });
+    var h = document.getElementById('bv-tua-lingua'); if (h) h.textContent = '🌐 ' + T('tua_lingua') + (op === 1 ? '' : ' · Your language');
+    FIRMA = creaFirma();
+  }
+
   var MARCHIO_SVG = logoSVG('marchio');
-  FIRMA = '<footer class="firma">' + MARCHIO_SVG +
-    '<span class="firma-etichetta">Ideazione e design</span>' +
-    '<span class="firma-nome">Massimiliano Previtali</span>' +
-    '<span class="firma-nota">© 2026 · Traduzioni da far controllare a un mediatore culturale.</span></footer>';
+  function creaFirma() {
+    return '<footer class="firma">' + MARCHIO_SVG +
+      '<span class="firma-etichetta">' + T('ideazione') + '</span>' +
+      '<span class="firma-nome">Massimiliano Previtali</span>' +
+      '<span class="firma-nota">© 2026 · ' + T('nota_firma') + '</span></footer>';
+  }
+  FIRMA = creaFirma();
   // [codice, nome sul bottone in alto, nome intero, simbolo, cosa fa]
   var RUOLI = [
     ['I', 'Infermiere', 'Infermiere', '💉', 'Terapie, parametri, dolore'],
@@ -1928,12 +2047,13 @@
   // Schermata di benvenuto: si apre all'avvio e toccando il ruolo in alto.
   // alLavoro = true: si apre già su «Che lavoro fai?» (dal bottone del ruolo in alto, per cambiare lavoro al volo)
   function apriBenvenuto(alLavoro) {
+    traduciUI();
     // Ordine dei riquadri: in alto Medico e Infermiere, in basso Operatore alberghiero e OSS.
     document.getElementById('bv-ruoli').innerHTML = ['M', 'I', 'A', 'S'].map(function (c) {
       return RUOLI.filter(function (r) { return r[0] === c; })[0];
     }).map(function (r) {
       return '<button type="button" class="bv-ruolo r-' + r[0] + (r[0] === ruolo ? ' ultimo' : '') + '" onclick="scegliRuolo(\'' + r[0] + '\')">' +
-        '<span class="simbolo" aria-hidden="true">' + r[3] + '</span><b>' + r[2] + '</b><small>' + r[4] + '</small></button>';
+        '<span class="simbolo" aria-hidden="true">' + r[3] + '</span><b>' + T('r_' + r[0]) + '</b><small>' + T('r_' + r[0] + '_d') + '</small></button>';
     }).join('');
     // Lingue dell'operatore: italiano primo, poi le altre in ordine di persone presenti in Italia
     // (comunità straniere residenti, stima). La posizione nelle frasi (n) non cambia.
@@ -1945,7 +2065,7 @@
     })).map(function (n) { var l = TUTTE[n];
       return '<button type="button" class="' + (n === op ? 'attiva' : '') + '" onclick="scegliOperatore(' + n + ')">' +
         (BANDIERE[n] ? '<span class="sigla bandiera" aria-hidden="true"><svg viewBox="0 0 30 30">' + BANDIERE[n] + '</svg></span>' : '<span class="sigla arabo" lang="ar" aria-hidden="true">ع</span>') +
-        '<span class="nomi"><b lang="' + l.id + '">' + l.nome + '</b><small>' + NOMI_IT[n] + '</small></span></button>';
+        '<span class="nomi"><b lang="' + l.id + '">' + l.nome + '</b><small>' + NOMI_OP[op][n] + '</small></span></button>';
     }).join('');
     document.getElementById('bv-firma').innerHTML = FIRMA;
     document.getElementById('bv-logo').innerHTML = MARCHIO_SVG;
@@ -2041,10 +2161,11 @@
     var stella = preferite.indexOf(f.t[0]) !== -1;
     return '<div class="riga-frase"><button type="button" class="frase" onclick="apri(' + i + ')"><span' + attrOp() + '>' + esc(f.t[op]) + '</span>' +
       '<small lang="' + info().id + '"' + (info().rtl ? ' dir="rtl"' : '') + '>' + esc(f.t[lingua]) + '</small></button>' +
-      '<button type="button" class="stella' + (stella ? ' piena' : '') + '" aria-pressed="' + stella + '" aria-label="' + (stella ? 'Togli dai preferiti' : 'Aggiungi ai preferiti') + '" onclick="alternaPreferita(' + i + ')">' + (stella ? '★' : '☆') + '</button></div>';
+      '<button type="button" class="stella' + (stella ? ' piena' : '') + '" aria-pressed="' + stella + '" aria-label="' + (stella ? T('pref_togli') : T('pref_add')) + '" onclick="alternaPreferita(' + i + ')">' + (stella ? '★' : '☆') + '</button></div>';
   }
 
   function disegna() {
+    traduciUI();
     // Lingue
     viste.lingue = ordinaSecondo(TUTTE.map(function (l, i) { return i; }).filter(function (i) { return i !== op; }), ordLingue);
     document.getElementById('lingue').innerHTML = viste.lingue.map(function (n, k) {
@@ -2054,8 +2175,8 @@
     // Chi sei: il ruolo scelto nella schermata di benvenuto
     var rs = RUOLI.filter(function (x) { return x[0] === ruolo; })[0];
     var br = document.getElementById('btn-ruolo');
-    br.innerHTML = (rs ? rs[3] + ' ' + rs[1] : 'Tutti') + ' <span>▾</span>';
-    br.setAttribute('aria-label', 'Ruolo: ' + (rs ? rs[2] : 'tutti') + '. Tocca per cambiare');
+    br.innerHTML = (rs ? rs[3] + ' ' + T('r_' + rs[0] + '_b') : T('tutti')) + ' <span>▾</span>';
+    br.setAttribute('aria-label', T('lavoro') + ' ' + (rs ? T('r_' + rs[0]) : T('tutti')));
     document.body.setAttribute('data-ruolo', ruolo);
     // Argomenti che hanno almeno una frase per il ruolo scelto, nell'ordine scelto
     var disponibili = [], nomeGruppo = '', rg = '';
@@ -2069,25 +2190,25 @@
     var altriGruppi = FRASI.filter(function (f) { return f.gruppo && disponibili.indexOf(f.gruppo) === -1; }).map(function (f) { return f.gruppo; });
     if (gruppo === '__pref' && !preferite.length) gruppo = '';
     if (gruppo && gruppo !== '__pref' && gruppo.indexOf('__parole') !== 0 && disponibili.indexOf(gruppo) === -1 && altriGruppi.indexOf(gruppo) === -1) gruppo = '';
-    var fissi = '<button type="button" class="' + (gruppo === '' ? 'attiva' : '') + '" onclick="scegliGruppo(\'\')">Tutti gli argomenti</button>' +
-      (preferite.length ? '<button type="button" class="' + (gruppo === '__pref' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__pref\')">★ Le mie frasi</button>' : '') +
-      '<button type="button" class="' + (gruppo === '__parole' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__parole\')">📖 Parole</button>';
+    var fissi = '<button type="button" class="' + (gruppo === '' ? 'attiva' : '') + '" onclick="scegliGruppo(\'\')">' + T('tutti_argomenti') + '</button>' +
+      (preferite.length ? '<button type="button" class="' + (gruppo === '__pref' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__pref\')">★ ' + T('mie_frasi') + '</button>' : '') +
+      '<button type="button" class="' + (gruppo === '__parole' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__parole\')">📖 ' + T('parole') + '</button>';
     var modoParole = gruppo.indexOf('__parole') === 0;
     if (modoParole) {
       // Stessa barra, niente riga in più: al posto degli argomenti compaiono le categorie delle parole
       var cats = [];
       PAROLE.forEach(function (w) { if (cats.indexOf(w.c) === -1) cats.push(w.c); });
       document.getElementById('gruppi').innerHTML =
-        '<button type="button" class="indietro" onclick="scegliGruppo(\'\')">‹ Argomenti</button>' +
-        '<button type="button" class="' + (gruppo === '__parole' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__parole\')">📖 Tutte</button>' +
+        '<button type="button" class="indietro" onclick="scegliGruppo(\'\')">‹ ' + T('argomenti') + '</button>' +
+        '<button type="button" class="' + (gruppo === '__parole' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__parole\')">📖 ' + T('tutte') + '</button>' +
         cats.map(function (c) {
-          return '<button type="button" class="' + (gruppo === '__parole:' + c ? 'attiva' : '') + '" onclick="scegliGruppo(' + JSON.stringify('__parole:' + c).replace(/"/g, '&quot;') + ')">' + esc(c) + '</button>';
+          return '<button type="button" class="' + (gruppo === '__parole:' + c ? 'attiva' : '') + '" onclick="scegliGruppo(' + JSON.stringify('__parole:' + c).replace(/"/g, '&quot;') + ')">' + esc(TG(c)) + '</button>';
         }).join('');
     } else
     document.getElementById('gruppi').innerHTML = fissi + viste.gruppi.map(function (g, k) {
-      return chip('gruppi', k, '<button type="button" class="' + (g === gruppo ? 'attiva' : '') + '" onclick="scegliGruppo(' + JSON.stringify(g).replace(/"/g, '&quot;') + ')">' + esc(g) + '</button>');
-    }).join('') + (ruolo && altriGruppi.length ? '<span class="etichetta-altri">Altri ruoli:</span>' + altriGruppi.map(function (g) {
-      return '<button type="button" class="altro-ruolo' + (g === gruppo ? ' attiva' : '') + '" onclick="scegliGruppo(' + JSON.stringify(g).replace(/"/g, '&quot;') + ')">' + esc(g) + '</button>';
+      return chip('gruppi', k, '<button type="button" class="' + (g === gruppo ? 'attiva' : '') + '" onclick="scegliGruppo(' + JSON.stringify(g).replace(/"/g, '&quot;') + ')">' + esc(TG(g)) + '</button>');
+    }).join('') + (ruolo && altriGruppi.length ? '<span class="etichetta-altri">' + T('altri_ruoli') + '</span>' + altriGruppi.map(function (g) {
+      return '<button type="button" class="altro-ruolo' + (g === gruppo ? ' attiva' : '') + '" onclick="scegliGruppo(' + JSON.stringify(g).replace(/"/g, '&quot;') + ')">' + esc(TG(g)) + '</button>';
     }).join('') : '');
     // Frasi: prima le preferite, poi gli argomenti nell'ordine scelto
     var html = '';
@@ -2115,16 +2236,16 @@
       });
       var nAltre = altre.esatte.length + altre.simili.length;
       trovate = mie.esatte.concat(mie.simili).join('') +
-        (nAltre ? '<h2 class="altri-ruoli">Frasi di altri ruoli</h2>' + altre.esatte.concat(altre.simili).join('') : '');
+        (nAltre ? '<h2 class="altri-ruoli">' + T('frasi_altri') + '</h2>' + altre.esatte.concat(altre.simili).join('') : '');
       // Parole del dizionario che corrispondono (per tutti i ruoli)
       var parTrovate = [];
       PAROLE.forEach(function (w, k) {
         var tp = normalizza(w.t[0] + ' ' + w.t[op] + ' ' + w.t[lingua]);
         if (basta(tp)) parTrovate.push(rigaParola(k));
       });
-      html = (parTrovate.length ? '<h2>📖 ' + (parTrovate.length === 1 ? 'Parola' : 'Parole') + '</h2>' + parTrovate.join('') : '') +
-             (n ? '<h2>' + n + (n === 1 ? ' frase trovata' : ' frasi trovate') + '</h2>' + trovate : '');
-      if (!html) html = '<p class="nessuna">Nessuna frase con «' + esc(testoCerca) + '».<br>Prova con un\'altra parola.</p>';
+      html = (parTrovate.length ? '<h2>📖 ' + (parTrovate.length === 1 ? T('parola') : T('parole')) + '</h2>' + parTrovate.join('') : '') +
+             (n ? '<h2>' + n + ' ' + (n === 1 ? T('trovata') : T('trovate')) + '</h2>' + trovate : '');
+      if (!html) html = '<p class="nessuna">' + T('nessun_risultato') + ' «' + esc(testoCerca) + '».<br>' + T('prova') + '</p>';
       document.getElementById('elenco').innerHTML = html + FIRMA;
       attivaTrascina();
       return;
@@ -2132,14 +2253,14 @@
     if (preferite.length && (gruppo === '' || gruppo === '__pref')) {
       var pref = '';
       FRASI.forEach(function (f, i) { if (!f.gruppo && preferite.indexOf(f.t[0]) !== -1) pref += rigaFrase(f, i); });
-      if (pref) html += '<h2 class="titolo-pref">★ Le mie frasi</h2>' + pref;
+      if (pref) html += '<h2 class="titolo-pref">★ ' + T('mie_frasi') + '</h2>' + pref;
     }
     if (gruppo.indexOf('__parole') === 0) {
       // Dizionario: tutte le parole per categoria, oppure solo la categoria scelta
       var cat = '', solo = gruppo.indexOf(':') !== -1 ? gruppo.slice(gruppo.indexOf(':') + 1) : '';
       PAROLE.forEach(function (w, k) {
         if (solo && w.c !== solo) return;
-        if (w.c !== cat) { cat = w.c; html += '<h2 class="cat-parole">' + esc(cat) + '</h2>'; }
+        if (w.c !== cat) { cat = w.c; html += '<h2 class="cat-parole">' + esc(TG(cat)) + '</h2>'; }
         html += rigaParola(k);
       });
     } else if (gruppo !== '__pref') {
@@ -2154,8 +2275,8 @@
         }
         (perGruppo[gruppoAttuale] = perGruppo[gruppoAttuale] || []).push(rigaFrase(f, i));
       });
-      viste.gruppi.forEach(function (g) { if (perGruppo[g]) html += '<h2>' + esc(g) + '</h2>' + perGruppo[g].join(''); });
-      if (gruppo && altreDelGruppo.length) html += '<h2 class="altri-ruoli">' + (perGruppo[gruppo] ? 'Frasi di altri ruoli' : esc(gruppo) + ' · frasi di altri ruoli') + '</h2>' + altreDelGruppo.join('');
+      viste.gruppi.forEach(function (g) { if (perGruppo[g]) html += '<h2>' + esc(TG(g)) + '</h2>' + perGruppo[g].join(''); });
+      if (gruppo && altreDelGruppo.length) html += '<h2 class="altri-ruoli">' + (perGruppo[gruppo] ? T('frasi_altri') : esc(TG(gruppo)) + ' · ' + T('frasi_altri')) + '</h2>' + altreDelGruppo.join('');
     }
     html += FIRMA;
     document.getElementById('elenco').innerHTML = html;
@@ -2273,20 +2394,20 @@
       var ascolta = function () {
         sr.startListening(function (m) { usaVoce(m); }, function (e) {
           if (String(e).indexOf('not available') !== -1 || String(e).indexOf('Not available') !== -1)
-            avvisoVoce('Riconoscimento vocale non disponibile su questo telefono. Controlla che l\'app Google sia installata e attiva.');
+            avvisoVoce(T('voce_no'));
           // annullato dall'utente o nessuna parola capita: nessun messaggio
-        }, { language: lang, matches: 5, prompt: 'Dì la parola da cercare', showPopup: true });
+        }, { language: lang, matches: 5, prompt: T('voce_prompt'), showPopup: true });
       };
       sr.hasPermission(function (ok) {
         if (ok) ascolta();
         else sr.requestPermission(function () {
-          sr.hasPermission(function (ok2) { if (ok2) ascolta(); else avvisoVoce('Per cercare a voce serve il permesso del microfono.'); });
-        }, function () { avvisoVoce('Per cercare a voce serve il permesso del microfono.'); });
+          sr.hasPermission(function (ok2) { if (ok2) ascolta(); else avvisoVoce(T('voce_perm')); });
+        }, function () { avvisoVoce(T('voce_perm')); });
       }, function () { ascolta(); });
       return;
     }
     var W = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!W) { avvisoVoce('La ricerca a voce non è disponibile qui.'); return; }
+    if (!W) { avvisoVoce(T('voce_qui')); return; }
     var r = new W(); r.lang = lang; r.maxAlternatives = 5; r.interimResults = false;
     r.onresult = function (ev) { var a = []; for (var k = 0; k < ev.results[0].length; k++) a.push(ev.results[0][k].transcript); usaVoce(a); };
     try { r.start(); } catch (e) {}
@@ -2366,12 +2487,12 @@
         return '<button type="button" id="casella-' + k + '" onclick="scegliCasella(' + k + ')">' + (FIGURE[c[1]] || '<span class="simbolo" aria-hidden="true">' + c[0] + '</span>') +
           '<b lang="' + info().id + '">' + esc(c[lingua + 1]) + '</b><small' + attrOp() + '>' + esc(c[op + 1]) + '</small></button>';
       }).join('') + '</div>' +
-        '<div class="scorri"><button type="button" onclick="avantiCasella()">▶ Avanti</button><button type="button" class="questa" onclick="scegliCasella(casella)">✓ Questa!</button></div>' +
-        '<p class="aiuto-tabella">Tocca <b>Avanti</b>: le caselle si accendono una alla volta e il telefono le legge nella lingua del paziente. Quando il paziente chiude gli occhi, tocca <b>Questa!</b> Se il paziente può indicare, indica col dito <b>senza toccare il telefono</b>: la casella la tocchi tu.</p>';
+        '<div class="scorri"><button type="button" onclick="avantiCasella()">▶ ' + T('avanti') + '</button><button type="button" class="questa" onclick="scegliCasella(casella)">✓ ' + T('questa') + '</button></div>' +
+        '<p class="aiuto-tabella"' + attrOp() + '>' + T('aiuto_tabella').replace('{A}', T('avanti')).replace('{Q}', T('questa')) + '</p>';
     } else r.innerHTML = '';
     // Il telefono lo tiene sempre l'operatore: il paziente indica o fa cenno, la risposta la tocchi tu.
     if (f.tipo === 'sn' || f.tipo === 'dolore' || f.tipo === 'calde' || f.scelte)
-      r.innerHTML += '<p class="aiuto-tabella">Il paziente indica o fa cenno, <b>senza toccare il telefono</b>: la risposta la tocchi tu.</p>';
+      r.innerHTML += '<p class="aiuto-tabella"' + attrOp() + '>' + T('aiuto_risposte') + '</p>';
     document.getElementById('g-risposta').style.display = 'none';
     document.getElementById('grande').classList.add('aperto');
     document.getElementById('grande').scrollTop = 0;
@@ -2465,7 +2586,7 @@
     var t = TEMI.filter(function (x) { return x[0] === tema; })[0];
     var b = document.getElementById('btn-tema');
     b.innerHTML = t[1] + (tema === 'auto' ? '<small>A</small>' : '');
-    b.setAttribute('aria-label', 'Giorno o notte: ' + t[2] + '. Tocca per cambiare');
+    b.setAttribute('aria-label', T('tema_' + (t[0] === 'light' ? 'giorno' : t[0] === 'dark' ? 'notte' : 'auto')));
     return t;
   }
   var tempoAvviso;
@@ -2474,7 +2595,7 @@
     tema = TEMI[(i + 1) % TEMI.length][0];
     try { localStorage.setItem('trad_tema', tema); } catch (e) {}
     var t = applicaTema(), a = document.getElementById('avviso');
-    a.textContent = t[1] + ' ' + t[2]; a.classList.add('visibile');
+    a.textContent = t[1] + ' ' + T('tema_' + (t[0] === 'light' ? 'giorno' : t[0] === 'dark' ? 'notte' : 'auto')); a.classList.add('visibile');
     clearTimeout(tempoAvviso); tempoAvviso = setTimeout(function () { a.classList.remove('visibile'); }, 1600);
   }
   applicaTema();
