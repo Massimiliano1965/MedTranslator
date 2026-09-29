@@ -3,3 +3,5 @@ plugins/
 node_modules/
 *.keystore
 *.jks
+# La firma fissa di MedTranslator deve stare nel progetto (vedi firma/LEGGIMI.txt)
+!firma/medtranslator.keystore
