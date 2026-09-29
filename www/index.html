@@ -1921,17 +1921,22 @@
     var html = '';
     if (testoCerca) {
       // Ricerca: tutte le frasi del proprio lavoro che contengono la parola (o una simile)
-      var parole = paroleDaCercare(testoCerca), trovate = '', n = 0, rgc = '', esatte = [], simili = [];
+      // La ricerca guarda le frasi di TUTTI i ruoli (anche un OA deve poter dire «radiografia»):
+      // prima quelle del proprio lavoro, poi quelle degli altri. L'elenco normale resta per ruolo.
+      var parole = paroleDaCercare(testoCerca), trovate = '', n = 0, rgc = '',
+          mie = { esatte: [], simili: [] }, altre = { esatte: [], simili: [] };
       FRASI.forEach(function (f, i) {
         if (f.gruppo) { rgc = f.ruoli; return; }
-        if (ruolo && (f.ruoli || rgc).indexOf(ruolo) === -1) return;
         var testo = normalizza(f.t[0] + ' ' + f.t[op] + ' ' + f.t[lingua]);
         if (!parole.length || !parole.every(function (g) { return g.some(function (p) { return testo.indexOf(p) !== -1; }); })) return;
+        var dove = (!ruolo || (f.ruoli || rgc).indexOf(ruolo) !== -1) ? mie : altre;
         // Prima le frasi con proprio le parole scritte, poi quelle trovate con le parole simili
-        (parole.every(function (g) { return testo.indexOf(g[0]) !== -1; }) ? esatte : simili).push(rigaFrase(f, i));
+        (parole.every(function (g) { return testo.indexOf(g[0]) !== -1; }) ? dove.esatte : dove.simili).push(rigaFrase(f, i));
         n++;
       });
-      trovate = esatte.concat(simili).join('');
+      var nAltre = altre.esatte.length + altre.simili.length;
+      trovate = mie.esatte.concat(mie.simili).join('') +
+        (nAltre ? '<h2 class="altri-ruoli">Frasi di altri ruoli</h2>' + altre.esatte.concat(altre.simili).join('') : '');
       html = n ? '<h2>' + n + (n === 1 ? ' frase trovata' : ' frasi trovate') + '</h2>' + trovate
                : '<p class="nessuna">Nessuna frase con «' + esc(testoCerca) + '».<br>Prova con un\'altra parola.</p>';
       document.getElementById('elenco').innerHTML = html + FIRMA;
