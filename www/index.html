@@ -175,6 +175,9 @@
     font-size: 22px; line-height: 1; cursor: pointer; color: var(--blu);
   }
   h2.titolo-pref { color: #b88600; }
+  /* Preferite: si trascinano tenendo premuto sulla frase */
+  .riga-pref { touch-action: pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  .riga-pref.preso { box-shadow: 0 6px 16px rgba(0,0,0,0.25); }
   /* Tasto Ordina e frecce per spostare lingue, ruoli e argomenti */
   .btn-ordina {
     margin-left: auto; flex: none; border: 1px solid var(--blu); background: transparent; color: var(--blu);
@@ -2369,9 +2372,14 @@
       return;
     }
     if (preferite.length && (gruppo === '' || gruppo === '__pref')) {
+      // Le preferite escono nell'ordine scelto da chi usa l'app (tieni premuto e trascina)
       var pref = '';
-      FRASI.forEach(function (f, i) { if (!f.gruppo && preferite.indexOf(f.t[0]) !== -1) pref += rigaFrase(f, i); });
-      if (pref) html += '<h2 class="titolo-pref">★ ' + T('mie_frasi') + '</h2>' + pref;
+      preferite.forEach(function (it) {
+        for (var i = 0; i < FRASI.length; i++) {
+          if (!FRASI[i].gruppo && FRASI[i].t[0] === it) { pref += rigaFrase(FRASI[i], i).replace('class="riga-frase"', 'class="riga-frase riga-pref" data-k="' + esc(it) + '"'); break; }
+        }
+      });
+      if (pref) html += '<h2 class="titolo-pref">★ ' + T('mie_frasi') + '</h2><div id="elenco-pref">' + pref + '</div>';
     }
     if (gruppo.indexOf('__parole') === 0) {
       // Dizionario: tutte le parole per categoria, oppure solo la categoria scelta
@@ -2405,6 +2413,7 @@
   // cambiargli posto. L'ordine resta salvato sul telefono.
   var ordinatori = [], appenaTrascinato = 0;
   function attivaTrascina() {
+    attivaTrascinaPref();
     if (typeof Sortable === 'undefined') return;
     ordinatori.forEach(function (o) { o.destroy(); });
     ordinatori = [['lingue', 'trad_ordine_lingue'], ['gruppi', 'trad_ordine_gruppi']].map(function (r) {
@@ -2422,6 +2431,24 @@
           setTimeout(disegna, 0);
         }
       });
+    });
+  }
+  // Frasi preferite: tieni premuto sulla frase e trascinala su o giù; l'ordine resta salvato
+  var ordinatorePref = null;
+  function attivaTrascinaPref() {
+    if (ordinatorePref) { ordinatorePref.destroy(); ordinatorePref = null; }
+    var box = document.getElementById('elenco-pref');
+    if (!box || typeof Sortable === 'undefined') return;
+    ordinatorePref = Sortable.create(box, {
+      draggable: '.riga-pref', handle: '.frase', animation: 150, delay: 300, delayOnTouchOnly: true, forceFallback: true,
+      fallbackTolerance: 4, ghostClass: 'fantasma', chosenClass: 'preso', scroll: true, bubbleScroll: true,
+      onEnd: function () {
+        appenaTrascinato = Date.now();
+        var nuovo = Array.prototype.map.call(box.querySelectorAll('.riga-pref'), function (r) { return r.getAttribute('data-k'); });
+        preferite = nuovo.concat(preferite.filter(function (x) { return nuovo.indexOf(x) === -1; }));
+        salva('trad_preferite', preferite);
+        setTimeout(disegna, 0);
+      }
     });
   }
   function daTrascinamento() { return Date.now() - appenaTrascinato < 400; }
@@ -2567,6 +2594,7 @@
   }
 
   function apri(i) {
+    if (daTrascinamento()) return;
     var f = typeof i === 'number' ? FRASI[i] : i; aperta = f;   // i = numero della frase, oppure una parola del dizionario
     var t = document.getElementById('g-testo');
     t.textContent = f.t[lingua];
