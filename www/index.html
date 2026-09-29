@@ -190,11 +190,28 @@
   .frase:active { background: var(--blu-chiaro); }
 
   /* Schermata di benvenuto: all'avvio si sceglie il proprio lavoro */
-  #benvenuto {
+  #benvenuto, #pazienti {
     position: fixed; inset: 0; z-index: 15; background: var(--sfondo); display: none; overflow-y: auto;
     padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
   }
-  #benvenuto.aperto { display: block; }
+  #benvenuto.aperto, #pazienti.aperto { display: block; }
+  /* Schermata «Lingue dei pazienti»: una, alcune o tutte (selezione multipla, spunta ✓) */
+  #pazienti { z-index: 16; }
+  .bv-lingue button.scelta { border-color: var(--blu); background: var(--blu-chiaro); }
+  .bv-lingue button.scelta .sigla { box-shadow: 0 0 0 3px var(--blu); }
+  .bv-lingue .spunta {
+    flex: none; margin-inline-start: auto; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+    border: 2px solid var(--bordo); color: transparent; font-size: 15px; font-weight: 900; line-height: 1;
+  }
+  .bv-lingue button.scelta .spunta { background: var(--blu); border-color: var(--blu); color: #fff; }
+  .pz-tutte { display: block; margin: -14px auto 14px; }
+  .bv-continua {
+    display: block; width: 100%; margin: 4px 0 0; border: 0; border-radius: 16px; padding: 16px; font: inherit;
+    font-size: 19px; font-weight: 800; background: var(--blu); color: #fff; box-shadow: var(--ombra);
+  }
+  .bv-continua:disabled { background: var(--bordo); color: var(--tenue); box-shadow: none; }
+  /* Bottone ＋ in fondo alla riga delle lingue: riapre «Lingue dei pazienti» */
+  .lingue button.piu { background: transparent; box-shadow: none; border: 2px dashed var(--blu); color: var(--blu); padding: 4px 12px; font-size: 18px; line-height: 1; }
   .bv { max-width: 520px; margin: 0 auto; padding: 28px 16px 16px; }
   .bv-logo { display: flex; justify-content: center; }
   .bv-logo .marchio { width: 96px; height: 96px; filter: drop-shadow(0 4px 10px rgba(11,58,74,.15)); }
@@ -375,6 +392,18 @@
     <div class="bv-ruoli" id="bv-ruoli"></div>
     <button type="button" class="bv-tutti" onclick="scegliRuolo('')" data-t="tutte_frasi">Vedi tutte le frasi</button>
     <div id="bv-firma"></div>
+  </div>
+</div>
+
+<div id="pazienti" role="dialog" aria-modal="true" aria-labelledby="pz-titolo">
+  <div class="bv">
+    <div class="bv-logo" id="pz-logo"></div>
+    <h1 id="pz-titolo" data-t="pz_titolo">Lingue dei pazienti</h1>
+    <p class="bv-sotto" data-t="pz_sotto">Tocca le lingue dei tuoi pazienti: una, alcune o tutte. Solo queste appariranno in alto.</p>
+    <button type="button" class="bv-tutti pz-tutte" id="pz-tutte" onclick="tuttePazienti()"></button>
+    <div class="bv-lingue" id="pz-lingue"></div>
+    <button type="button" class="bv-continua" id="pz-continua" onclick="confermaPazienti()"></button>
+    <button type="button" class="bv-tutti" onclick="apriBenvenuto()" data-t="pz_cambia">Cambia la tua lingua o il tuo lavoro</button>
   </div>
 </div>
 
@@ -1915,6 +1944,13 @@
   // ---------- Scritte dell'app nella lingua dell'operatore ----------
   // Ogni riga: [it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru, bn, fil]. Aggiunte il 29/09/2026: DA FAR CONTROLLARE.
   var UI = {
+    "pz_titolo": ["Lingue dei pazienti", "Patients' languages", "Idiomas de los pacientes", "Langues des patients", "لغات المرضى", "患者的语言", "患者さんの言語", "مریضوں کی زبانیں", "Limbile pacienților", "Gjuhët e pacientëve", "ਮਰੀਜ਼ਾਂ ਦੀਆਂ ਭਾਸ਼ਾਵਾਂ", "Мови пацієнтів", "Языки пациентов", "রোগীদের ভাষা", "Mga wika ng mga pasyente"],
+    "pz_sotto": ["Tocca le lingue dei tuoi pazienti: una, alcune o tutte. Solo queste appariranno in alto.", "Tap your patients' languages: one, some or all. Only these will appear at the top.", "Toca los idiomas de tus pacientes: uno, varios o todos. Solo estos aparecerán arriba.", "Touche les langues de tes patients : une, plusieurs ou toutes. Seules celles-ci apparaîtront en haut.", "اضغط على لغات مرضاك: واحدة أو عدة لغات أو كلها. ستظهر هذه اللغات فقط في الأعلى.", "点选你的患者的语言：一种、几种或全部。只有这些语言会显示在上方。", "患者さんの言語をタップしてください（1つ、複数、またはすべて）。選んだ言語だけが上に表示されます。", "اپنے مریضوں کی زبانوں کو چھوئیں: ایک، کچھ یا سب۔ صرف یہی اوپر نظر آئیں گی۔", "Atinge limbile pacienților tăi: una, câteva sau toate. Doar acestea vor apărea sus.", "Prek gjuhët e pacientëve të tu: një, disa ose të gjitha. Vetëm këto do të shfaqen lart.", "ਆਪਣੇ ਮਰੀਜ਼ਾਂ ਦੀਆਂ ਭਾਸ਼ਾਵਾਂ ਛੂਹੋ: ਇੱਕ, ਕੁਝ ਜਾਂ ਸਾਰੀਆਂ। ਸਿਰਫ਼ ਇਹੀ ਉੱਪਰ ਦਿਖਣਗੀਆਂ।", "Торкнися мов своїх пацієнтів: однієї, кількох або всіх. Лише вони з'являться вгорі.", "Коснись языков своих пациентов: одного, нескольких или всех. Только они появятся вверху.", "তোমার রোগীদের ভাষাগুলো ছোঁও: একটি, কয়েকটি বা সবগুলো। শুধু এগুলোই উপরে দেখাবে।", "Pindutin ang mga wika ng iyong mga pasyente: isa, ilan o lahat. Ang mga ito lang ang lalabas sa itaas."],
+    "pz_continua": ["Continua", "Continue", "Continuar", "Continuer", "متابعة", "继续", "続ける", "جاری رکھیں", "Continuă", "Vazhdo", "ਜਾਰੀ ਰੱਖੋ", "Продовжити", "Продолжить", "চালিয়ে যাও", "Magpatuloy"],
+    "pz_almeno": ["Scegli almeno una lingua", "Choose at least one language", "Elige al menos un idioma", "Choisis au moins une langue", "اختر لغة واحدة على الأقل", "请至少选择一种语言", "少なくとも1つの言語を選んでください", "کم از کم ایک زبان منتخب کریں", "Alege cel puțin o limbă", "Zgjidh të paktën një gjuhë", "ਘੱਟੋ-ਘੱਟ ਇੱਕ ਭਾਸ਼ਾ ਚੁਣੋ", "Обери хоча б одну мову", "Выбери хотя бы один язык", "অন্তত একটি ভাষা বেছে নাও", "Pumili ng kahit isang wika"],
+    "pz_tutte": ["Scegli tutte", "Select all", "Elegir todos", "Tout choisir", "اختيار الكل", "全选", "すべて選ぶ", "سب منتخب کریں", "Alege toate", "Zgjidh të gjitha", "ਸਾਰੀਆਂ ਚੁਣੋ", "Обрати всі", "Выбрать все", "সব বেছে নাও", "Piliin lahat"],
+    "pz_nessuna": ["Togli tutte", "Clear all", "Quitar todos", "Tout enlever", "إلغاء الكل", "全部取消", "すべて外す", "سب ہٹائیں", "Scoate toate", "Hiqi të gjitha", "ਸਾਰੀਆਂ ਹਟਾਓ", "Прибрати всі", "Убрать все", "সব সরাও", "Alisin lahat"],
+    "pz_cambia": ["Cambia la tua lingua o il tuo lavoro", "Change your language or your job", "Cambiar tu idioma o tu trabajo", "Changer ta langue ou ton métier", "غيّر لغتك أو وظيفتك", "更改你的语言或工作", "自分の言語や職種を変える", "اپنی زبان یا کام تبدیل کریں", "Schimbă limba ta sau meseria", "Ndrysho gjuhën ose punën tënde", "ਆਪਣੀ ਭਾਸ਼ਾ ਜਾਂ ਕੰਮ ਬਦਲੋ", "Змінити свою мову або роботу", "Сменить свой язык или работу", "তোমার ভাষা বা কাজ বদলাও", "Palitan ang iyong wika o trabaho"],
     "titolo_bv": ["Benvenuto in MedTranslator", "Welcome to MedTranslator", "Bienvenido a MedTranslator", "Bienvenue dans MedTranslator", "مرحبًا بك في MedTranslator", "欢迎使用 MedTranslator", "MedTranslatorへようこそ", "MedTranslator میں خوش آمدید", "Bun venit în MedTranslator", "Mirë se vini në MedTranslator", "MedTranslator ਵਿੱਚ ਜੀ ਆਇਆਂ ਨੂੰ", "Ласкаво просимо до MedTranslator", "Добро пожаловать в MedTranslator", "MedTranslator-এ স্বাগতম", "Maligayang pagdating sa MedTranslator"],
     "sotto": ["Frasi pronte per comunicare con i pazienti", "Ready-made phrases to communicate with patients", "Frases listas para comunicarse con los pacientes", "Phrases prêtes pour communiquer avec les patients", "عبارات جاهزة للتواصل مع المرضى", "与患者沟通的常用语句", "患者さんと話すための定型フレーズ", "مریضوں سے بات کرنے کے لیے تیار جملے", "Fraze gata făcute pentru a comunica cu pacienții", "Fraza të gatshme për të komunikuar me pacientët", "ਮਰੀਜ਼ਾਂ ਨਾਲ ਗੱਲ ਕਰਨ ਲਈ ਤਿਆਰ ਵਾਕ", "Готові фрази для спілкування з пацієнтами", "Готовые фразы для общения с пациентами", "রোগীদের সাথে কথা বলার জন্য তৈরি বাক্য", "Mga handang parirala para makipag-usap sa mga pasyente"],
     "tua_lingua": ["La tua lingua", "Your language", "Tu idioma", "Ta langue", "لغتك", "你的语言", "あなたの言語", "آپ کی زبان", "Limba ta", "Gjuha jote", "ਤੁਹਾਡੀ ਭਾਸ਼ਾ", "Твоя мова", "Твой язык", "তোমার ভাষা", "Iyong wika"],
@@ -2047,6 +2083,7 @@
   // Schermata di benvenuto: si apre all'avvio e toccando il ruolo in alto.
   // alLavoro = true: si apre già su «Che lavoro fai?» (dal bottone del ruolo in alto, per cambiare lavoro al volo)
   function apriBenvenuto(alLavoro) {
+    document.getElementById('pazienti').classList.remove('aperto'); pazientiAperto = false;
     traduciUI();
     // Ordine dei riquadri: in alto Medico e Infermiere, in basso Operatore alberghiero e OSS.
     document.getElementById('bv-ruoli').innerHTML = ['M', 'I', 'A', 'S'].map(function (c) {
@@ -2081,6 +2118,7 @@
   // Lingua dell'operatore (le frasi compaiono in questa lingua; il paziente ne sceglie un'altra)
   function scegliOperatore(n) {
     op = n;
+    if (pazienti.indexOf(op) !== -1) { pazienti.splice(pazienti.indexOf(op), 1); salva('trad_pazienti', pazienti); }
     if (lingua === op) lingua = op === 0 ? 1 : 0;
     try { localStorage.setItem('trad_operatore', String(op)); localStorage.setItem('trad_lingua', String(lingua)); } catch (e) {}
     apriBenvenuto();
@@ -2096,6 +2134,68 @@
     document.getElementById('benvenuto').classList.remove('aperto');
     benvenutoAperto = false;
     document.body.classList.remove('cercando'); testoCerca = ''; document.getElementById('cerca-testo').value = '';
+    disegna();
+    // Scelti lingua e lavoro: si passa alle lingue dei pazienti
+    apriPazienti();
+  }
+  // ---------- Lingue dei pazienti ----------
+  // Si scelgono una, alcune o tutte; in alto compaiono solo queste.
+  // Dopo la prima volta l'app si apre sempre qui (non più su lingua e lavoro).
+  var pazienti = leggi('trad_pazienti', []).filter(function (n, k, a) {
+    return typeof n === 'number' && n >= 0 && n < TUTTE.length && n !== op && a.indexOf(n) === k;
+  });
+  var configurato = false;
+  try { configurato = localStorage.getItem('trad_configurato') === '1'; } catch (e) {}
+  var pazientiAperto = false;
+  function ordinePazienti() {   // stesso ordine della schermata «La tua lingua», senza la lingua dell'operatore
+    var el = [];
+    ORDINE_OPERATORE.forEach(function (id) { for (var n = 0; n < TUTTE.length; n++) if (TUTTE[n].id === id) el.push(n); });
+    TUTTE.forEach(function (l, n) { if (el.indexOf(n) === -1) el.push(n); });
+    return el.filter(function (n) { return n !== op; });
+  }
+  function disegnaPazienti() {
+    var el = ordinePazienti();
+    document.getElementById('pz-lingue').innerHTML = el.map(function (n) { var l = TUTTE[n], si = pazienti.indexOf(n) !== -1;
+      return '<button type="button" class="' + (si ? 'scelta' : '') + '" aria-pressed="' + si + '" onclick="alternaPaziente(' + n + ')">' +
+        (BANDIERE[n] ? '<span class="sigla bandiera" aria-hidden="true"><svg viewBox="0 0 30 30">' + BANDIERE[n] + '</svg></span>' : '<span class="sigla arabo" lang="ar" aria-hidden="true">ع</span>') +
+        '<span class="nomi"><b lang="' + l.id + '">' + l.nome + '</b><small>' + NOMI_OP[op][n] + '</small></span>' +
+        '<span class="spunta" aria-hidden="true">✓</span></button>';
+    }).join('');
+    var tutte = el.every(function (n) { return pazienti.indexOf(n) !== -1; });
+    document.getElementById('pz-tutte').textContent = tutte ? T('pz_nessuna') : T('pz_tutte');
+    var c = document.getElementById('pz-continua');
+    c.disabled = !pazienti.length;
+    c.textContent = pazienti.length ? T('pz_continua') + ' (' + pazienti.length + ') →' : T('pz_almeno');
+  }
+  function apriPazienti() {
+    document.getElementById('benvenuto').classList.remove('aperto'); benvenutoAperto = false;
+    traduciUI();
+    document.getElementById('pz-logo').innerHTML = MARCHIO_SVG;
+    disegnaPazienti();
+    var p = document.getElementById('pazienti');
+    p.classList.add('aperto'); p.scrollTop = 0;
+    document.body.setAttribute('data-ruolo', '');
+    pazientiAperto = true;
+  }
+  function alternaPaziente(n) {
+    var k = pazienti.indexOf(n);
+    if (k === -1) pazienti.push(n); else pazienti.splice(k, 1);
+    salva('trad_pazienti', pazienti);
+    disegnaPazienti();
+  }
+  function tuttePazienti() {
+    var el = ordinePazienti();
+    pazienti = el.every(function (n) { return pazienti.indexOf(n) !== -1; }) ? [] : el;
+    salva('trad_pazienti', pazienti);
+    disegnaPazienti();
+  }
+  function confermaPazienti() {
+    if (!pazienti.length) return;
+    if (pazienti.indexOf(lingua) === -1) lingua = ordinaSecondo(pazienti, ordLingue)[0];
+    configurato = true;
+    try { localStorage.setItem('trad_lingua', String(lingua)); localStorage.setItem('trad_configurato', '1'); } catch (e) {}
+    document.getElementById('pazienti').classList.remove('aperto');
+    pazientiAperto = false;
     disegna();
     window.scrollTo(0, 0);
     centra('lingue'); centra('gruppi');
@@ -2167,11 +2267,13 @@
   function disegna() {
     traduciUI();
     // Lingue
-    viste.lingue = ordinaSecondo(TUTTE.map(function (l, i) { return i; }).filter(function (i) { return i !== op; }), ordLingue);
+    // Solo le lingue dei pazienti scelte (se non ce n'è nessuna, tutte)
+    viste.lingue = ordinaSecondo(TUTTE.map(function (l, i) { return i; }).filter(function (i) { return i !== op && (!pazienti.length || pazienti.indexOf(i) !== -1); }), ordLingue);
+    if (viste.lingue.length && viste.lingue.indexOf(lingua) === -1) lingua = viste.lingue[0];
     document.getElementById('lingue').innerHTML = viste.lingue.map(function (n, k) {
       var l = TUTTE[n];
       return chip('lingue', k, '<button type="button" class="' + (n === lingua ? 'attiva' : '') + '" lang="' + l.id + '" onclick="scegliLingua(' + n + ')">' + l.nome + '</button>');
-    }).join('');
+    }).join('') + '<button type="button" class="piu" onclick="apriPazienti()" aria-label="' + esc(T('pz_titolo')) + '">＋</button>';
     // Chi sei: il ruolo scelto nella schermata di benvenuto
     var rs = RUOLI.filter(function (x) { return x[0] === ruolo; })[0];
     var br = document.getElementById('btn-ruolo');
@@ -2298,7 +2400,7 @@
           var ordine = Array.prototype.map.call(document.querySelectorAll('#' + r[0] + ' .trascina'), function (b) {
             var v = b.getAttribute('data-k'); return r[0] === 'lingue' ? +v : v;
           });
-          if (r[0] === 'lingue') ordLingue = ordine;
+          if (r[0] === 'lingue') { ordine = ordine.concat(ordLingue.filter(function (x) { return ordine.indexOf(x) === -1; })); ordLingue = ordine; }
           if (r[0] === 'gruppi') ordGruppi = ordine;
           salva(r[1], ordine);
           setTimeout(disegna, 0);
@@ -2603,12 +2705,13 @@
   // Tasto Indietro di Android: chiude la frase aperta invece di uscire.
   window.addEventListener('popstate', function () { if (aperta) chiudi(); });
   // App Android: il tasto Indietro chiude la frase aperta; dalle frasi torna
-  // alla schermata di benvenuto; dal benvenuto esce dall'app.
+  // alla schermata «Lingue dei pazienti»; da lì esce dall'app.
   document.addEventListener('backbutton', function (e) {
     e.preventDefault();
     if (aperta) chiudi();
     else if (document.body.classList.contains('cercando')) chiudiCerca();
-    else if (!benvenutoAperto) apriBenvenuto();
+    else if (benvenutoAperto && configurato && pazienti.length) apriPazienti();   // da lingua/lavoro torna alle lingue dei pazienti
+    else if (!benvenutoAperto && !pazientiAperto) apriPazienti();                 // dalle frasi torna alle lingue dei pazienti
     else if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
   }, false);
   var apriOriginale = apri;
@@ -2617,7 +2720,8 @@
   chiudi = function () { var era = aperta; chiudiOriginale(); if (era && history.state && history.state.f !== undefined) history.back(); };
 
   disegna();
-  apriBenvenuto();
+  // Prima volta: lingua e lavoro. Dalle volte dopo: subito le lingue dei pazienti.
+  if (configurato && pazienti.length) apriPazienti(); else apriBenvenuto();
 
   // Avvio: nel fumetto del logo scorrono i saluti nelle 15 lingue, poi sparisce.
   // Ordine voluto da Massi: italiano primo, giapponese terzo, francese ultimo.
