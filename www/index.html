@@ -132,6 +132,10 @@
     padding: 4px 10px; font: inherit; font-size: 13.5px; font-weight: 700; white-space: nowrap;
   }
   .gruppi button.attiva { background: var(--blu); color: #fff; }
+  /* Argomenti degli altri ruoli: in fondo, bordo tratteggiato */
+  .gruppi .etichetta-altri { flex: none; align-self: center; font-size: 12.5px; color: var(--tenue); margin-left: 4px; }
+  .gruppi button.altro-ruolo { border-style: dashed; opacity: .85; }
+  .gruppi button.altro-ruolo.attiva { opacity: 1; }
   main { padding: 8px 16px 32px; max-width: 640px; margin: 0 auto; }
   h2 { font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 700; color: var(--tenue); margin: 20px 4px 8px; }
   /* Frase + stella dei preferiti sulla stessa riga */
@@ -1746,6 +1750,130 @@
     });
   });
 
+  // Dizionario: parole singole da mostrare e far ascoltare (anche se non sono in una frase).
+  // Righe: [it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru, bn, fil]. Aggiunte il 29/09/2026:
+  // DA FAR CONTROLLARE AI MADRELINGUA.
+  var PAROLE = [
+    {"c": "Esami", "t": ["Radiografia", "X-ray", "Radiografía", "Radiographie", "صورة أشعة", "X光检查", "レントゲン", "ایکسرے", "Radiografie", "Radiografi", "ਐਕਸ-ਰੇ", "Рентген", "Рентген", "এক্স-রে", "X-ray"]},
+    {"c": "Esami", "t": ["TAC", "CT scan", "TAC (escáner)", "Scanner", "أشعة مقطعية", "CT扫描", "CT検査", "سی ٹی اسکین", "Tomografie (CT)", "Skaner (TAC)", "ਸੀਟੀ ਸਕੈਨ", "КТ (комп'ютерна томографія)", "КТ (компьютерная томография)", "সিটি স্ক্যান", "CT scan"]},
+    {"c": "Esami", "t": ["Risonanza magnetica", "MRI scan", "Resonancia magnética", "IRM", "رنين مغناطيسي", "核磁共振", "MRI検査", "ایم آر آئی", "Rezonanță magnetică (RMN)", "Rezonancë magnetike", "ਐਮਆਰਆਈ", "МРТ", "МРТ", "এমআরআই", "MRI"]},
+    {"c": "Esami", "t": ["Ecografia", "Ultrasound scan", "Ecografía", "Échographie", "تصوير بالموجات فوق الصوتية", "超声波检查", "超音波検査（エコー）", "الٹراساؤنڈ", "Ecografie", "Ekografi", "ਅਲਟਰਾਸਾਊਂਡ", "УЗД", "УЗИ", "আল্ট্রাসাউন্ড", "Ultrasound"]},
+    {"c": "Esami", "t": ["Elettrocardiogramma", "ECG (heart tracing)", "Electrocardiograma", "Électrocardiogramme", "تخطيط القلب", "心电图", "心電図", "ای سی جی (دل کا ٹیسٹ)", "Electrocardiogramă (EKG)", "Elektrokardiogram", "ਈਸੀਜੀ (ਦਿਲ ਦੀ ਜਾਂਚ)", "ЕКГ", "ЭКГ", "ইসিজি", "ECG"]},
+    {"c": "Esami", "t": ["Esami del sangue", "Blood tests", "Análisis de sangre", "Analyses de sang", "تحاليل الدم", "验血", "血液検査", "خون کے ٹیسٹ", "Analize de sânge", "Analiza e gjakut", "ਖ਼ੂਨ ਦੇ ਟੈਸਟ", "Аналіз крові", "Анализ крови", "রক্ত পরীক্ষা", "Pagsusuri ng dugo"]},
+    {"c": "Esami", "t": ["Esame delle urine", "Urine test", "Análisis de orina", "Analyse d'urine", "تحليل البول", "验尿", "尿検査", "پیشاب کا ٹیسٹ", "Analiza urinei", "Analiza e urinës", "ਪਿਸ਼ਾਬ ਦਾ ਟੈਸਟ", "Аналіз сечі", "Анализ мочи", "প্রস্রাব পরীক্ষা", "Pagsusuri ng ihi"]},
+    {"c": "Esami", "t": ["Spirometria", "Spirometry (breathing test)", "Espirometría", "Spirométrie", "قياس التنفس", "肺功能检查", "呼吸機能検査", "سانس کا ٹیسٹ (اسپائرومیٹری)", "Spirometrie", "Spirometri", "ਸਾਹ ਦਾ ਟੈਸਟ (ਸਪਾਇਰੋਮੈਟਰੀ)", "Спірометрія", "Спирометрия", "স্পাইরোমেট্রি", "Spirometry"]},
+    {"c": "Esami", "t": ["Gastroscopia", "Gastroscopy", "Gastroscopia", "Gastroscopie", "تنظير المعدة", "胃镜检查", "胃カメラ", "معدے کی اینڈوسکوپی", "Gastroscopie", "Gastroskopi", "ਮਿਹਦੇ ਦੀ ਦੂਰਬੀਨ ਜਾਂਚ", "Гастроскопія", "Гастроскопия", "গ্যাস্ট্রোস্কোপি", "Gastroscopy"]},
+    {"c": "Esami", "t": ["Colonscopia", "Colonoscopy", "Colonoscopia", "Coloscopie", "تنظير القولون", "肠镜检查", "大腸カメラ", "بڑی آنت کی اینڈوسکوپی", "Colonoscopie", "Kolonoskopi", "ਵੱਡੀ ਅੰਤੜੀ ਦੀ ਦੂਰਬੀਨ ਜਾਂਚ", "Колоноскопія", "Колоноскопия", "কোলনোস্কোপি", "Colonoscopy"]},
+    {"c": "Esami", "t": ["Biopsia", "Biopsy", "Biopsia", "Biopsie", "خزعة", "活检", "生検", "بایوپسی", "Biopsie", "Biopsi", "ਬਾਇਓਪਸੀ", "Біопсія", "Биопсия", "বায়োপসি", "Biopsy"]},
+    {"c": "Esami", "t": ["Tampone", "Swab test", "Prueba con hisopo", "Prélèvement par écouvillon", "مسحة", "拭子检测", "綿棒での検査", "سواب ٹیسٹ", "Test cu tampon", "Tampon", "ਸਵੈਬ ਟੈਸਟ", "Мазок", "Мазок", "সোয়াব টেস্ট", "Swab test"]},
+    {"c": "Medicine e cure", "t": ["Medicina", "Medicine", "Medicamento", "Médicament", "دواء", "药", "薬", "دوا", "Medicament", "Ilaç", "ਦਵਾਈ", "Ліки", "Лекарство", "ওষুধ", "Gamot"]},
+    {"c": "Medicine e cure", "t": ["Compressa", "Tablet", "Pastilla", "Comprimé", "قرص", "药片", "錠剤", "گولی", "Pastilă", "Tabletë", "ਗੋਲੀ", "Таблетка", "Таблетка", "ট্যাবলেট", "Tableta"]},
+    {"c": "Medicine e cure", "t": ["Sciroppo", "Syrup", "Jarabe", "Sirop", "شراب دوائي", "糖浆", "シロップ", "شربت (دوا)", "Sirop", "Shurup", "ਸ਼ਰਬਤ (ਦਵਾਈ)", "Сироп", "Сироп", "সিরাপ", "Syrup"]},
+    {"c": "Medicine e cure", "t": ["Gocce", "Drops", "Gotas", "Gouttes", "قطرات", "滴剂", "滴剤", "قطرے", "Picături", "Pika", "ਬੂੰਦਾਂ", "Краплі", "Капли", "ফোঁটা", "Patak"]},
+    {"c": "Medicine e cure", "t": ["Pomata", "Ointment", "Pomada", "Pommade", "مرهم", "药膏", "軟膏", "مرہم", "Unguent", "Pomadë", "ਮਲ੍ਹਮ", "Мазь", "Мазь", "মলম", "Pamahid"]},
+    {"c": "Medicine e cure", "t": ["Supposta", "Suppository", "Supositorio", "Suppositoire", "تحميلة", "栓剂", "座薬", "سپوزیٹری", "Supozitor", "Supozitor", "ਸਪੋਜ਼ਿਟਰੀ", "Свічка (супозиторій)", "Свеча (суппозиторий)", "সাপোজিটরি", "Suppository"]},
+    {"c": "Medicine e cure", "t": ["Cerotto", "Plaster (bandage)", "Tirita", "Pansement adhésif", "لاصق طبي", "创可贴", "絆創膏", "پلاسٹر (پٹی)", "Plasture", "Leukoplast", "ਪਲਾਸਟਰ (ਪੱਟੀ)", "Пластир", "Пластырь", "প্লাস্টার (ব্যান্ডেজ)", "Band-aid"]},
+    {"c": "Medicine e cure", "t": ["Iniezione", "Injection", "Inyección", "Piqûre", "حقنة", "打针", "注射", "انجکشن", "Injecție", "Injeksion", "ਟੀਕਾ", "Укол", "Укол", "ইনজেকশন", "Iniksiyon"]},
+    {"c": "Medicine e cure", "t": ["Flebo", "IV drip", "Suero (gotero)", "Perfusion", "محلول وريدي", "输液", "点滴", "ڈرپ", "Perfuzie", "Serum", "ਡ੍ਰਿੱਪ", "Крапельниця", "Капельница", "স্যালাইন", "Suwero"]},
+    {"c": "Medicine e cure", "t": ["Aerosol", "Nebuliser", "Aerosol (nebulizador)", "Aérosol", "جهاز البخار", "雾化", "吸入（ネブライザー）", "نیبولائزر", "Aerosol", "Aerosol", "ਨੈਬੂਲਾਈਜ਼ਰ", "Інгаляція", "Ингаляция", "নেবুলাইজার", "Nebulizer"]},
+    {"c": "Medicine e cure", "t": ["Ossigeno", "Oxygen", "Oxígeno", "Oxygène", "أكسجين", "氧气", "酸素", "آکسیجن", "Oxigen", "Oksigjen", "ਆਕਸੀਜਨ", "Кисень", "Кислород", "অক্সিজেন", "Oxygen"]},
+    {"c": "Medicine e cure", "t": ["Antibiotico", "Antibiotic", "Antibiótico", "Antibiotique", "مضاد حيوي", "抗生素", "抗生物質", "اینٹی بائیوٹک", "Antibiotic", "Antibiotik", "ਐਂਟੀਬਾਇਓਟਿਕ", "Антибіотик", "Антибиотик", "অ্যান্টিবায়োটিক", "Antibiotic"]},
+    {"c": "Medicine e cure", "t": ["Antidolorifico", "Painkiller", "Analgésico", "Antidouleur", "مسكّن للألم", "止痛药", "痛み止め", "درد کی دوا", "Analgezic", "Qetësues dhimbjesh", "ਦਰਦ ਦੀ ਦਵਾਈ", "Знеболювальне", "Обезболивающее", "ব্যথানাশক", "Gamot sa kirot"]},
+    {"c": "Medicine e cure", "t": ["Insulina", "Insulin", "Insulina", "Insuline", "إنسولين", "胰岛素", "インスリン", "انسولین", "Insulină", "Insulinë", "ਇਨਸੁਲਿਨ", "Інсулін", "Инсулин", "ইনসুলিন", "Insulin"]},
+    {"c": "Medicine e cure", "t": ["Vaccino", "Vaccine", "Vacuna", "Vaccin", "لقاح", "疫苗", "ワクチン", "ویکسین", "Vaccin", "Vaksinë", "ਵੈਕਸੀਨ", "Вакцина", "Вакцина", "টিকা", "Bakuna"]},
+    {"c": "Medicine e cure", "t": ["Catetere", "Catheter", "Sonda (catéter)", "Sonde (cathéter)", "قسطرة", "导管", "カテーテル", "کیتھیٹر", "Sondă (cateter)", "Kateter", "ਕੈਥੀਟਰ", "Катетер", "Катетер", "ক্যাথেটার", "Catheter"]},
+    {"c": "Corpo", "t": ["Testa", "Head", "Cabeza", "Tête", "رأس", "头", "頭", "سر", "Cap", "Kokë", "ਸਿਰ", "Голова", "Голова", "মাথা", "Ulo"]},
+    {"c": "Corpo", "t": ["Occhio", "Eye", "Ojo", "Œil", "عين", "眼睛", "目", "آنکھ", "Ochi", "Sy", "ਅੱਖ", "Око", "Глаз", "চোখ", "Mata"]},
+    {"c": "Corpo", "t": ["Orecchio", "Ear", "Oído", "Oreille", "أذن", "耳朵", "耳", "کان", "Ureche", "Vesh", "ਕੰਨ", "Вухо", "Ухо", "কান", "Tainga"]},
+    {"c": "Corpo", "t": ["Naso", "Nose", "Nariz", "Nez", "أنف", "鼻子", "鼻", "ناک", "Nas", "Hundë", "ਨੱਕ", "Ніс", "Нос", "নাক", "Ilong"]},
+    {"c": "Corpo", "t": ["Bocca", "Mouth", "Boca", "Bouche", "فم", "嘴", "口", "منہ", "Gură", "Gojë", "ਮੂੰਹ", "Рот", "Рот", "মুখ", "Bibig"]},
+    {"c": "Corpo", "t": ["Denti", "Teeth", "Dientes", "Dents", "أسنان", "牙齿", "歯", "دانت", "Dinți", "Dhëmbë", "ਦੰਦ", "Зуби", "Зубы", "দাঁত", "Ngipin"]},
+    {"c": "Corpo", "t": ["Gola", "Throat", "Garganta", "Gorge", "حلق", "喉咙", "喉", "گلا", "Gât", "Fyt", "ਗਲਾ", "Горло", "Горло", "গলা", "Lalamunan"]},
+    {"c": "Corpo", "t": ["Collo", "Neck", "Cuello", "Cou", "رقبة", "脖子", "首", "گردن", "Gât și ceafă", "Qafë", "ਗਰਦਨ", "Шия", "Шея", "ঘাড়", "Leeg"]},
+    {"c": "Corpo", "t": ["Spalla", "Shoulder", "Hombro", "Épaule", "كتف", "肩膀", "肩", "کندھا", "Umăr", "Sup", "ਮੋਢਾ", "Плече", "Плечо", "কাঁধ", "Balikat"]},
+    {"c": "Corpo", "t": ["Braccio", "Arm", "Brazo", "Bras", "ذراع", "手臂", "腕", "بازو", "Braț", "Krah", "ਬਾਂਹ", "Рука", "Рука", "বাহু", "Braso"]},
+    {"c": "Corpo", "t": ["Mano", "Hand", "Mano", "Main", "يد", "手", "手", "ہاتھ", "Mână", "Dorë", "ਹੱਥ", "Кисть руки", "Кисть руки", "হাত", "Kamay"]},
+    {"c": "Corpo", "t": ["Petto", "Chest", "Pecho", "Poitrine", "صدر", "胸口", "胸", "سینہ", "Piept", "Kraharor", "ਛਾਤੀ", "Груди", "Грудь", "বুক", "Dibdib"]},
+    {"c": "Corpo", "t": ["Cuore", "Heart", "Corazón", "Cœur", "قلب", "心脏", "心臓", "دل", "Inimă", "Zemër", "ਦਿਲ", "Серце", "Сердце", "হৃৎপিণ্ড", "Puso"]},
+    {"c": "Corpo", "t": ["Polmoni", "Lungs", "Pulmones", "Poumons", "رئتان", "肺", "肺", "پھیپھڑے", "Plămâni", "Mushkëri", "ਫੇਫੜੇ", "Легені", "Лёгкие", "ফুসফুস", "Baga"]},
+    {"c": "Corpo", "t": ["Pancia", "Belly (abdomen)", "Barriga (abdomen)", "Ventre", "بطن", "肚子", "お腹", "پیٹ", "Burtă", "Bark", "ਪੇਟ", "Живіт", "Живот", "পেট", "Tiyan"]},
+    {"c": "Corpo", "t": ["Schiena", "Back", "Espalda", "Dos", "ظهر", "背部", "背中", "کمر", "Spate", "Shpinë", "ਪਿੱਠ", "Спина", "Спина", "পিঠ", "Likod"]},
+    {"c": "Corpo", "t": ["Gamba", "Leg", "Pierna", "Jambe", "ساق", "腿", "脚", "ٹانگ", "Picior", "Këmbë", "ਲੱਤ", "Нога", "Нога", "পা", "Binti"]},
+    {"c": "Corpo", "t": ["Ginocchio", "Knee", "Rodilla", "Genou", "ركبة", "膝盖", "膝", "گھٹنا", "Genunchi", "Gju", "ਗੋਡਾ", "Коліно", "Колено", "হাঁটু", "Tuhod"]},
+    {"c": "Corpo", "t": ["Piede", "Foot", "Pie", "Pied", "قدم", "脚", "足", "پاؤں", "Laba piciorului", "Shputë", "ਪੈਰ", "Стопа", "Стопа", "পায়ের পাতা", "Paa"]},
+    {"c": "Corpo", "t": ["Pelle", "Skin", "Piel", "Peau", "جلد", "皮肤", "皮膚", "جلد", "Piele", "Lëkurë", "ਚਮੜੀ", "Шкіра", "Кожа", "ত্বক", "Balat"]},
+    {"c": "Sintomi", "t": ["Febbre", "Fever", "Fiebre", "Fièvre", "حمى", "发烧", "熱", "بخار", "Febră", "Temperaturë", "ਬੁਖ਼ਾਰ", "Температура", "Температура", "জ্বর", "Lagnat"]},
+    {"c": "Sintomi", "t": ["Tosse", "Cough", "Tos", "Toux", "سعال", "咳嗽", "咳", "کھانسی", "Tuse", "Kollë", "ਖੰਘ", "Кашель", "Кашель", "কাশি", "Ubo"]},
+    {"c": "Sintomi", "t": ["Mal di testa", "Headache", "Dolor de cabeza", "Mal de tête", "صداع", "头痛", "頭痛", "سر درد", "Durere de cap", "Dhimbje koke", "ਸਿਰ ਦਰਦ", "Головний біль", "Головная боль", "মাথাব্যথা", "Sakit ng ulo"]},
+    {"c": "Sintomi", "t": ["Nausea", "Nausea", "Náuseas", "Nausée", "غثيان", "恶心", "吐き気", "متلی", "Greață", "Të përziera", "ਜੀ ਕੱਚਾ ਹੋਣਾ", "Нудота", "Тошнота", "বমি বমি ভাব", "Pagduduwal"]},
+    {"c": "Sintomi", "t": ["Vomito", "Vomiting", "Vómito", "Vomissement", "قيء", "呕吐", "嘔吐", "الٹی", "Vomă", "Të vjella", "ਉਲਟੀ", "Блювання", "Рвота", "বমি", "Pagsusuka"]},
+    {"c": "Sintomi", "t": ["Diarrea", "Diarrhoea", "Diarrea", "Diarrhée", "إسهال", "腹泻", "下痢", "اسہال (دست)", "Diaree", "Diarre", "ਦਸਤ", "Діарея", "Диарея (понос)", "ডায়রিয়া", "Pagtatae"]},
+    {"c": "Sintomi", "t": ["Stitichezza", "Constipation", "Estreñimiento", "Constipation", "إمساك", "便秘", "便秘", "قبض", "Constipație", "Kapsllëk", "ਕਬਜ਼", "Закреп", "Запор", "কোষ্ঠকাঠিন্য", "Tibi"]},
+    {"c": "Sintomi", "t": ["Vertigini", "Dizziness", "Mareo", "Vertiges", "دوخة", "头晕", "めまい", "چکر آنا", "Amețeală", "Marramendje", "ਚੱਕਰ ਆਉਣੇ", "Запаморочення", "Головокружение", "মাথা ঘোরা", "Pagkahilo"]},
+    {"c": "Sintomi", "t": ["Prurito", "Itching", "Picor", "Démangeaisons", "حكة", "瘙痒", "かゆみ", "خارش", "Mâncărime", "Kruajtje", "ਖਾਰਸ਼", "Свербіж", "Зуд", "চুলকানি", "Pangangati"]},
+    {"c": "Sintomi", "t": ["Sangue", "Blood", "Sangre", "Sang", "دم", "血", "血", "خون", "Sânge", "Gjak", "ਖ਼ੂਨ", "Кров", "Кровь", "রক্ত", "Dugo"]},
+    {"c": "Sintomi", "t": ["Gonfiore", "Swelling", "Hinchazón", "Gonflement", "تورّم", "肿胀", "腫れ", "سوجن", "Umflătură", "Ënjtje", "ਸੋਜ", "Набряк", "Отёк", "ফোলা", "Pamamaga"]},
+    {"c": "Sintomi", "t": ["Bruciore", "Burning", "Ardor", "Brûlure", "حرقة", "烧灼感", "焼けるような痛み", "جلن", "Usturime", "Djegie", "ਜਲਣ", "Печіння", "Жжение", "জ্বালা", "Hapdi"]},
+    {"c": "Sintomi", "t": ["Stanchezza", "Tiredness", "Cansancio", "Fatigue", "تعب", "疲劳", "疲れ", "تھکاوٹ", "Oboseală", "Lodhje", "ਥਕਾਵਟ", "Втома", "Усталость", "ক্লান্তি", "Pagod"]},
+    {"c": "Sintomi", "t": ["Affanno", "Shortness of breath", "Falta de aire", "Essoufflement", "ضيق التنفس", "气短", "息切れ", "سانس پھولنا", "Lipsă de aer", "Frymëmarrje e vështirë", "ਸਾਹ ਚੜ੍ਹਨਾ", "Задишка", "Одышка", "শ্বাসকষ্ট", "Hirap sa paghinga"]},
+    {"c": "Luoghi", "t": ["Reparto", "Ward", "Planta (servicio)", "Service", "قسم", "病房", "病棟", "وارڈ", "Secție", "Repart", "ਵਾਰਡ", "Відділення", "Отделение", "ওয়ার্ড", "Ward"]},
+    {"c": "Luoghi", "t": ["Pronto soccorso", "Emergency department", "Urgencias", "Urgences", "الطوارئ", "急诊室", "救急外来", "ایمرجنسی", "Urgențe", "Urgjenca", "ਐਮਰਜੈਂਸੀ", "Відділення невідкладної допомоги", "Отделение неотложной помощи", "জরুরি বিভাগ", "Emergency"]},
+    {"c": "Luoghi", "t": ["Sala operatoria", "Operating theatre", "Quirófano", "Bloc opératoire", "غرفة العمليات", "手术室", "手術室", "آپریشن تھیٹر", "Sală de operație", "Salla e operacionit", "ਆਪ੍ਰੇਸ਼ਨ ਥੀਏਟਰ", "Операційна", "Операционная", "অপারেশন থিয়েটার", "Operating room"]},
+    {"c": "Luoghi", "t": ["Ambulatorio", "Outpatient clinic", "Consulta", "Consultation", "العيادة الخارجية", "门诊", "外来", "او پی ڈی (کلینک)", "Cabinet medical", "Klinika ambulatore", "ਓਪੀਡੀ (ਕਲੀਨਿਕ)", "Кабінет лікаря", "Кабинет врача", "বহির্বিভাগ", "Klinika"]},
+    {"c": "Luoghi", "t": ["Farmacia", "Pharmacy", "Farmacia", "Pharmacie", "صيدلية", "药房", "薬局", "فارمیسی", "Farmacie", "Farmaci", "ਫਾਰਮੇਸੀ", "Аптека", "Аптека", "ফার্মেসি", "Botika"]},
+    {"c": "Luoghi", "t": ["Bagno", "Toilet", "Baño", "Toilettes", "الحمّام", "厕所", "トイレ", "باتھ روم", "Toaletă", "Banjo", "ਬਾਥਰੂਮ", "Туалет", "Туалет", "টয়লেট", "Banyo"]},
+    {"c": "Luoghi", "t": ["Doccia", "Shower", "Ducha", "Douche", "دُش", "淋浴", "シャワー", "شاور", "Duș", "Dush", "ਸ਼ਾਵਰ", "Душ", "Душ", "শাওয়ার", "Shower"]},
+    {"c": "Luoghi", "t": ["Ascensore", "Lift", "Ascensor", "Ascenseur", "مصعد", "电梯", "エレベーター", "لفٹ", "Lift", "Ashensor", "ਲਿਫਟ", "Ліфт", "Лифт", "লিফট", "Elevator"]},
+    {"c": "Luoghi", "t": ["Uscita", "Exit", "Salida", "Sortie", "مخرج", "出口", "出口", "باہر جانے کا راستہ", "Ieșire", "Dalje", "ਬਾਹਰ ਜਾਣ ਦਾ ਰਾਹ", "Вихід", "Выход", "বের হওয়ার পথ", "Labasan"]},
+    {"c": "Luoghi", "t": ["Sala d'attesa", "Waiting room", "Sala de espera", "Salle d'attente", "غرفة الانتظار", "候诊室", "待合室", "انتظار گاہ", "Sală de așteptare", "Salla e pritjes", "ਉਡੀਕ ਕਮਰਾ", "Зала очікування", "Зал ожидания", "অপেক্ষা কক্ষ", "Waiting area"]},
+    {"c": "Luoghi", "t": ["Luogo di preghiera", "Prayer room", "Sala de oración", "Lieu de prière", "مصلّى", "祈祷室", "礼拝室", "نماز کی جگہ", "Loc de rugăciune", "Vend lutjeje", "ਪ੍ਰਾਰਥਨਾ ਦੀ ਥਾਂ", "Місце для молитви", "Место для молитвы", "প্রার্থনার জায়গা", "Dasalan"]},
+    {"c": "Oggetti", "t": ["Letto", "Bed", "Cama", "Lit", "سرير", "床", "ベッド", "بستر", "Pat", "Shtrat", "ਬਿਸਤਰਾ", "Ліжко", "Кровать", "বিছানা", "Kama"]},
+    {"c": "Oggetti", "t": ["Campanello", "Call button", "Timbre", "Sonnette", "زر الاستدعاء", "呼叫铃", "ナースコール", "بلانے کا بٹن", "Sonerie", "Zile", "ਬੁਲਾਉਣ ਵਾਲਾ ਬਟਨ", "Кнопка виклику", "Кнопка вызова", "ডাকার বোতাম", "Buton na pantawag"]},
+    {"c": "Oggetti", "t": ["Sedia a rotelle", "Wheelchair", "Silla de ruedas", "Fauteuil roulant", "كرسي متحرك", "轮椅", "車椅子", "وہیل چیئر", "Scaun cu rotile", "Karrige me rrota", "ਵ੍ਹੀਲਚੇਅਰ", "Інвалідний візок", "Инвалидная коляска", "হুইলচেয়ার", "Wheelchair"]},
+    {"c": "Oggetti", "t": ["Stampelle", "Crutches", "Muletas", "Béquilles", "عكازات", "拐杖", "松葉杖", "بیساکھیاں", "Cârje", "Paterica", "ਫੌੜੀਆਂ", "Милиці", "Костыли", "ক্রাচ", "Saklay"]},
+    {"c": "Oggetti", "t": ["Occhiali", "Glasses", "Gafas", "Lunettes", "نظارة", "眼镜", "眼鏡", "عینک", "Ochelari", "Syze", "ਐਨਕ", "Окуляри", "Очки", "চশমা", "Salamin sa mata"]},
+    {"c": "Oggetti", "t": ["Dentiera", "Dentures", "Dentadura postiza", "Dentier", "طقم أسنان", "假牙", "入れ歯", "مصنوعی دانت", "Proteză dentară", "Protezë dentare", "ਨਕਲੀ ਦੰਦ", "Зубний протез", "Зубной протез", "নকল দাঁত", "Pustiso"]},
+    {"c": "Oggetti", "t": ["Apparecchio acustico", "Hearing aid", "Audífono", "Appareil auditif", "سماعة طبية للأذن", "助听器", "補聴器", "سننے کا آلہ", "Aparat auditiv", "Aparat dëgjimi", "ਸੁਣਨ ਵਾਲੀ ਮਸ਼ੀਨ", "Слуховий апарат", "Слуховой аппарат", "শ্রবণযন্ত্র", "Hearing aid"]},
+    {"c": "Oggetti", "t": ["Telefono", "Phone", "Teléfono", "Téléphone", "هاتف", "电话", "電話", "فون", "Telefon", "Telefon", "ਫ਼ੋਨ", "Телефон", "Телефон", "ফোন", "Telepono"]},
+    {"c": "Oggetti", "t": ["Caricabatterie", "Phone charger", "Cargador", "Chargeur", "شاحن", "充电器", "充電器", "چارجر", "Încărcător", "Karikues", "ਚਾਰਜਰ", "Зарядний пристрій", "Зарядное устройство", "চার্জার", "Charger"]},
+    {"c": "Oggetti", "t": ["Asciugamano", "Towel", "Toalla", "Serviette", "منشفة", "毛巾", "タオル", "تولیہ", "Prosop", "Peshqir", "ਤੌਲੀਆ", "Рушник", "Полотенце", "তোয়ালে", "Tuwalya"]},
+    {"c": "Oggetti", "t": ["Coperta", "Blanket", "Manta", "Couverture", "بطانية", "毯子", "毛布", "کمبل", "Pătură", "Batanije", "ਕੰਬਲ", "Ковдра", "Одеяло", "কম্বল", "Kumot"]},
+    {"c": "Oggetti", "t": ["Cuscino", "Pillow", "Almohada", "Oreiller", "وسادة", "枕头", "枕", "تکیہ", "Pernă", "Jastëk", "ਸਿਰਹਾਣਾ", "Подушка", "Подушка", "বালিশ", "Unan"]},
+    {"c": "Oggetti", "t": ["Termometro", "Thermometer", "Termómetro", "Thermomètre", "ميزان الحرارة", "体温计", "体温計", "تھرمامیٹر", "Termometru", "Termometër", "ਥਰਮਾਮੀਟਰ", "Термометр", "Термометр", "থার্মোমিটার", "Thermometer"]},
+    {"c": "Oggetti", "t": ["Mascherina", "Face mask", "Mascarilla", "Masque", "كمامة", "口罩", "マスク", "ماسک", "Mască", "Maskë", "ਮਾਸਕ", "Маска", "Маска", "মাস্ক", "Mask"]},
+    {"c": "Persone", "t": ["Medico", "Doctor", "Médico", "Médecin", "طبيب", "医生", "医師", "ڈاکٹر", "Medic", "Mjek", "ਡਾਕਟਰ", "Лікар", "Врач", "ডাক্তার", "Doktor"]},
+    {"c": "Persone", "t": ["Infermiere", "Nurse", "Enfermero", "Infirmier", "ممرض", "护士", "看護師", "نرس", "Asistent medical", "Infermier", "ਨਰਸ", "Медсестра / медбрат", "Медсестра / медбрат", "নার্স", "Nars"]},
+    {"c": "Persone", "t": ["Operatore socio-sanitario", "Healthcare assistant", "Auxiliar de enfermería", "Aide-soignant", "مساعد تمريض", "护理员", "看護助手", "نرسنگ اسسٹنٹ", "Infirmier", "Ndihmës infermier", "ਨਰਸਿੰਗ ਸਹਾਇਕ", "Молодша медсестра", "Младшая медсестра", "স্বাস্থ্যসেবা সহকারী", "Nursing aide"]},
+    {"c": "Persone", "t": ["Familiare", "Family member", "Familiar", "Membre de la famille", "أحد أفراد العائلة", "家属", "家族", "گھر کا فرد", "Membru al familiei", "Familjar", "ਪਰਿਵਾਰ ਦਾ ਜੀਅ", "Родич", "Родственник", "পরিবারের সদস্য", "Kapamilya"]},
+    {"c": "Persone", "t": ["Interprete", "Interpreter", "Intérprete", "Interprète", "مترجم فوري", "翻译", "通訳", "ترجمان", "Interpret", "Përkthyes", "ਦੁਭਾਸ਼ੀਆ", "Перекладач", "Переводчик", "দোভাষী", "Interpreter"]},
+    {"c": "Persone", "t": ["Mediatore culturale", "Cultural mediator", "Mediador cultural", "Médiateur culturel", "وسيط ثقافي", "文化调解员", "文化仲介者", "ثقافتی ثالث", "Mediator cultural", "Ndërmjetës kulturor", "ਸੱਭਿਆਚਾਰਕ ਵਿਚੋਲਾ", "Культурний медіатор", "Культурный медиатор", "সাংস্কৃতিক মধ্যস্থতাকারী", "Cultural mediator"]},
+    {"c": "Persone", "t": ["Chirurgo", "Surgeon", "Cirujano", "Chirurgien", "جرّاح", "外科医生", "外科医", "سرجن", "Chirurg", "Kirurg", "ਸਰਜਨ", "Хірург", "Хирург", "সার্জন", "Siruhano"]},
+    {"c": "Persone", "t": ["Ostetrica", "Midwife", "Matrona", "Sage-femme", "قابلة", "助产士", "助産師", "دائی", "Moașă", "Mami", "ਦਾਈ", "Акушерка", "Акушерка", "ধাত্রী", "Komadrona"]},
+    {"c": "Tempo", "t": ["Oggi", "Today", "Hoy", "Aujourd'hui", "اليوم", "今天", "今日", "آج", "Azi", "Sot", "ਅੱਜ", "Сьогодні", "Сегодня", "আজ", "Ngayong araw"]},
+    {"c": "Tempo", "t": ["Domani", "Tomorrow", "Mañana", "Demain", "غدًا", "明天", "明日", "کل (آنے والا)", "Mâine", "Nesër", "ਕੱਲ੍ਹ (ਆਉਣ ਵਾਲਾ)", "Завтра", "Завтра", "আগামীকাল", "Bukas"]},
+    {"c": "Tempo", "t": ["Ieri", "Yesterday", "Ayer", "Hier", "أمس", "昨天", "昨日", "کل (گزرا ہوا)", "Ieri", "Dje", "ਕੱਲ੍ਹ (ਬੀਤਿਆ)", "Учора", "Вчера", "গতকাল", "Kahapon"]},
+    {"c": "Tempo", "t": ["Adesso", "Now", "Ahora", "Maintenant", "الآن", "现在", "今", "ابھی", "Acum", "Tani", "ਹੁਣੇ", "Зараз", "Сейчас", "এখন", "Ngayon na"]},
+    {"c": "Tempo", "t": ["Più tardi", "Later", "Más tarde", "Plus tard", "لاحقًا", "等一会儿", "後で", "بعد میں", "Mai târziu", "Më vonë", "ਬਾਅਦ ਵਿੱਚ", "Пізніше", "Позже", "পরে", "Mamaya"]},
+    {"c": "Tempo", "t": ["Mattina", "Morning", "Por la mañana", "Matin", "صباح", "早上", "朝", "صبح", "Dimineață", "Mëngjes", "ਸਵੇਰ", "Ранок", "Утро", "সকাল", "Umaga"]},
+    {"c": "Tempo", "t": ["Pomeriggio", "Afternoon", "Por la tarde", "Après-midi", "بعد الظهر", "下午", "午後", "دوپہر", "După-amiază", "Pasdite", "ਦੁਪਹਿਰ", "Після обіду", "После обеда", "বিকেল", "Hapon"]},
+    {"c": "Tempo", "t": ["Sera", "Evening", "Al anochecer", "Soir", "مساء", "晚上", "夕方", "شام", "Seară", "Mbrëmje", "ਸ਼ਾਮ", "Вечір", "Вечер", "সন্ধ্যা", "Pagsapit ng gabi"]},
+    {"c": "Tempo", "t": ["Notte", "Night", "Noche", "Nuit", "ليل", "夜里", "夜", "رات", "Noapte", "Natë", "ਰਾਤ", "Ніч", "Ночь", "রাত", "Gabi"]},
+    {"c": "Cibo e bevande", "t": ["Acqua", "Water", "Agua", "Eau", "ماء", "水", "水", "پانی", "Apă", "Ujë", "ਪਾਣੀ", "Вода", "Вода", "পানি", "Tubig"]},
+    {"c": "Cibo e bevande", "t": ["Pane", "Bread", "Pan", "Pain", "خبز", "面包", "パン", "ڈبل روٹی", "Pâine", "Bukë", "ਡਬਲ ਰੋਟੀ", "Хліб", "Хлеб", "পাউরুটি", "Tinapay"]},
+    {"c": "Cibo e bevande", "t": ["Pasta", "Pasta", "Pasta", "Pâtes", "معكرونة", "意大利面", "パスタ", "پاستا", "Paste", "Makarona", "ਪਾਸਤਾ", "Макарони", "Макароны", "পাস্তা", "Pasta"]},
+    {"c": "Cibo e bevande", "t": ["Riso", "Rice", "Arroz", "Riz", "أرز", "米饭", "ご飯", "چاول", "Orez", "Oriz", "ਚੌਲ", "Рис", "Рис", "ভাত", "Kanin"]},
+    {"c": "Cibo e bevande", "t": ["Carne", "Meat", "Carne", "Viande", "لحم", "肉", "肉", "گوشت", "Carne", "Mish", "ਮੀਟ", "М'ясо", "Мясо", "মাংস", "Karne"]},
+    {"c": "Cibo e bevande", "t": ["Pollo", "Chicken", "Pollo", "Poulet", "دجاج", "鸡肉", "鶏肉", "مرغی", "Pui", "Pulë", "ਚਿਕਨ", "Курка", "Курица", "মুরগি", "Manok"]},
+    {"c": "Cibo e bevande", "t": ["Pesce", "Fish", "Pescado", "Poisson", "سمك", "鱼", "魚", "مچھلی", "Pește", "Peshk", "ਮੱਛੀ", "Риба", "Рыба", "মাছ", "Isda"]},
+    {"c": "Cibo e bevande", "t": ["Uova", "Eggs", "Huevos", "Œufs", "بيض", "鸡蛋", "卵", "انڈے", "Ouă", "Vezë", "ਅੰਡੇ", "Яйця", "Яйца", "ডিম", "Itlog"]},
+    {"c": "Cibo e bevande", "t": ["Formaggio", "Cheese", "Queso", "Fromage", "جبن", "奶酪", "チーズ", "پنیر", "Brânză", "Djathë", "ਪਨੀਰ", "Сир", "Сыр", "পনির", "Keso"]},
+    {"c": "Cibo e bevande", "t": ["Verdura", "Vegetables", "Verduras", "Légumes", "خضار", "蔬菜", "野菜", "سبزی", "Legume", "Perime", "ਸਬਜ਼ੀ", "Овочі", "Овощи", "সবজি", "Gulay"]},
+    {"c": "Cibo e bevande", "t": ["Frutta", "Fruit", "Fruta", "Fruits", "فاكهة", "水果", "果物", "پھل", "Fructe", "Fruta", "ਫਲ", "Фрукти", "Фрукты", "ফল", "Prutas"]},
+    {"c": "Cibo e bevande", "t": ["Latte", "Milk", "Leche", "Lait", "حليب", "牛奶", "牛乳", "دودھ", "Lapte", "Qumësht", "ਦੁੱਧ", "Молоко", "Молоко", "দুধ", "Gatas"]},
+    {"c": "Cibo e bevande", "t": ["Yogurt", "Yoghurt", "Yogur", "Yaourt", "زبادي", "酸奶", "ヨーグルト", "دہی", "Iaurt", "Kos", "ਦਹੀਂ", "Йогурт", "Йогурт", "দই", "Yogurt"]},
+    {"c": "Cibo e bevande", "t": ["Minestra", "Soup", "Sopa", "Soupe", "حساء", "汤", "スープ", "سوپ", "Supă", "Supë", "ਸੂਪ", "Суп", "Суп", "স্যুপ", "Sabaw"]}
+  ];
+
   var lingua = 1;   // lingua del paziente: colonna nelle frasi (1 = English)
   var op = 0;       // lingua dell'operatore: colonna nelle frasi (0 = italiano)
   try {
@@ -1882,6 +2010,12 @@
   function chip(riga, k, html) {
     return html.replace('class="', 'data-k="' + String(viste[riga][k]).replace(/"/g, '&quot;') + '" class="trascina ');
   }
+  // Riga di una parola del dizionario: tocca e la parola compare grande, letta a voce
+  function rigaParola(k) {
+    var w = PAROLE[k].t;
+    return '<div class="riga-frase"><button type="button" class="frase parola" onclick="apri(PAROLE[' + k + '])"><span' + attrOp() + '>' + esc(w[op]) + '</span>' +
+      '<small lang="' + info().id + '"' + (info().rtl ? ' dir="rtl"' : '') + '>' + esc(w[lingua]) + '</small></button></div>';
+  }
   function rigaFrase(f, i) {
     var stella = preferite.indexOf(f.t[0]) !== -1;
     return '<div class="riga-frase"><button type="button" class="frase" onclick="apri(' + i + ')"><span' + attrOp() + '>' + esc(f.t[op]) + '</span>' +
@@ -1910,13 +2044,18 @@
       if (disponibili.indexOf(nomeGruppo) === -1) disponibili.push(nomeGruppo);
     });
     viste.gruppi = ordinaSecondo(disponibili, ordGruppi.concat(disponibili.filter(function (g) { return ordGruppi.indexOf(g) === -1; })));
+    // Argomenti che sono solo di altri ruoli: si possono aprire lo stesso (in fondo, più chiari)
+    var altriGruppi = FRASI.filter(function (f) { return f.gruppo && disponibili.indexOf(f.gruppo) === -1; }).map(function (f) { return f.gruppo; });
     if (gruppo === '__pref' && !preferite.length) gruppo = '';
-    if (gruppo && gruppo !== '__pref' && disponibili.indexOf(gruppo) === -1) gruppo = '';
+    if (gruppo && gruppo !== '__pref' && gruppo !== '__parole' && disponibili.indexOf(gruppo) === -1 && altriGruppi.indexOf(gruppo) === -1) gruppo = '';
     var fissi = '<button type="button" class="' + (gruppo === '' ? 'attiva' : '') + '" onclick="scegliGruppo(\'\')">Tutti gli argomenti</button>' +
-      (preferite.length ? '<button type="button" class="' + (gruppo === '__pref' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__pref\')">★ Le mie frasi</button>' : '');
+      (preferite.length ? '<button type="button" class="' + (gruppo === '__pref' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__pref\')">★ Le mie frasi</button>' : '') +
+      '<button type="button" class="' + (gruppo === '__parole' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__parole\')">📖 Parole</button>';
     document.getElementById('gruppi').innerHTML = fissi + viste.gruppi.map(function (g, k) {
       return chip('gruppi', k, '<button type="button" class="' + (g === gruppo ? 'attiva' : '') + '" onclick="scegliGruppo(' + JSON.stringify(g).replace(/"/g, '&quot;') + ')">' + esc(g) + '</button>');
-    }).join('');
+    }).join('') + (ruolo && altriGruppi.length ? '<span class="etichetta-altri">Altri ruoli:</span>' + altriGruppi.map(function (g) {
+      return '<button type="button" class="altro-ruolo' + (g === gruppo ? ' attiva' : '') + '" onclick="scegliGruppo(' + JSON.stringify(g).replace(/"/g, '&quot;') + ')">' + esc(g) + '</button>';
+    }).join('') : '');
     // Frasi: prima le preferite, poi gli argomenti nell'ordine scelto
     var html = '';
     if (testoCerca) {
@@ -1937,8 +2076,15 @@
       var nAltre = altre.esatte.length + altre.simili.length;
       trovate = mie.esatte.concat(mie.simili).join('') +
         (nAltre ? '<h2 class="altri-ruoli">Frasi di altri ruoli</h2>' + altre.esatte.concat(altre.simili).join('') : '');
-      html = n ? '<h2>' + n + (n === 1 ? ' frase trovata' : ' frasi trovate') + '</h2>' + trovate
-               : '<p class="nessuna">Nessuna frase con «' + esc(testoCerca) + '».<br>Prova con un\'altra parola.</p>';
+      // Parole del dizionario che corrispondono (per tutti i ruoli)
+      var parTrovate = [];
+      PAROLE.forEach(function (w, k) {
+        var tp = normalizza(w.t[0] + ' ' + w.t[op] + ' ' + w.t[lingua]);
+        if (parole.length && parole.every(function (g) { return g.some(function (p) { return tp.indexOf(p) !== -1; }); })) parTrovate.push(rigaParola(k));
+      });
+      html = (parTrovate.length ? '<h2>📖 ' + (parTrovate.length === 1 ? 'Parola' : 'Parole') + '</h2>' + parTrovate.join('') : '') +
+             (n ? '<h2>' + n + (n === 1 ? ' frase trovata' : ' frasi trovate') + '</h2>' + trovate : '');
+      if (!html) html = '<p class="nessuna">Nessuna frase con «' + esc(testoCerca) + '».<br>Prova con un\'altra parola.</p>';
       document.getElementById('elenco').innerHTML = html + FIRMA;
       attivaTrascina();
       return;
@@ -1948,15 +2094,27 @@
       FRASI.forEach(function (f, i) { if (!f.gruppo && preferite.indexOf(f.t[0]) !== -1) pref += rigaFrase(f, i); });
       if (pref) html += '<h2 class="titolo-pref">★ Le mie frasi</h2>' + pref;
     }
-    if (gruppo !== '__pref') {
-      var perGruppo = {}, ruoliGruppo = '', gruppoAttuale = '';
+    if (gruppo === '__parole') {
+      // Dizionario: tutte le parole, per categoria
+      var cat = '';
+      PAROLE.forEach(function (w, k) {
+        if (w.c !== cat) { cat = w.c; html += '<h2>' + esc(cat) + '</h2>'; }
+        html += rigaParola(k);
+      });
+    } else if (gruppo !== '__pref') {
+      var perGruppo = {}, ruoliGruppo = '', gruppoAttuale = '', altreDelGruppo = [];
       FRASI.forEach(function (f, i) {
         if (f.gruppo) { ruoliGruppo = f.ruoli; gruppoAttuale = f.gruppo; return; }
-        if (ruolo && (f.ruoli || ruoliGruppo).indexOf(ruolo) === -1) return;
         if (gruppo && gruppoAttuale !== gruppo) return;
+        if (ruolo && (f.ruoli || ruoliGruppo).indexOf(ruolo) === -1) {
+          // Argomento scelto: sotto le mie frasi compaiono anche quelle degli altri ruoli
+          if (gruppo) altreDelGruppo.push(rigaFrase(f, i));
+          return;
+        }
         (perGruppo[gruppoAttuale] = perGruppo[gruppoAttuale] || []).push(rigaFrase(f, i));
       });
       viste.gruppi.forEach(function (g) { if (perGruppo[g]) html += '<h2>' + esc(g) + '</h2>' + perGruppo[g].join(''); });
+      if (gruppo && altreDelGruppo.length) html += '<h2 class="altri-ruoli">' + (perGruppo[gruppo] ? 'Frasi di altri ruoli' : esc(gruppo) + ' · frasi di altri ruoli') + '</h2>' + altreDelGruppo.join('');
     }
     html += FIRMA;
     document.getElementById('elenco').innerHTML = html;
@@ -2064,7 +2222,7 @@
   }
 
   function apri(i) {
-    var f = FRASI[i]; aperta = f;
+    var f = typeof i === 'number' ? FRASI[i] : i; aperta = f;   // i = numero della frase, oppure una parola del dizionario
     var t = document.getElementById('g-testo');
     t.textContent = f.t[lingua];
     t.setAttribute('lang', info().id);
