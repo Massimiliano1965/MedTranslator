@@ -2305,13 +2305,14 @@
   function scegliCalda(k) {
     calda = k;
     CALDE.forEach(function (c, j) { document.getElementById('calda-' + j).classList.toggle('accesa', j === k); });
-    parlaTesto(DOMANDA_AGGIUNTE[lingua]);
+    parlaTesto(CALDE[k][lingua]);   // dice la bevanda scelta (la domanda sulle aggiunte resta scritta)
     rispostaCalde();
   }
   function alternaAggiunta(k) {
     var i = aggiunte.indexOf(k);
     if (i === -1) aggiunte.push(k); else aggiunte.splice(i, 1);
     document.getElementById('aggiunta-' + k).classList.toggle('accesa', i === -1);
+    if (i === -1) parlaTesto(AGGIUNTE[k][lingua]);   // dice l'aggiunta appena scelta
     rispostaCalde();
   }
   function rispostaCalde() {
