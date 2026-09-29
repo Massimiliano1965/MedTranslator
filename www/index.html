@@ -166,6 +166,9 @@
   .stella { color: #d4a300; }
   /* Gialla solo quando la frase è nei preferiti; altrimenti sfondo come le altre schede */
   .stella.piena { background: rgba(245,196,0,0.3); }
+  /* Di notte il giallo trasparente su blu scuro veniva verde-oliva: qui un ambra caldo */
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stella.piena { background: #3d2c10; color: #f0b650; } }
+  :root[data-theme="dark"] .stella.piena { background: #3d2c10; color: #f0b650; }
   /* Riga: stella a sinistra, frase al centro, altoparlante a destra (ascolta senza aprire la scheda grande) */
   .riga-frase .ascolta-mini {
     flex: none; width: 48px; border: 0; border-radius: 16px; background: var(--blu-chiaro); box-shadow: var(--ombra);
