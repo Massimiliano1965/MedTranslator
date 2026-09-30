@@ -98,6 +98,9 @@
   /* Microfono della ricerca a voce: stesso stile della lente, colore del ruolo */
   .btn-voce { color: var(--ruolo, var(--blu)) !important; }
   .cerca .btn-voce svg { width: 22px; height: 22px; display: block; margin: auto; }
+  /* Mentre ascolta: il microfono diventa rosso e pulsa (niente finestra di Google) */
+  body.ascolto .btn-voce { background: var(--rosso) !important; color: #fff !important; animation: pulsa-mic 1.1s ease-out infinite; }
+  @keyframes pulsa-mic { 0% { box-shadow: 0 0 0 0 rgba(229,57,53,.55); } 100% { box-shadow: 0 0 0 12px rgba(229,57,53,0); } }
   body.senza-voce .btn-voce { display: none; }
   /* Giorno / notte: automatico (segue il telefono), sempre giorno, sempre notte */
   .btn-tema {
@@ -2532,16 +2535,33 @@
     cercaFrasi(q);
   }
   function avvisoVoce(msg) { alert(msg); }
+  var staAscoltando = false, fermaAscolto = null, timerAscolto = null;
+  function ascoltoFinito() {
+    staAscoltando = false; fermaAscolto = null;
+    clearTimeout(timerAscolto);
+    document.body.classList.remove('ascolto');
+  }
+  function ascoltoIniziato(ferma) {
+    staAscoltando = true; fermaAscolto = ferma;
+    document.body.classList.add('ascolto');
+    // sicurezza: dopo 15 secondi il microfono torna normale comunque
+    clearTimeout(timerAscolto);
+    timerAscolto = setTimeout(function () { if (fermaAscolto) try { fermaAscolto(); } catch (e) {} ascoltoFinito(); }, 15000);
+  }
   function cercaAVoce() {
+    // Se sta già ascoltando, toccare di nuovo il microfono lo ferma
+    if (staAscoltando) { if (fermaAscolto) try { fermaAscolto(); } catch (e) {} ascoltoFinito(); return; }
     var lang = infoOp().voce;
     var sr = window.plugins && window.plugins.speechRecognition;
     if (sr) {
       var ascolta = function () {
-        sr.startListening(function (m) { usaVoce(m); }, function (e) {
+        ascoltoIniziato(function () { sr.stopListening(function () {}, function () {}); });
+        sr.startListening(function (m) { ascoltoFinito(); usaVoce(m); }, function (e) {
+          ascoltoFinito();
           if (String(e).indexOf('not available') !== -1 || String(e).indexOf('Not available') !== -1)
             avvisoVoce(T('voce_no'));
-          // annullato dall'utente o nessuna parola capita: nessun messaggio
-        }, { language: lang, matches: 5, prompt: T('voce_prompt'), showPopup: true });
+          // annullato o nessuna parola capita: nessun messaggio
+        }, { language: lang, matches: 5, showPopup: false, showPartial: false });
       };
       sr.hasPermission(function (ok) {
         if (ok) ascolta();
@@ -2554,8 +2574,9 @@
     var W = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!W) { avvisoVoce(T('voce_qui')); return; }
     var r = new W(); r.lang = lang; r.maxAlternatives = 5; r.interimResults = false;
-    r.onresult = function (ev) { var a = []; for (var k = 0; k < ev.results[0].length; k++) a.push(ev.results[0][k].transcript); usaVoce(a); };
-    try { r.start(); } catch (e) {}
+    r.onresult = function (ev) { var a = []; for (var k = 0; k < ev.results[0].length; k++) a.push(ev.results[0][k].transcript); ascoltoFinito(); usaVoce(a); };
+    r.onend = ascoltoFinito; r.onerror = ascoltoFinito;
+    try { r.start(); ascoltoIniziato(function () { r.stop(); }); } catch (e) { ascoltoFinito(); }
   }
   // Nel browser senza riconoscimento vocale il microfono non compare
   if (!window.cordova && !(window.SpeechRecognition || window.webkitSpeechRecognition)) document.body.classList.add('senza-voce');
