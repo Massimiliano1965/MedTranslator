@@ -22,10 +22,10 @@ Il PC di Massi è Linux; il telefono è Android.
 Fai SOLO quello che Massi chiede. Qualsiasi altra cosa va PRIMA proposta e fatta solo dopo il suo sì.
 
 ## Lingue
-Ordine delle lingue (colonne delle frasi): it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru.
+Ordine delle lingue (colonne delle frasi): it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru, bn, fil (15 lingue).
 - Le prime 7 sono scritte dentro ogni frase (`FRASI`); urdu, romeno, albanese, punjabi (gurmukhi), ucraino e russo
-  stanno nei dizionari `URDU`/`ROMENO`/`ALBANESE`/`PUNJABI`/`UCRAINO`/`RUSSO` (chiave = frase italiana)
-  e vengono aggiunte in fondo alle frasi. Le frasi aggiunte dopo (`FRASI_NUOVE`) hanno già tutte le 13 colonne.
+  stanno nei dizionari `URDU`/`ROMENO`/`ALBANESE`/`PUNJABI`/`UCRAINO`/`RUSSO`/`BENGALESE`/`TAGALOG` (chiave = frase italiana)
+  e vengono aggiunte in fondo alle frasi. Le frasi aggiunte dopo (`FRASI_NUOVE`) hanno già tutte le 15 colonne.
 - IL GIAPPONESE È PER MASSI (motivo personale, molto importante): la LINGUA giapponese deve restare sempre nell'app.
   Le frasi (giapponese compreso) si possono correggere, cambiare o togliere come tutte le altre.
 - Altre lingue: le decide Massi.
