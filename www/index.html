@@ -437,7 +437,16 @@
   #g-risposte { margin-top: auto; }   /* risposte e comandi in basso, dove arriva il pollice */
   #grande .barra { order: 99; position: sticky; bottom: 0; z-index: 2; margin: 14px -16px 0; padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--sfondo); border-top: 1px solid var(--bordo); }
   #grande { padding-bottom: 0; }
-  #g-risposta { scroll-margin-bottom: 100px; }
+  #g-risposta, #g-seguiti { scroll-margin-bottom: 100px; }
+  #g-seguiti { display: flex; flex-direction: column; gap: 10px; }
+  #g-seguiti:empty { display: none; }
+  .seguiti-titolo { margin: 16px 2px 0; font-size: 17px; font-weight: 700; color: var(--tenue); }
+  #g-seguiti button { border: 0; border-radius: 16px; padding: 18px 16px; font: inherit; text-align: start; background: var(--carta); color: var(--testo); border: 2px solid var(--blu); box-shadow: var(--ombra); }
+  #g-seguiti button b { display: block; font-size: 24px; line-height: 1.25; }
+  #g-seguiti button small { display: block; font-size: 15px; font-weight: 400; color: var(--tenue); margin-top: 4px; }
+  /* Scala del dolore più grande: 4 per riga */
+  .scala { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .scala button { padding: 26px 0; font-size: 34px; border-radius: 16px; }
   #grande .barra button { flex: 1 1 0; min-height: 68px; font-size: 24px; padding: 12px 10px; }
   @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
@@ -511,6 +520,7 @@
   <p id="g-it"></p>
   <div id="g-risposte"></div>
   <div id="g-risposta"></div>
+  <div id="g-seguiti"></div>
 </div>
 
 <script src="lib/Sortable.min.js"></script>
@@ -1241,6 +1251,8 @@
   // Bengalese (Bangladesh) e Tagalog/Filipino, aggiunti il 29/09/2026: chiave = testo italiano.
   // DA FAR CONTROLLARE A UN MADRELINGUA prima di usarle con i pazienti.
   var BENGALESE = {
+    "Quando le fa male?": "কখন ব্যথা করে?",
+    "Ha bisogno di qualcosa?": "আপনার কি কিছু লাগবে?",
     "Buongiorno": "শুভ সকাল",
     "Buonasera": "শুভ সন্ধ্যা",
     "Buon appetito": "খাবার উপভোগ করুন",
@@ -1467,6 +1479,8 @@
     "Il medico le spiegherà l'esito della radiografia.": "ডাক্তার আপনাকে এক্স-রের ফলাফল বুঝিয়ে বলবেন।"
   };
   var TAGALOG = {
+    "Quando le fa male?": "Kailan po masakit?",
+    "Ha bisogno di qualcosa?": "May kailangan po ba kayo?",
     "Buongiorno": "Magandang umaga po",
     "Buonasera": "Magandang gabi po",
     "Buon appetito": "Kain na po kayo",
@@ -1696,6 +1710,8 @@
   // (it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru).
   var GRUPPI_NUOVI = {"Pronto soccorso": "ISAM", "Igiene e movimento": "IS", "Prima e dopo l'operazione": "ISM", "Dimissione": "ISAM", "Mamme e bambini": "ISM", "Medicine": "ISM", "Trapianto": "IM"};
   var FRASI_NUOVE = [
+    {"g": "Dolore e come sta", "ruoli": "IM", "t": ["Quando le fa male?", "When does it hurt?", "¿Cuándo le duele?", "Quand avez-vous mal ?", "متى تشعر بالألم؟", "您什么时候疼？", "いつ痛みますか？", "درد کب ہوتا ہے؟", "Când vă doare?", "Kur ju dhemb?", "ਦਰਦ ਕਦੋਂ ਹੁੰਦਾ ਹੈ?", "Коли болить?", "Когда болит?"]},
+    {"g": "Dolore e come sta", "ruoli": "ISAM", "tipo": "sn", "t": ["Ha bisogno di qualcosa?", "Do you need anything?", "¿Necesita algo?", "Avez-vous besoin de quelque chose ?", "هل تحتاج إلى شيء؟", "您需要什么吗？", "何か必要なものはありますか？", "کیا آپ کو کسی چیز کی ضرورت ہے؟", "Aveți nevoie de ceva?", "Keni nevojë për diçka?", "ਕੀ ਤੁਹਾਨੂੰ ਕਿਸੇ ਚੀਜ਼ ਦੀ ਲੋੜ ਹੈ?", "Вам щось потрібно?", "Вам что-нибудь нужно?"]},
     {"g": "Esami e cure", "ruoli": "IM", "t": ["Dobbiamo fare le analisi delle urine.", "We need to do a urine test.", "Tenemos que hacerle un análisis de orina.", "Nous devons faire une analyse d'urine.", "يجب أن نجري تحليل بول.", "我们需要给您做尿检。", "尿検査をします。", "ہمیں پیشاب کا ٹیسٹ کرنا ہے۔", "Trebuie să vă facem o analiză de urină.", "Duhet t'ju bëjmë analizën e urinës.", "ਸਾਨੂੰ ਪਿਸ਼ਾਬ ਦਾ ਟੈਸਟ ਕਰਨਾ ਪਵੇਗਾ।", "Нам потрібно зробити аналіз сечі.", "Нам нужно сделать анализ мочи."]},
     {"g": "Esami e cure", "ruoli": "IM", "t": ["Le analisi sono buone.", "Your test results are good.", "Los resultados de los análisis son buenos.", "Vos résultats d'analyses sont bons.", "نتائج التحاليل جيدة.", "您的检查结果很好。", "検査の結果は良好です。", "آپ کے ٹیسٹ کے نتائج ٹھیک ہیں۔", "Analizele sunt bune.", "Analizat janë në rregull.", "ਤੁਹਾਡੇ ਟੈਸਟਾਂ ਦੇ ਨਤੀਜੇ ਠੀਕ ਹਨ।", "Ваші аналізи добрі.", "Ваши анализы хорошие."]},
     {"g": "Esami e cure", "ruoli": "IM", "t": ["Dobbiamo ripetere le analisi.", "We need to repeat the tests.", "Tenemos que repetir los análisis.", "Nous devons refaire les analyses.", "يجب أن نعيد التحاليل.", "我们需要重新检查一次。", "検査をもう一度します。", "ہمیں ٹیسٹ دوبارہ کرنے ہیں۔", "Trebuie să repetăm analizele.", "Duhet t'i përsërisim analizat.", "ਸਾਨੂੰ ਟੈਸਟ ਦੁਬਾਰਾ ਕਰਨੇ ਪੈਣਗੇ।", "Нам потрібно повторити аналізи.", "Нам нужно повторить анализы."]},
@@ -1826,6 +1842,16 @@
     if (n.tab) f.tab = n.tab;
     if (n.scelte) f.scelte = n.scelte;
     FRASI.splice(fine, 0, f);
+  });
+  // Dopo Sì/No a "Ha dolore?" compaiono le domande da fare subito (sono frasi già presenti: chiave = frase italiana).
+  FRASI.forEach(function (f) {
+    if (f.t && f.t[0] === 'Quanto dolore ha, da 0 a 10?') f.seguiti = {
+      dopo: ['Dove le fa male? Me lo indichi.', 'Quando le fa male?', 'Vuole qualcosa per il dolore?']
+    };
+    if (f.t && f.t[0] === 'Ha dolore?') f.sulSi = 'Quanto dolore ha, da 0 a 10?';   // Sì → subito la scala del dolore
+    if (f.t && f.t[0] === 'Ha dolore?') f.seguiti = {
+      no: ['Ha bisogno di qualcosa?', "Vuole dell'acqua?", 'Ha bisogno del bagno?', 'Se sente dolore o qualcosa di strano, suoni il campanello.']
+    };
   });
   // Aggiunge ogni lingua in fondo, nell'ordine di LINGUE (dopo il giapponese).
   [URDU, ROMENO, ALBANESE, PUNJABI, UCRAINO, RUSSO].forEach(function (L, k) {
@@ -2289,6 +2315,7 @@
     "avanti": ["Avanti", "Next", "Siguiente", "Suivant", "التالي", "下一个", "次へ", "اگلا", "Înainte", "Tjetra", "ਅੱਗੇ", "Далі", "Дальше", "পরেরটি", "Susunod"],
     "questa": ["Questa!", "This one!", "¡Esta!", "Celle-ci !", "هذه!", "就这个！", "これ！", "یہ والا!", "Aceasta!", "Kjo!", "ਇਹ ਵਾਲਾ!", "Ось це!", "Вот это!", "এটা!", "Ito!"],
     "aiuto_tabella": ["Tocca <b>{A}</b>: le caselle si accendono una alla volta e il telefono le legge nella lingua del paziente. Quando il paziente chiude gli occhi, tocca <b>{Q}</b> Se il paziente può indicare, indica col dito <b>senza toccare il telefono</b>: la casella la tocchi tu.", "Tap <b>{A}</b>: the boxes light up one at a time and the phone reads them in the patient's language. When the patient closes their eyes, tap <b>{Q}</b> If the patient can point, they point with a finger <b>without touching the phone</b>: you tap the box.", "Toca <b>{A}</b>: las casillas se encienden una a una y el teléfono las lee en el idioma del paciente. Cuando el paciente cierre los ojos, toca <b>{Q}</b> Si el paciente puede señalar, que señale con el dedo <b>sin tocar el teléfono</b>: la casilla la tocas tú.", "Touche <b>{A}</b> : les cases s'allument une par une et le téléphone les lit dans la langue du patient. Quand le patient ferme les yeux, touche <b>{Q}</b> Si le patient peut montrer, il montre du doigt <b>sans toucher le téléphone</b> : c'est toi qui touches la case.", "اضغط <b>{A}</b>: تضيء الخانات واحدة تلو الأخرى ويقرؤها الهاتف بلغة المريض. عندما يغمض المريض عينيه، اضغط <b>{Q}</b> إذا كان المريض يستطيع الإشارة، فليُشر بإصبعه <b>دون لمس الهاتف</b>: وأنت تضغط على الخانة.", "点 <b>{A}</b>：格子会一个一个亮起，手机用患者的语言读出来。患者闭眼时，点 <b>{Q}</b> 如果患者能指，就让他用手指指出来，<b>不要碰手机</b>：由你来点格子。", "<b>{A}</b> をタップ：マスが一つずつ光り、患者さんの言語で読み上げます。患者さんが目を閉じたら <b>{Q}</b> をタップ。指させる場合は<b>電話に触れずに</b>指で示してもらい、マスはあなたがタップします。", "<b>{A}</b> دبائیں: خانے ایک ایک کر کے روشن ہوتے ہیں اور فون انہیں مریض کی زبان میں پڑھتا ہے۔ جب مریض آنکھیں بند کرے تو <b>{Q}</b> دبائیں۔ اگر مریض اشارہ کر سکے تو انگلی سے اشارہ کرے، <b>فون کو چھوئے بغیر</b>: خانہ آپ دبائیں۔", "Atinge <b>{A}</b>: căsuțele se aprind pe rând și telefonul le citește în limba pacientului. Când pacientul închide ochii, atinge <b>{Q}</b> Dacă pacientul poate arăta, arată cu degetul <b>fără să atingă telefonul</b>: căsuța o atingi tu.", "Prek <b>{A}</b>: kutitë ndizen një nga një dhe telefoni i lexon në gjuhën e pacientit. Kur pacienti mbyll sytë, prek <b>{Q}</b> Nëse pacienti mund të tregojë, tregon me gisht <b>pa e prekur telefonin</b>: kutinë e prek ti.", "<b>{A}</b> ਦਬਾਓ: ਖਾਨੇ ਇੱਕ-ਇੱਕ ਕਰਕੇ ਜਗਦੇ ਹਨ ਅਤੇ ਫ਼ੋਨ ਉਨ੍ਹਾਂ ਨੂੰ ਮਰੀਜ਼ ਦੀ ਭਾਸ਼ਾ ਵਿੱਚ ਪੜ੍ਹਦਾ ਹੈ। ਜਦੋਂ ਮਰੀਜ਼ ਅੱਖਾਂ ਬੰਦ ਕਰੇ, <b>{Q}</b> ਦਬਾਓ। ਜੇ ਮਰੀਜ਼ ਇਸ਼ਾਰਾ ਕਰ ਸਕਦਾ ਹੈ ਤਾਂ ਉਂਗਲ ਨਾਲ ਕਰੇ, <b>ਫ਼ੋਨ ਨੂੰ ਛੂਹੇ ਬਿਨਾਂ</b>: ਖਾਨਾ ਤੁਸੀਂ ਦਬਾਓ।", "Торкнися <b>{A}</b>: клітинки загоряються по черзі, і телефон читає їх мовою пацієнта. Коли пацієнт заплющить очі, торкнися <b>{Q}</b> Якщо пацієнт може показати, хай покаже пальцем, <b>не торкаючись телефону</b>: клітинку торкаєшся ти.", "Нажми <b>{A}</b>: клетки загораются по одной, и телефон читает их на языке пациента. Когда пациент закроет глаза, нажми <b>{Q}</b> Если пациент может показать, пусть покажет пальцем, <b>не касаясь телефона</b>: клетку нажимаешь ты.", "<b>{A}</b> চাপো: ঘরগুলো একটা একটা করে জ্বলে ওঠে আর ফোন রোগীর ভাষায় পড়ে শোনায়। রোগী চোখ বন্ধ করলে <b>{Q}</b> চাপো। রোগী দেখাতে পারলে আঙুল দিয়ে দেখাক, <b>ফোন না ছুঁয়ে</b>: ঘরটা তুমি চাপবে।", "I-tap ang <b>{A}</b>: isa-isang umiilaw ang mga kahon at binabasa ito ng telepono sa wika ng pasyente. Kapag pumikit ang pasyente, i-tap ang <b>{Q}</b> Kung kayang tumuro ng pasyente, ituro niya gamit ang daliri <b>nang hindi hinahawakan ang telepono</b>: ikaw ang magta-tap sa kahon."],
+    "ora_chiedi": ["Ora puoi chiedere:", "Now you can ask:", "Ahora puede preguntar:", "Vous pouvez maintenant demander :", "يمكنك الآن أن تسأل:", "现在可以问：", "次に聞けること："],
     "aiuto_risposte": ["Il paziente indica o fa cenno, <b>senza toccare il telefono</b>: la risposta la tocchi tu.", "The patient points or nods, <b>without touching the phone</b>: you tap the answer.", "El paciente señala o hace un gesto, <b>sin tocar el teléfono</b>: la respuesta la tocas tú.", "Le patient montre ou fait un signe, <b>sans toucher le téléphone</b> : c'est toi qui touches la réponse.", "يشير المريض أو يومئ، <b>دون لمس الهاتف</b>: وأنت تضغط على الإجابة.", "患者用手指或点头示意，<b>不碰手机</b>：由你来点答案。", "患者さんは指さすか合図をします（<b>電話には触れません</b>）。答えはあなたがタップします。", "مریض اشارہ کرتا ہے، <b>فون کو چھوئے بغیر</b>: جواب آپ دبائیں۔", "Pacientul arată sau face un semn, <b>fără să atingă telefonul</b>: răspunsul îl atingi tu.", "Pacienti tregon ose bën shenjë, <b>pa e prekur telefonin</b>: përgjigjen e prek ti.", "ਮਰੀਜ਼ ਇਸ਼ਾਰਾ ਕਰਦਾ ਹੈ, <b>ਫ਼ੋਨ ਨੂੰ ਛੂਹੇ ਬਿਨਾਂ</b>: ਜਵਾਬ ਤੁਸੀਂ ਦਬਾਓ।", "Пацієнт показує або киває, <b>не торкаючись телефону</b>: відповідь торкаєшся ти.", "Пациент показывает или кивает, <b>не касаясь телефона</b>: ответ нажимаешь ты.", "রোগী আঙুল দিয়ে দেখায় বা ইশারা করে, <b>ফোন না ছুঁয়ে</b>: উত্তরটা তুমি চাপবে।", "Tumuturo o sumesenyas ang pasyente, <b>nang hindi hinahawakan ang telepono</b>: ikaw ang magta-tap ng sagot."],
     "pref_add": ["Aggiungi ai preferiti", "Add to favourites", "Añadir a favoritos", "Ajouter aux favoris", "إضافة إلى المفضلة", "加入收藏", "お気に入りに追加", "پسندیدہ میں شامل کریں", "Adaugă la favorite", "Shto te të preferuarat", "ਮਨਪਸੰਦ ਵਿੱਚ ਜੋੜੋ", "Додати в обране", "Добавить в избранное", "প্রিয়তে যোগ করো", "Idagdag sa paborito"],
     "pref_togli": ["Togli dai preferiti", "Remove from favourites", "Quitar de favoritos", "Retirer des favoris", "إزالة من المفضلة", "取消收藏", "お気に入りから削除", "پسندیدہ سے ہٹائیں", "Scoate de la favorite", "Hiq nga të preferuarat", "ਮਨਪਸੰਦ ਵਿੱਚੋਂ ਹਟਾਓ", "Прибрати з обраного", "Убрать из избранного", "প্রিয় থেকে সরাও", "Alisin sa paborito"],
@@ -2926,8 +2953,8 @@
     var rtl = info().rtl ? ' dir="rtl"' : '';
     if (f.tipo === 'sn') {
       r.innerHTML = '<div class="risposte due"' + rtl + '>' +
-        '<button type="button" onclick="risposta(SI[op])">✓ ' + SI[lingua] + '</button>' +
-        '<button type="button" class="no" onclick="risposta(NO[op])">✕ ' + NO[lingua] + '</button></div>';
+        '<button type="button" onclick="rispostaSN(\'si\')">✓ ' + SI[lingua] + '</button>' +
+        '<button type="button" class="no" onclick="rispostaSN(\'no\')">✕ ' + NO[lingua] + '</button></div>';
     } else if (f.scelte) {
       r.innerHTML = '<div class="risposte"' + rtl + '>' + f.scelte.map(function (s, k) {
         return '<button type="button" class="' + (k === f.scelte.length - 1 ? 'altra' : '') + '" onclick="risposta(aperta.scelte[' + k + '][op])">' + (FIGURE[s[0]] ? '<span class="riquadro">' + FIGURE[s[0]] + '</span>' : '') + '<span>' + esc(s[lingua]) + '</span></button>';
@@ -2935,7 +2962,7 @@
     } else if (f.tipo === 'dolore') {
       var colori = ['#2e9e44', '#4fa83d', '#79b236', '#a3b92f', '#c9b82a', '#e0a526', '#e58a24', '#e36c22', '#d9501f', '#c9351f', '#b01c1c'];
       var b = '';
-      for (var n = 0; n <= 10; n++) b += '<button type="button" style="background:' + colori[n] + '" onclick="risposta(\'' + n + ' / 10\')">' + n + '</button>';
+      for (var n = 0; n <= 10; n++) b += '<button type="button" style="background:' + colori[n] + '" onclick="rispostaDolore(' + n + ')">' + n + '</button>';
       r.innerHTML = '<div class="scala" dir="ltr">' + b + '</div><div class="scala-etichette" dir="ltr"><span>0 = ' + esc(DOLORE_0[lingua]) + '</span><span>10 = ' + esc(DOLORE_10[lingua]) + '</span></div>';
     } else if (f.tipo === 'calde') {
       calda = -1; aggiunte = [];
@@ -2960,6 +2987,7 @@
     if (f.tipo === 'sn' || f.tipo === 'dolore' || f.tipo === 'calde' || f.scelte)
       r.innerHTML += '<p class="aiuto-tabella"' + attrOp() + '>' + T('aiuto_risposte') + '</p>';
     document.getElementById('g-risposta').style.display = 'none';
+    document.getElementById('g-seguiti').innerHTML = '';
     document.getElementById('grande').classList.add('aperto');
     document.getElementById('grande').scrollTop = 0;
     parla();
@@ -2973,6 +3001,36 @@
     g.innerHTML = '<small' + attrOp() + '>' + HA_RISPOSTO[op] + '</small><span' + attrOp() + '>' + esc(it) + '</span>';
     g.style.display = 'block';
     g.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+
+  // Sì/No: mostra la risposta e, se la frase ha domande di seguito, le propone subito.
+  function rispostaSN(k) {
+    if (k === 'si' && aperta && aperta.sulSi) {
+      var d = FRASI.filter(function (x) { return x.t && x.t[0] === aperta.sulSi; })[0];
+      if (d) { apri(d); return; }
+    }
+    risposta(k === 'si' ? SI[op] : NO[op]);
+    mostraSeguiti(k);
+  }
+  function mostraSeguiti(k) {
+    var box = document.getElementById('g-seguiti'), elenco = aperta && aperta.seguiti && aperta.seguiti[k];
+    if (!elenco) { box.innerHTML = ''; return; }
+    box.innerHTML = '<p class="seguiti-titolo"' + attrOp() + '>' + T('ora_chiedi') + '</p>' + elenco.map(function (it, j) {
+      var f = FRASI.filter(function (x) { return x.t && x.t[0] === it; })[0];
+      return f ? '<button type="button" onclick="apriSeguito(\'' + k + '\',' + j + ')"><b lang="' + info().id + '"' + (info().rtl ? ' dir="rtl"' : '') + '>' + esc(f.t[lingua]) + '</b><small' + attrOp() + '>' + esc(f.t[op]) + '</small></button>' : '';
+    }).join('');
+    box.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+  function apriSeguito(k, j) {
+    var it = aperta.seguiti[k][j];
+    var f = FRASI.filter(function (x) { return x.t && x.t[0] === it; })[0];
+    if (f) apri(f);
+  }
+  // Scala del dolore: il numero toccato viene detto a voce nella lingua del paziente.
+  function rispostaDolore(n) {
+    parlaTesto(String(n));
+    risposta(n + ' / 10');
+    mostraSeguiti('dopo');
   }
 
   // Scheda tè/caffè/camomilla: una bevanda + le aggiunte che vuole.
