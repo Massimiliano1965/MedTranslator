@@ -81,31 +81,31 @@
   header h1 { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.1; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   /* Testata stretta (lente + microfono + ruolo): bottoni un po' più piccoli perché il titolo ci stia */
   .testata { gap: 5px !important; }
-  .testata .btn-lente, .testata .btn-tema { width: 34px !important; height: 34px !important; }
-  @media (max-width: 380px) { header h1 { font-size: 14.5px; } .btn-ruolo { padding: 6px 8px !important; font-size: 13px !important; } }
+  .testata .btn-lente, .testata .btn-tema { width: 44px !important; height: 44px !important; }
+  @media (max-width: 420px) { header h1 { display: none; } }
   /* Bottone del ruolo scelto: toccandolo si torna alla schermata di benvenuto */
   .btn-ruolo {
     flex: none; border: 0; background: var(--ruolo); color: var(--ruolo-testo);
-    border-radius: 999px; padding: 6px 11px; font: inherit; font-size: 14px; font-weight: 700; white-space: nowrap;
+    border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 18px; font-weight: 700; white-space: nowrap;
   }
   .btn-ruolo span { font-weight: 400; opacity: .8; }
   /* Lente di ricerca e barra di ricerca (prende il posto della riga del titolo) */
   .btn-lente {
-    flex: none; width: 36px; height: 36px; padding: 7px; border: 0; border-radius: 50%;
+    flex: none; width: 47px; height: 47px; padding: 9px; border: 0; border-radius: 50%;
     background: var(--chip); color: var(--testo);
   }
   .btn-lente svg { width: 100%; height: 100%; display: block; }
   /* Microfono della ricerca a voce: stesso stile della lente, colore del ruolo */
   .btn-voce { color: var(--ruolo, var(--blu)) !important; }
-  .cerca .btn-voce svg { width: 22px; height: 22px; display: block; margin: auto; }
+  .cerca .btn-voce svg { width: 29px; height: 29px; display: block; margin: auto; }
   /* Mentre ascolta: il microfono diventa rosso e pulsa (niente finestra di Google) */
   body.ascolto .btn-voce { background: var(--rosso) !important; color: #fff !important; animation: pulsa-mic 1.1s ease-out infinite; }
   @keyframes pulsa-mic { 0% { box-shadow: 0 0 0 0 rgba(229,57,53,.55); } 100% { box-shadow: 0 0 0 12px rgba(229,57,53,0); } }
   body.senza-voce .btn-voce { display: none; }
   /* Giorno / notte: automatico (segue il telefono), sempre giorno, sempre notte */
   .btn-tema {
-    flex: none; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%;
-    background: var(--chip); font-size: 19px; line-height: 36px; text-align: center;
+    flex: none; width: 47px; height: 47px; padding: 0; border: 0; border-radius: 50%;
+    background: var(--chip); font-size: 25px; line-height: 47px; text-align: center;
   }
   .btn-tema small { font-size: 9px; font-weight: 800; position: relative; top: -1px; margin-left: -2px; color: var(--testo); }
   /* La «A» di automatico resta discreta: bianca di giorno, scura di notte */
@@ -122,12 +122,12 @@
   body.cercando .cerca { display: flex; }
   body.cercando .testata, body.cercando .gruppi { display: none; }
   .cerca input {
-    flex: 1; min-width: 0; height: 42px; padding: 0 16px; border-radius: 21px; border: 1.5px solid var(--blu);
-    background: var(--carta); color: var(--testo); font: inherit; font-size: 17px;
+    flex: 1; min-width: 0; height: 55px; padding: 0 20px; border-radius: 28px; border: 1.5px solid var(--blu);
+    background: var(--carta); color: var(--testo); font: inherit; font-size: 22px;
   }
   .cerca button {
-    flex: none; width: 42px; height: 42px; border: 0; border-radius: 50%; background: var(--chip);
-    color: var(--testo); font: inherit; font-size: 18px; font-weight: 700;
+    flex: none; width: 55px; height: 55px; border: 0; border-radius: 50%; background: var(--chip);
+    color: var(--testo); font: inherit; font-size: 23px; font-weight: 700;
   }
   .cerca input::-webkit-search-cancel-button { display: none; }
   .cerca input:focus { outline: none; border-width: 2px; }
@@ -141,20 +141,20 @@
   .lingue::-webkit-scrollbar, .gruppi::-webkit-scrollbar { display: none; }
   .lingue button {
     flex: none; border: 0; background: linear-gradient(135deg, var(--lg1), var(--lg2)); color: var(--testo); white-space: nowrap; box-shadow: var(--ombra);
-    border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 15px; font-weight: 700;
+    border-radius: 999px; padding: 8px 16px; font: inherit; font-size: 19.5px; font-weight: 700;
   }
   .lingue button.attiva { background: var(--blu); color: #fff; }
   .gruppi { margin-top: 6px; }
   /* Argomenti in color sabbia/ambra, lingue in azzurro: due barre che non si confondono */
   .gruppi button {
     flex: none; border: 0; background: var(--arg); color: var(--arg-testo); border-radius: 999px;
-    padding: 4px 10px; font: inherit; font-size: 13.5px; font-weight: 700; white-space: nowrap;
+    padding: 5.5px 13px; font: inherit; font-size: 17.5px; font-weight: 700; white-space: nowrap;
   }
   .gruppi button.attiva { background: var(--arg-attivo); color: var(--arg-attivo-testo); }
   /* Argomenti degli altri ruoli: in fondo, bordo tratteggiato */
-  .gruppi .etichetta-altri { flex: none; align-self: center; font-size: 12.5px; color: var(--tenue); margin-left: 4px; }
-  .gruppi button.altro-ruolo { border: 1.5px dashed var(--arg-attivo); padding: 2.5px 8.5px; opacity: .85; }
-  .gruppi button.indietro { background: transparent; border: 1.5px solid var(--arg-attivo); padding: 2.5px 8.5px; }
+  .gruppi .etichetta-altri { flex: none; align-self: center; font-size: 16px; color: var(--tenue); margin-left: 4px; }
+  .gruppi button.altro-ruolo { border: 1.5px dashed var(--arg-attivo); padding: 4px 11.5px; opacity: .85; }
+  .gruppi button.indietro { background: transparent; border: 1.5px solid var(--arg-attivo); padding: 4px 11.5px; }
   h2.cat-parole { font-size: 16px; color: var(--arg-attivo); letter-spacing: 0.02em; margin-top: 26px; }
   .gruppi button.altro-ruolo.attiva { opacity: 1; }
   main { padding: 8px 16px 32px; max-width: 640px; margin: 0 auto; }
@@ -163,8 +163,8 @@
   .riga-frase { display: flex; gap: 6px; align-items: stretch; margin: 0 0 8px; }
   .riga-frase .frase { margin: 0; flex: 1; min-width: 0; }
   .stella {
-    flex: none; width: 48px; border: 0; border-radius: 16px; background: linear-gradient(135deg, var(--lg1), var(--lg2)); box-shadow: var(--ombra);
-    color: var(--tenue); font-size: 24px; line-height: 1; cursor: pointer;
+    flex: none; width: 62px; border: 0; border-radius: 16px; background: linear-gradient(135deg, var(--lg1), var(--lg2)); box-shadow: var(--ombra);
+    color: var(--tenue); font-size: 31px; line-height: 1; cursor: pointer;
   }
   .stella { color: #d4a300; }
   /* Gialla solo quando la frase è nei preferiti; altrimenti sfondo come le altre schede */
@@ -174,8 +174,8 @@
   :root[data-theme="dark"] .stella.piena { background: #3d2c10; color: #f0b650; }
   /* Riga: stella a sinistra, frase al centro, altoparlante a destra (ascolta senza aprire la scheda grande) */
   .riga-frase .ascolta-mini {
-    flex: none; width: 48px; border: 0; border-radius: 16px; background: var(--blu-chiaro); box-shadow: var(--ombra);
-    font-size: 22px; line-height: 1; cursor: pointer; color: var(--blu);
+    flex: none; width: 62px; border: 0; border-radius: 16px; background: var(--blu-chiaro); box-shadow: var(--ombra);
+    font-size: 29px; line-height: 1; cursor: pointer; color: var(--blu);
   }
   h2.titolo-pref { color: #b88600; }
   /* Preferite: si trascinano tenendo premuto sulla frase */
@@ -184,13 +184,13 @@
   /* Tasto Ordina e frecce per spostare lingue, ruoli e argomenti */
   .btn-ordina {
     margin-left: auto; flex: none; border: 1px solid var(--blu); background: transparent; color: var(--blu);
-    border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 14px; font-weight: 700;
+    border-radius: 999px; padding: 8px 16px; font: inherit; font-size: 18px; font-weight: 700;
   }
   body.ordinando .btn-ordina { background: var(--blu); color: #fff; }
   .chip-ordina { display: inline-flex; align-items: center; gap: 2px; flex: none; }
   .chip-ordina .freccia {
     border: 0; background: var(--blu-chiaro); color: var(--blu); border-radius: 8px;
-    width: 26px; height: 30px; padding: 0; font: inherit; font-size: 20px; font-weight: 700; line-height: 1;
+    width: 34px; height: 39px; padding: 0; font: inherit; font-size: 26px; font-weight: 700; line-height: 1;
   }
   /* Trascinamento: il bottone preso si solleva, il posto libero è tratteggiato */
   .trascina { touch-action: pan-x pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -225,12 +225,12 @@
   .bv-lingue button.scelta .spunta { background: var(--blu); border-color: var(--blu); color: #fff; }
   .pz-tutte { display: block; margin: -14px auto 14px; }
   .bv-continua {
-    display: block; width: 100%; margin: 4px 0 0; border: 0; border-radius: 16px; padding: 16px; font: inherit;
-    font-size: 19px; font-weight: 800; background: var(--blu); color: #fff; box-shadow: var(--ombra);
+    display: block; width: 100%; margin: 4px 0 0; border: 0; border-radius: 16px; padding: 21px; font: inherit;
+    font-size: 25px; font-weight: 800; background: var(--blu); color: #fff; box-shadow: var(--ombra);
   }
   .bv-continua:disabled { background: var(--bordo); color: var(--tenue); box-shadow: none; }
   /* Bottone ＋ in fondo alla riga delle lingue: riapre «Lingue dei pazienti» */
-  .lingue button.piu { background: transparent; box-shadow: none; border: 2px dashed var(--blu); color: var(--blu); padding: 4px 12px; font-size: 18px; line-height: 1; }
+  .lingue button.piu { background: transparent; box-shadow: none; border: 2px dashed var(--blu); color: var(--blu); padding: 6px 17px; font-size: 24px; line-height: 1; }
   .bv { max-width: 520px; margin: 0 auto; padding: 28px 16px 16px; }
   .bv-logo { display: flex; justify-content: center; }
   .bv-logo .marchio { width: 96px; height: 96px; filter: drop-shadow(0 4px 10px rgba(11,58,74,.15)); }
@@ -257,7 +257,7 @@
   /* Lingua dell'operatore: schede morbide su 2 colonne, cerchietto a sinistra */
   .bv-lingue { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 26px; }
   .bv-lingue button {
-    display: flex; align-items: center; gap: 8px; min-width: 0; padding: 9px 8px; text-align: start;
+    display: flex; align-items: center; gap: 8px; min-width: 0; padding: 13px 8px; text-align: start;
     background: linear-gradient(135deg, var(--lg1), var(--lg2)); color: var(--testo);
     border: 2px solid transparent; border-radius: 16px; box-shadow: var(--ombra); font: inherit;
   }
@@ -307,7 +307,7 @@
   #grande.aperto { display: flex; }
   .barra { display: flex; justify-content: space-between; gap: 10px; }
   .barra button {
-    border: 0; border-radius: 999px; padding: 11px 20px; font: inherit; font-size: 17px; font-weight: 700;
+    border: 0; border-radius: 999px; padding: 14px 26px; font: inherit; font-size: 22px; font-weight: 700;
     background: linear-gradient(135deg, var(--lg1), var(--lg2)); color: var(--testo); box-shadow: var(--ombra);
   }
   .barra .ascolta { background: var(--blu); border-color: var(--blu); color: #fff; }
