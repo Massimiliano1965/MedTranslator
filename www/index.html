@@ -377,27 +377,86 @@
   .firma-etichetta { font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--tenue); }
   .firma-nome { font-family: "Caveat", "Segoe Script", "Brush Script MT", cursive; font-size: 36px; font-weight: 600; line-height: 1.1; color: var(--blu); }
   .firma-nota { font-size: 13px; color: var(--tenue); max-width: 34ch; }
+
+  /* Layout v2 (4/10/2026): in alto solo le lingue scelte; comandi in basso sotto il pollice;
+     argomenti in una schermata a pulsanti grandi. Pratico e veloce, non bello. */
+  header { padding: calc(8px + env(safe-area-inset-top, 0px)) 0 8px; }
+  .lingue { gap: 8px; }
+  .lingue button { flex: 1 1 auto; min-width: 0; text-align: center; padding: 13px 6px; font-size: 18px; }
+  .lingue button.piu { display: none; }
+  main { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+  body.cercando main { padding-bottom: 32px; }
+  #barra-giu {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 8; display: flex; gap: 8px;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px)); background: var(--testata); border-top: 1px solid var(--bordo);
+  }
+  body.cercando #barra-giu { display: none; }
+  #barra-giu button {
+    flex: 1 1 0; min-width: 0; min-height: 66px; border: 0; border-radius: 16px; background: var(--chip); color: var(--testo);
+    font: inherit; font-size: 12.5px; font-weight: 800; line-height: 1.1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 3px; padding: 4px 2px;
+  }
+  #barra-giu button b { font-size: 28px; line-height: 1; font-weight: 400; }
+  #barra-giu .bg-arg { flex: 1.25 1 0; background: var(--arg-attivo); color: var(--arg-attivo-testo); }
+  #barra-giu .bg-pref { flex: 1.25 1 0; background: var(--arg); color: var(--arg-testo); }
+  #barra-giu .bg-pref b { color: #d4a300; }
+  #barra-giu .bg-pref.attiva { background: var(--arg-attivo); color: var(--arg-attivo-testo); }
+  #barra-giu .bg-pref.vuota { opacity: .45; }
+  #barra-giu .bg-icona { flex: .8 1 0; }
+  #barra-giu .btn-voce { color: var(--ruolo, var(--blu)); }
+  #argomenti, #menu {
+    position: fixed; inset: 0; z-index: 18; background: var(--sfondo); display: none; flex-direction: column; gap: 12px;
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px)); overflow-y: auto;
+  }
+  #argomenti.aperto, #menu.aperto { display: flex; }
+  .arg-testa { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .arg-testa b { font-size: 26px; }
+  .arg-testa button { border: 0; border-radius: 999px; padding: 13px 24px; font: inherit; font-size: 21px; font-weight: 700; background: var(--chip); color: var(--testo); }
+  #argomenti .gruppi { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; overflow: visible; gap: 10px; padding: 0; margin: 0; }
+  #argomenti .gruppi button { min-height: 76px; padding: 12px 10px; font-size: 21px; line-height: 1.2; border-radius: 18px; white-space: normal; text-align: center; }
+  #argomenti .gruppi > button:first-child { grid-column: 1 / -1; }
+  #argomenti .gruppi button.altro-ruolo, #argomenti .gruppi button.indietro { padding: 10px 8px; }
+  #argomenti .gruppi .etichetta-altri { grid-column: 1 / -1; font-size: 17px; margin: 12px 0 0; }
+  #menu .btn-tema .tema-testo { font-size: 22px; font-weight: 700; color: var(--testo); }
+  #menu .btn-ruolo, #menu .menu-voce, #menu .btn-tema {
+    width: 100%; min-height: 72px; border: 0; border-radius: 18px; font: inherit; font-size: 23px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px;
+  }
+  #menu .menu-voce { background: var(--chip); color: var(--testo); }
+  #menu .btn-tema { width: 100%; height: auto; border-radius: 18px; font-size: 34px; line-height: 1; }
   @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
 </head>
 <body>
 <header>
-  <div class="testata">
-    <button type="button" class="btn-tema" id="btn-tema" onclick="cambiaTema()"></button>
-    <h1>MedTranslator</h1>
-    <button type="button" class="btn-lente" onclick="apriCerca()" data-t-aria="cerca_frase" aria-label="Cerca una frase"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M15.5 15.5 L21 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>
-    <button type="button" class="btn-lente btn-voce" onclick="cercaAVoce()" data-t-aria="cerca_voce" aria-label="Cerca a voce"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="currentColor"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5V22M8.5 22h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
-    <button type="button" class="btn-ruolo" id="btn-ruolo" onclick="apriBenvenuto(true)"></button>
-  </div>
   <div class="cerca" id="cerca">
     <input type="search" id="cerca-testo" data-t-ph="placeholder" placeholder="Cerca: flebo, cuscino, dolore…" autocomplete="off" enterkeyhint="search" oninput="cercaFrasi(this.value)">
     <button type="button" class="btn-voce" onclick="cercaAVoce()" data-t-aria="cerca_voce" aria-label="Cerca a voce"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="currentColor"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5V22M8.5 22h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
     <button type="button" onclick="chiudiCerca()" data-t-aria="chiudi_ricerca" aria-label="Chiudi la ricerca">✕</button>
   </div>
   <div class="lingue" id="lingue"></div>
-  <div class="gruppi" id="gruppi"></div>
 </header>
 <main id="elenco"></main>
+
+<nav id="barra-giu" aria-label="Comandi">
+  <button type="button" class="bg-arg" onclick="apriArgomenti()"><b aria-hidden="true">☰</b><span data-t="argomenti">Argomenti</span></button>
+  <button type="button" class="bg-pref" id="bg-pref" onclick="vaiPreferite()"><b aria-hidden="true">★</b><span data-t="mie_frasi">Le mie frasi</span></button>
+  <button type="button" class="bg-icona" onclick="apriCerca()" data-t-aria="cerca_frase" aria-label="Cerca una frase"><b aria-hidden="true">🔍</b></button>
+  <button type="button" class="bg-icona btn-voce" onclick="cercaAVoce()" data-t-aria="cerca_voce" aria-label="Cerca a voce"><b aria-hidden="true">🎤</b></button>
+  <button type="button" class="bg-icona" onclick="apriMenu()" aria-label="Menu"><b aria-hidden="true">⋯</b></button>
+</nav>
+
+<div id="argomenti" role="dialog" aria-modal="true">
+  <div class="arg-testa"><b data-t="argomenti">Argomenti</b><button type="button" onclick="chiudiArgomenti()">✕ <span data-t="chiudi">Chiudi</span></button></div>
+  <div class="gruppi" id="gruppi"></div>
+</div>
+
+<div id="menu" role="dialog" aria-modal="true">
+  <div class="arg-testa"><b>⋯</b><button type="button" onclick="chiudiMenu()">✕ <span data-t="chiudi">Chiudi</span></button></div>
+  <button type="button" class="btn-ruolo" id="btn-ruolo" onclick="chiudiMenu(); apriBenvenuto(true)"></button>
+  <button type="button" class="menu-voce" onclick="chiudiMenu(); apriPazienti()"><span>🌐</span> <span data-t="pz_titolo">Lingue dei pazienti</span></button>
+  <button type="button" class="btn-tema" id="btn-tema" onclick="cambiaTema()"></button>
+</div>
 
 <div id="benvenuto" role="dialog" aria-modal="true" aria-labelledby="bv-titolo">
   <div class="bv">
@@ -2290,6 +2349,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-t-ph]'), function (e) { e.setAttribute('placeholder', T(e.getAttribute('data-t-ph'))); });
     var h = document.getElementById('bv-tua-lingua'); if (h) h.textContent = '🌐 ' + T('tua_lingua') + (op === 1 ? '' : ' · Your language');
     FIRMA = creaFirma();
+    if (typeof applicaTema === 'function') applicaTema();
   }
 
   var MARCHIO_SVG = logoSVG('marchio');
@@ -2513,6 +2573,7 @@
     br.innerHTML = (rs ? rs[3] + ' ' + T('r_' + rs[0] + '_b') : T('tutti')) + ' <span>▾</span>';
     br.setAttribute('aria-label', T('lavoro') + ' ' + (rs ? T('r_' + rs[0]) : T('tutti')));
     document.body.setAttribute('data-ruolo', ruolo);
+    aggiornaBarra();
     // Argomenti che hanno almeno una frase per il ruolo scelto, nell'ordine scelto
     var disponibili = [], nomeGruppo = '', rg = '';
     FRASI.forEach(function (f) {
@@ -2534,7 +2595,7 @@
       var cats = [];
       PAROLE.forEach(function (w) { if (cats.indexOf(w.c) === -1) cats.push(w.c); });
       document.getElementById('gruppi').innerHTML =
-        '<button type="button" class="indietro" onclick="scegliGruppo(\'\')">‹ ' + T('argomenti') + '</button>' +
+        '<button type="button" class="indietro" onclick="scegliGruppo(\'\', true)">‹ ' + T('argomenti') + '</button>' +
         '<button type="button" class="' + (gruppo === '__parole' ? 'attiva' : '') + '" onclick="scegliGruppo(\'__parole\')">📖 ' + T('tutte') + '</button>' +
         cats.map(function (c) {
           return '<button type="button" class="' + (gruppo === '__parole:' + c ? 'attiva' : '') + '" onclick="scegliGruppo(' + JSON.stringify('__parole:' + c).replace(/"/g, '&quot;') + ')">' + esc(TG(c)) + '</button>';
@@ -2808,13 +2869,23 @@
 
   var gruppo = '', GRUPPI_VISTI = [];
   try { gruppo = localStorage.getItem('trad_gruppo') || ''; } catch (e) {}
-  function scegliGruppo(g) {
+  function scegliGruppo(g, tieniAperto) {
     if (daTrascinamento()) return;
     gruppo = g;
     try { localStorage.setItem('trad_gruppo', gruppo); } catch (e) {}
+    if (!tieniAperto && g !== '__parole') chiudiArgomenti();   // le parole mostrano le loro categorie nella stessa schermata
     disegna();
     window.scrollTo(0, 0);
     centra('gruppi');
+  }
+  function apriArgomenti() { var a = document.getElementById('argomenti'); a.classList.add('aperto'); a.scrollTop = 0; }
+  function chiudiArgomenti() { document.getElementById('argomenti').classList.remove('aperto'); }
+  function apriMenu() { document.getElementById('menu').classList.add('aperto'); }
+  function chiudiMenu() { document.getElementById('menu').classList.remove('aperto'); }
+  function vaiPreferite() { if (!preferite.length) return; scegliGruppo(gruppo === '__pref' ? '' : '__pref'); }
+  function aggiornaBarra() {
+    var b = document.getElementById('bg-pref'); if (!b) return;
+    b.classList.toggle('attiva', gruppo === '__pref'); b.classList.toggle('vuota', !preferite.length);
   }
 
   function scegliLingua(n) {
@@ -2963,7 +3034,7 @@
     else document.documentElement.setAttribute('data-theme', tema);
     var t = TEMI.filter(function (x) { return x[0] === tema; })[0];
     var b = document.getElementById('btn-tema');
-    b.innerHTML = t[1] + (tema === 'auto' ? '<small>A</small>' : '');
+    b.innerHTML = t[1] + (tema === 'auto' ? '<small>A</small>' : '') + ' <span class="tema-testo">' + T('tema_' + (t[0] === 'light' ? 'giorno' : t[0] === 'dark' ? 'notte' : 'auto')) + '</span>';
     b.setAttribute('aria-label', T('tema_' + (t[0] === 'light' ? 'giorno' : t[0] === 'dark' ? 'notte' : 'auto')));
     return t;
   }
@@ -2985,6 +3056,8 @@
   document.addEventListener('backbutton', function (e) {
     e.preventDefault();
     if (aperta) chiudi();
+    else if (document.getElementById('argomenti').classList.contains('aperto')) chiudiArgomenti();
+    else if (document.getElementById('menu').classList.contains('aperto')) chiudiMenu();
     else if (document.body.classList.contains('cercando')) chiudiCerca();
     else if (benvenutoAperto && configurato && pazienti.length) apriPazienti();   // da lingua/lavoro torna alle lingue dei pazienti
     else if (!benvenutoAperto && !pazientiAperto) apriPazienti();                 // dalle frasi torna alle lingue dei pazienti
