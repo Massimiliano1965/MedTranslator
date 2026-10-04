@@ -432,6 +432,13 @@
   .lingue.sei button { flex: 1 1 30%; padding: 9px 4px; font-size: 15px; }
   .lingue.molte { flex-wrap: nowrap; gap: 6px; }
   .lingue.molte button { flex: none; padding: 10px 14px; font-size: 16px; }
+
+  /* Scheda aperta: Chiudi e Ascolta in basso (sotto il pollice), grandi, come i comandi delle frasi */
+  #g-risposte { margin-top: auto; }   /* risposte e comandi in basso, dove arriva il pollice */
+  #grande .barra { order: 99; position: sticky; bottom: 0; z-index: 2; margin: 14px -16px 0; padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--sfondo); border-top: 1px solid var(--bordo); }
+  #grande { padding-bottom: 0; }
+  #g-risposta { scroll-margin-bottom: 100px; }
+  #grande .barra button { flex: 1 1 0; min-height: 68px; font-size: 24px; padding: 12px 10px; }
   @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
 </head>
