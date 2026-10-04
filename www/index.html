@@ -2666,7 +2666,7 @@
     br.setAttribute('aria-label', T('lavoro') + ' ' + (rs ? T('r_' + rs[0]) : T('tutti')));
     document.body.setAttribute('data-ruolo', ruolo);
     document.getElementById('br-av').innerHTML = rs ? figuraRuolo(rs[0]) : '👥';
-    document.getElementById('br-nome').textContent = rs ? T('r_' + rs[0]) : T('tutti');
+    document.getElementById('br-nome').textContent = rs ? T('r_' + rs[0] + '_b') : T('tutti');
     document.getElementById('barra-ruolo').setAttribute('aria-label', T('lavoro') + ' ' + (rs ? T('r_' + rs[0]) : T('tutti')));
     aggiornaBarra();
     // Argomenti che hanno almeno una frase per il ruolo scelto, nell'ordine scelto
@@ -2980,7 +2980,7 @@
   function apriScelta() {
     var h = ['M', 'I', 'S', 'A'].map(function (c) {
       return '<button type="button" class="sr-opt r-' + c + (c === ruolo ? ' on' : '') + '" onclick="cambiaRuolo(\'' + c + '\')">' +
-        '<span class="sr-sw" aria-hidden="true"></span><span class="av" aria-hidden="true">' + figuraRuolo(c) + '</span><b>' + T('r_' + c) + '</b><span class="sr-ck" aria-hidden="true">✓</span></button>';
+        '<span class="sr-sw" aria-hidden="true"></span><span class="av" aria-hidden="true">' + figuraRuolo(c) + '</span><b>' + T('r_' + c + '_b') + '</b><span class="sr-ck" aria-hidden="true">✓</span></button>';
     }).join('') +
       '<button type="button" class="sr-opt' + (ruolo === '' ? ' on' : '') + '" onclick="cambiaRuolo(\'\')">' +
       '<span class="sr-sw" aria-hidden="true"></span><span class="av" aria-hidden="true" style="--r-avbg:var(--chip);--r-anello:var(--bordo)">👥</span><b>' + T('tutti') + '</b><span class="sr-ck" aria-hidden="true">✓</span></button>';
