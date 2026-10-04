@@ -60,22 +60,57 @@
     /* La barra parte dal bordo in alto e copre anche la zona dell'ora e della
        batteria: così le frasi non si vedono scorrere dietro. */
     position: sticky; top: 0; z-index: 5;
-    background: var(--testata, var(--carta)); border-bottom: 1px solid var(--bordo); border-top: 6px solid var(--ruolo);
-    padding: calc(8px + env(safe-area-inset-top, 0px)) 0 6px;
+    background: var(--testata, var(--carta)); border-bottom: 1px solid var(--bordo);
+    padding: 0 0 6px;
   }
+  /* Barra della mansione (in cima): figura con la divisa, nome e banda del colore. Toccandola si apre la scelta. */
+  body { --r-bar: var(--carta); --r-bar-t: var(--testo); --r-band: var(--bordo); --r-anello: var(--bordo); --r-avbg: var(--chip); --r-linea: transparent; }
+  body[data-ruolo="M"] { --r-bar: #ffffff; --r-bar-t: #2c2c2a; --r-band: #b4b2a9; --r-anello: #b4b2a9; --r-avbg: #f1efe8; --r-linea: #9aa5b1; }
+  body[data-ruolo="I"] { --r-bar: #ffffff; --r-bar-t: #2c2c2a; --r-band: #8ec5f0; --r-anello: #8ec5f0; --r-avbg: #eaf4fc; --r-linea: #8ec5f0; }
+  body[data-ruolo="S"] { --r-bar: #34a847; --r-bar-t: #0e1620; --r-band: #34a847; --r-anello: #ffffff; --r-avbg: #e3f4e7; --r-linea: #34a847; }
+  body[data-ruolo="A"] { --r-bar: #9fa8f0; --r-bar-t: #1b245e; --r-band: #2f6fd6; --r-anello: #2f6fd6; --r-avbg: #e6e8fb; --r-linea: #2f6fd6; }
+  .barra-ruolo {
+    display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; border: 0; border-radius: 0; text-align: left;
+    background: var(--r-bar); color: var(--r-bar-t); font: inherit; font-size: 19px; font-weight: 700; line-height: 1.2;
+    padding: calc(8px + env(safe-area-inset-top, 0px)) 14px 8px;
+  }
+  .barra-ruolo .br-nome { flex: 1; min-width: 0; }
+  .barra-ruolo .br-fr { flex: none; font-size: 22px; }
+  .br-banda { height: 6px; background: var(--r-band); margin: 0 0 8px; }
+  .av { width: 48px; height: 48px; flex: none; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center;
+    background: var(--r-avbg); border: 2px solid var(--r-anello); font-size: 26px; line-height: 1; }
+  .av svg { display: block; width: 100%; height: 100%; }
+  /* Finestra di scelta della mansione (si chiude da sola appena si sceglie) */
+  #scelta-ruolo { position: fixed; inset: 0; z-index: 30; display: none; }
+  #scelta-ruolo.aperto { display: block; }
+  #scelta-ruolo .sr-dim { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+  #scelta-ruolo .sr-panel { position: absolute; left: 10px; right: 10px; top: 80px; background: var(--carta); color: var(--testo);
+    border-radius: 18px; padding: 8px; box-shadow: 0 10px 30px rgba(0,0,0,.35); border: 1px solid var(--bordo); max-height: calc(100vh - 100px); overflow-y: auto; }
+  .sr-opt { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 72px; padding: 8px 10px; border: 0; border-radius: 14px;
+    background: transparent; color: var(--testo); font: inherit; font-size: 20px; font-weight: 700; text-align: left; }
+  .sr-opt:active { background: var(--blu-chiaro); }
+  .sr-opt .sr-sw { width: 12px; height: 44px; border-radius: 6px; flex: none; border: 1px solid var(--bordo); }
+  .sr-opt b { flex: 1; min-width: 0; font-weight: 700; }
+  .sr-opt .sr-ck { flex: none; font-size: 26px; color: var(--blu); visibility: hidden; }
+  .sr-opt.on { background: var(--blu-chiaro); }
+  .sr-opt.on .sr-ck { visibility: visible; }
+  .sr-opt.r-M .av { --r-avbg: #f1efe8; --r-anello: #b4b2a9; } .sr-opt.r-I .av { --r-avbg: #eaf4fc; --r-anello: #8ec5f0; }
+  .sr-opt.r-S .av { --r-avbg: #e3f4e7; --r-anello: #34a847; } .sr-opt.r-A .av { --r-avbg: #e6e8fb; --r-anello: #2f6fd6; }
+  .sr-opt.r-M .sr-sw { background: #ffffff; } .sr-opt.r-I .sr-sw { background: #8ec5f0; } .sr-opt.r-S .sr-sw { background: #34a847; } .sr-opt.r-A .sr-sw { background: #9fa8f0; }
   /* Colore del ruolo (divise): solo la barra in alto e il bottone del ruolo.
      Medico blu istituzionale, OA viola-azzurro, OSS verde, Infermiere grigio-azzurro. */
   body { --ruolo: var(--blu); --ruolo-testo: #ffffff; }
-  body[data-ruolo="M"] { --ruolo: #1f4e8c; } body[data-ruolo="A"] { --ruolo: #5b5bc9; }
-  body[data-ruolo="S"] { --ruolo: #2e7d4f; } body[data-ruolo="I"] { --ruolo: #5f7f9c; }
+  body[data-ruolo="S"] { --ruolo-testo: #0e1620; }
+  body[data-ruolo="M"] { --ruolo: #6b7785; } body[data-ruolo="A"] { --ruolo: #2f6fd6; }
+  body[data-ruolo="S"] { --ruolo: #34a847; } body[data-ruolo="I"] { --ruolo: #3f8fd0; }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) body { --ruolo-testo: #0e1620; }
-    :root:not([data-theme="light"]) body[data-ruolo="M"] { --ruolo: #7fa8e6; } :root:not([data-theme="light"]) body[data-ruolo="A"] { --ruolo: #9d9cf2; }
-    :root:not([data-theme="light"]) body[data-ruolo="S"] { --ruolo: #6cc793; } :root:not([data-theme="light"]) body[data-ruolo="I"] { --ruolo: #b9cadb; }
+    :root:not([data-theme="light"]) body[data-ruolo="M"] { --ruolo: #cfd6df; } :root:not([data-theme="light"]) body[data-ruolo="A"] { --ruolo: #9fa8f0; }
+    :root:not([data-theme="light"]) body[data-ruolo="S"] { --ruolo: #34a847; } :root:not([data-theme="light"]) body[data-ruolo="I"] { --ruolo: #8ec5f0; }
   }
   :root[data-theme="dark"] body { --ruolo-testo: #0e1620; }
-  :root[data-theme="dark"] body[data-ruolo="M"] { --ruolo: #7fa8e6; } :root[data-theme="dark"] body[data-ruolo="A"] { --ruolo: #9d9cf2; }
-  :root[data-theme="dark"] body[data-ruolo="S"] { --ruolo: #6cc793; } :root[data-theme="dark"] body[data-ruolo="I"] { --ruolo: #b9cadb; }
+  :root[data-theme="dark"] body[data-ruolo="M"] { --ruolo: #cfd6df; } :root[data-theme="dark"] body[data-ruolo="A"] { --ruolo: #9fa8f0; }
+  :root[data-theme="dark"] body[data-ruolo="S"] { --ruolo: #34a847; } :root[data-theme="dark"] body[data-ruolo="I"] { --ruolo: #8ec5f0; }
   .testata { display: flex; align-items: center; gap: 6px; margin: 0 0 6px; padding: 0 16px; }
   .marchio { width: 28px; height: 28px; flex: none; }
   header h1 { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.1; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -200,7 +235,7 @@
      così il bottone spostato resta sempre in vista */
   .frase {
     display: block; width: 100%; text-align: left; margin: 0 0 8px; padding: 13px 16px;
-    background: linear-gradient(135deg, var(--lg1), var(--lg2)); color: var(--testo); border: 2px solid transparent; border-radius: 16px;
+    background: linear-gradient(135deg, var(--lg1), var(--lg2)); color: var(--testo); border: 2px solid transparent; border-left: 6px solid var(--r-linea, transparent); border-radius: 16px;
     box-shadow: var(--ombra); font: inherit; font-size: 18px; font-weight: 700; cursor: pointer;
   }
   .frase > span { display: block; }
@@ -287,13 +322,13 @@
   .bv-ruolo .simbolo { font-size: 40px; line-height: 1.1; }
   .bv-ruolo b { font-size: 19px; line-height: 1.2; }
   .bv-ruolo small { font-size: 13.5px; color: var(--tenue); line-height: 1.3; }
-  .bv-ruolo.r-M { --c: #1f4e8c; } .bv-ruolo.r-A { --c: #5b5bc9; } .bv-ruolo.r-S { --c: #2e7d4f; } .bv-ruolo.r-I { --c: #5f7f9c; }
+  .bv-ruolo.r-M { --c: #6b7785; } .bv-ruolo.r-A { --c: #2f6fd6; } .bv-ruolo.r-S { --c: #34a847; } .bv-ruolo.r-I { --c: #3f8fd0; }
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .bv-ruolo.r-M { --c: #7fa8e6; } :root:not([data-theme="light"]) .bv-ruolo.r-A { --c: #9d9cf2; }
-    :root:not([data-theme="light"]) .bv-ruolo.r-S { --c: #6cc793; } :root:not([data-theme="light"]) .bv-ruolo.r-I { --c: #b9cadb; }
+    :root:not([data-theme="light"]) .bv-ruolo.r-M { --c: #cfd6df; } :root:not([data-theme="light"]) .bv-ruolo.r-A { --c: #9fa8f0; }
+    :root:not([data-theme="light"]) .bv-ruolo.r-S { --c: #34a847; } :root:not([data-theme="light"]) .bv-ruolo.r-I { --c: #8ec5f0; }
   }
-  :root[data-theme="dark"] .bv-ruolo.r-M { --c: #7fa8e6; } :root[data-theme="dark"] .bv-ruolo.r-A { --c: #9d9cf2; }
-  :root[data-theme="dark"] .bv-ruolo.r-S { --c: #6cc793; } :root[data-theme="dark"] .bv-ruolo.r-I { --c: #b9cadb; }
+  :root[data-theme="dark"] .bv-ruolo.r-M { --c: #cfd6df; } :root[data-theme="dark"] .bv-ruolo.r-A { --c: #9fa8f0; }
+  :root[data-theme="dark"] .bv-ruolo.r-S { --c: #34a847; } :root[data-theme="dark"] .bv-ruolo.r-I { --c: #8ec5f0; }
   .bv-tutti {
     display: block; margin: 16px auto 0; border: 0; background: transparent; color: var(--blu);
     font: inherit; font-size: 16px; font-weight: 700; text-decoration: underline; padding: 10px;
@@ -452,7 +487,15 @@
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="fig-M" viewBox="0 0 120 104"><path d="M10 104V82Q10 58 38 52H82Q110 58 110 82V104Z" fill="#fff" stroke="#b4b2a9" stroke-width="1.5"/><rect x="52" y="40" width="16" height="16" fill="#e2b78f"/><path d="M46 52L60 84L74 52" fill="none" stroke="#b4b2a9" stroke-width="1.5"/><circle cx="42" cy="29" r="3.5" fill="#e8be98"/><circle cx="78" cy="29" r="3.5" fill="#e8be98"/><ellipse cx="60" cy="26" rx="18" ry="21" fill="#f0c9a8"/><path d="M43 19Q45 5 60 5Q75 5 77 19Q70 11 60 11Q50 11 43 19Z" fill="#5f4b3a"/><circle cx="53" cy="28" r="1.7" fill="#444441"/><circle cx="67" cy="28" r="1.7" fill="#444441"/><path d="M54 36Q60 40 66 36" fill="none" stroke="#444441" stroke-width="1.5" stroke-linecap="round"/><path d="M44 54C42 70 52 78 60 78C68 78 78 70 76 54" fill="none" stroke="#1f1f1e" stroke-width="5" stroke-linecap="round"/><path d="M60 78C60 88 80 84 80 92" fill="none" stroke="#1f1f1e" stroke-width="4.5" stroke-linecap="round"/><circle cx="80" cy="96" r="6" fill="#c9c7bd" stroke="#1f1f1e" stroke-width="3.5"/></symbol>
+<symbol id="fig-I" viewBox="0 0 120 104"><path d="M10 104V82Q10 58 38 52H82Q110 58 110 82V104Z" fill="#fff" stroke="#b4b2a9" stroke-width="1.5"/><rect x="52" y="40" width="16" height="16" fill="#e2b78f"/><path d="M46 52L60 84L74 52" fill="none" stroke="#8ec5f0" stroke-width="4" stroke-linejoin="round"/><circle cx="42" cy="29" r="3.5" fill="#e8be98"/><circle cx="78" cy="29" r="3.5" fill="#e8be98"/><ellipse cx="60" cy="26" rx="18" ry="21" fill="#f0c9a8"/><path d="M43 19Q45 5 60 5Q75 5 77 19Q70 11 60 11Q50 11 43 19Z" fill="#5f4b3a"/><circle cx="53" cy="28" r="1.7" fill="#444441"/><circle cx="67" cy="28" r="1.7" fill="#444441"/><path d="M54 36Q60 40 66 36" fill="none" stroke="#444441" stroke-width="1.5" stroke-linecap="round"/></symbol>
+<symbol id="fig-S" viewBox="0 0 120 104"><path d="M10 104V82Q10 58 38 52H82Q110 58 110 82V104Z" fill="#fff" stroke="#b4b2a9" stroke-width="1.5"/><rect x="52" y="40" width="16" height="16" fill="#e2b78f"/><path d="M44 52L60 84L76 52L90 56L60 100L30 56Z" fill="#34a847"/><circle cx="42" cy="29" r="3.5" fill="#e8be98"/><circle cx="78" cy="29" r="3.5" fill="#e8be98"/><ellipse cx="60" cy="26" rx="18" ry="21" fill="#f0c9a8"/><path d="M43 19Q45 5 60 5Q75 5 77 19Q70 11 60 11Q50 11 43 19Z" fill="#5f4b3a"/><circle cx="53" cy="28" r="1.7" fill="#444441"/><circle cx="67" cy="28" r="1.7" fill="#444441"/><path d="M54 36Q60 40 66 36" fill="none" stroke="#444441" stroke-width="1.5" stroke-linecap="round"/></symbol>
+<symbol id="fig-A" viewBox="0 0 120 104"><path d="M10 104V82Q10 58 38 52H82Q110 58 110 82V104Z" fill="#9fa8f0" stroke="#6e78d6" stroke-width="1.5"/><rect x="52" y="40" width="16" height="16" fill="#e2b78f"/><path d="M44 52L60 84L76 52L90 56L60 100L30 56Z" fill="#2f6fd6"/><circle cx="42" cy="29" r="3.5" fill="#e8be98"/><circle cx="78" cy="29" r="3.5" fill="#e8be98"/><ellipse cx="60" cy="26" rx="18" ry="21" fill="#f0c9a8"/><path d="M43 19Q45 5 60 5Q75 5 77 19Q70 11 60 11Q50 11 43 19Z" fill="#5f4b3a"/><circle cx="53" cy="28" r="1.7" fill="#444441"/><circle cx="67" cy="28" r="1.7" fill="#444441"/><path d="M54 36Q60 40 66 36" fill="none" stroke="#444441" stroke-width="1.5" stroke-linecap="round"/></symbol>
+</defs></svg>
 <header>
+  <button type="button" class="barra-ruolo" id="barra-ruolo" onclick="apriScelta()" aria-haspopup="dialog" aria-expanded="false"><span class="av" id="br-av" aria-hidden="true"></span><span class="br-nome" id="br-nome"></span><span class="br-fr" aria-hidden="true">▾</span></button>
+  <div class="br-banda" id="br-banda"></div>
   <div class="cerca" id="cerca">
     <input type="search" id="cerca-testo" data-t-ph="placeholder" placeholder="Cerca: flebo, cuscino, dolore…" autocomplete="off" enterkeyhint="search" oninput="cercaFrasi(this.value)">
     <button type="button" class="btn-voce" onclick="cercaAVoce()" data-t-aria="cerca_voce" aria-label="Cerca a voce"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="currentColor"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5V22M8.5 22h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
@@ -469,6 +512,11 @@
   <button type="button" class="bg-icona btn-voce" onclick="cercaAVoce()" data-t-aria="cerca_voce" aria-label="Cerca a voce"><b aria-hidden="true">🎤</b></button>
   <button type="button" class="bg-icona" onclick="apriMenu()" aria-label="Menu"><b aria-hidden="true">⋯</b></button>
 </nav>
+
+<div id="scelta-ruolo" role="dialog" aria-modal="true">
+  <div class="sr-dim" onclick="chiudiScelta()"></div>
+  <div class="sr-panel" id="sr-panel"></div>
+</div>
 
 <div id="argomenti" role="dialog" aria-modal="true">
   <div class="arg-testa"><b data-t="argomenti">Argomenti</b><button type="button" onclick="chiudiArgomenti()">✕ <span data-t="chiudi">Chiudi</span></button></div>
@@ -624,7 +672,7 @@
     function persona(x, y, sc, col) {
       return '<g transform="translate(' + x + ' ' + y + ') scale(' + sc + ')"><path d="M-16 44 V26 A16 16 0 0 1 16 26 V44 Z" fill="' + col + '" ' + L + '/><circle cx="0" cy="0" r="11" fill="#f6cfa6" ' + L + '/></g>';
     }
-    var famiglia = persona(26, 34, 1, '#34a847') + persona(74, 34, 1, '#5b5bc9') + persona(50, 56, 0.72, '#e8a33c') +
+    var famiglia = persona(26, 34, 1, '#34a847') + persona(74, 34, 1, '#2f6fd6') + persona(50, 56, 0.72, '#e8a33c') +
       '<rect x="80" y="62" width="16" height="28" rx="3" fill="#12331d"/><rect x="83" y="66" width="10" height="17" fill="#bfe7ff"/>';
     var tappo = '<path d="M36 20 Q50 8 64 20 L66 34 H34 Z" fill="#c9d1cd" ' + L + '/><circle cx="44" cy="20" r="2" fill="#12331d"/><circle cx="50" cy="16" r="2" fill="#12331d"/><circle cx="56" cy="20" r="2" fill="#12331d"/>';
     var sale = '<path d="M34 34 H66 L70 92 H30 Z" fill="#fff" ' + L + '/>' + tappo;
@@ -2617,6 +2665,9 @@
     br.innerHTML = (rs ? rs[3] + ' ' + T('r_' + rs[0] + '_b') : T('tutti')) + ' <span>▾</span>';
     br.setAttribute('aria-label', T('lavoro') + ' ' + (rs ? T('r_' + rs[0]) : T('tutti')));
     document.body.setAttribute('data-ruolo', ruolo);
+    document.getElementById('br-av').innerHTML = rs ? figuraRuolo(rs[0]) : '👥';
+    document.getElementById('br-nome').textContent = rs ? T('r_' + rs[0]) : T('tutti');
+    document.getElementById('barra-ruolo').setAttribute('aria-label', T('lavoro') + ' ' + (rs ? T('r_' + rs[0]) : T('tutti')));
     aggiornaBarra();
     // Argomenti che hanno almeno una frase per il ruolo scelto, nell'ordine scelto
     var disponibili = [], nomeGruppo = '', rg = '';
@@ -2924,6 +2975,32 @@
   }
   function apriArgomenti() { var a = document.getElementById('argomenti'); a.classList.add('aperto'); a.scrollTop = 0; }
   function chiudiArgomenti() { document.getElementById('argomenti').classList.remove('aperto'); }
+  // ---------- Scelta della mansione dalla barra in alto ----------
+  function figuraRuolo(r) { return '<svg viewBox="8 0 104 104" aria-hidden="true"><use href="#fig-' + r + '"></use></svg>'; }
+  function apriScelta() {
+    var h = ['M', 'I', 'S', 'A'].map(function (c) {
+      return '<button type="button" class="sr-opt r-' + c + (c === ruolo ? ' on' : '') + '" onclick="cambiaRuolo(\'' + c + '\')">' +
+        '<span class="sr-sw" aria-hidden="true"></span><span class="av" aria-hidden="true">' + figuraRuolo(c) + '</span><b>' + T('r_' + c) + '</b><span class="sr-ck" aria-hidden="true">✓</span></button>';
+    }).join('') +
+      '<button type="button" class="sr-opt' + (ruolo === '' ? ' on' : '') + '" onclick="cambiaRuolo(\'\')">' +
+      '<span class="sr-sw" aria-hidden="true"></span><span class="av" aria-hidden="true" style="--r-avbg:var(--chip);--r-anello:var(--bordo)">👥</span><b>' + T('tutti') + '</b><span class="sr-ck" aria-hidden="true">✓</span></button>';
+    var pn = document.getElementById('sr-panel'); pn.innerHTML = h;
+    var bar = document.getElementById('barra-ruolo'), banda = document.getElementById('br-banda');
+    pn.style.top = Math.round(banda.getBoundingClientRect().bottom + 6) + 'px';
+    document.getElementById('scelta-ruolo').classList.add('aperto');
+    bar.setAttribute('aria-expanded', 'true');
+  }
+  function chiudiScelta() {
+    document.getElementById('scelta-ruolo').classList.remove('aperto');
+    document.getElementById('barra-ruolo').setAttribute('aria-expanded', 'false');
+  }
+  function cambiaRuolo(r) {
+    ruolo = r;
+    try { localStorage.setItem('trad_ruolo', r); } catch (e) {}
+    chiudiScelta();
+    disegna();
+    window.scrollTo(0, 0);
+  }
   function apriMenu() { document.getElementById('menu').classList.add('aperto'); }
   function chiudiMenu() { document.getElementById('menu').classList.remove('aperto'); }
   function vaiPreferite() { if (!preferite.length) return; scegliGruppo(gruppo === '__pref' ? '' : '__pref'); }
@@ -3131,6 +3208,7 @@
   document.addEventListener('backbutton', function (e) {
     e.preventDefault();
     if (aperta) chiudi();
+    else if (document.getElementById('scelta-ruolo').classList.contains('aperto')) chiudiScelta();
     else if (document.getElementById('argomenti').classList.contains('aperto')) chiudiArgomenti();
     else if (document.getElementById('menu').classList.contains('aperto')) chiudiMenu();
     else if (document.body.classList.contains('cercando')) chiudiCerca();
