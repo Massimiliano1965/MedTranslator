@@ -2979,7 +2979,7 @@
   function apriArgomenti() { var a = document.getElementById('argomenti'); a.classList.add('aperto'); a.scrollTop = 0; }
   function chiudiArgomenti() { document.getElementById('argomenti').classList.remove('aperto'); }
   // ---------- Scelta della mansione dalla barra in alto ----------
-  function figuraRuolo(r) { return '<svg viewBox="8 0 104 104" aria-hidden="true"><use href="#fig-' + r + '"></use></svg>'; }
+  function figuraRuolo(r) { return '<svg viewBox="10 -8 100 112" aria-hidden="true"><use href="#fig-' + r + '" width="120" height="104"></use></svg>'; }
   function apriScelta() {
     var h = ['M', 'I', 'S', 'A'].map(function (c) {
       return '<button type="button" class="sr-opt r-' + c + (c === ruolo ? ' on' : '') + '" onclick="cambiaRuolo(\'' + c + '\')">' +
