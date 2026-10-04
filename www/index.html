@@ -772,9 +772,9 @@
 
     { gruppo: 'Paziente che non può parlare', ruoli: 'ISAM' },
     { ruoli: 'ISM', tipo: 'tabella', t: ["Tabella a immagini: indico una casella, il paziente chiude gli occhi", "Close your eyes when I point to the right one.", "Cierre los ojos cuando señale lo correcto.", "Fermez les yeux quand je montre la bonne case.", "أغمض عينيك عندما أشير إلى الخيار الصحيح.", "我指到正确的那一项时，请闭上眼睛。", "正しいものを指したら、目を閉じてください。"] },
-    { ruoli: 'ISAM', tipo: 'sn', t: ["Se non può parlare: chiuda gli occhi una volta per SÌ, due volte per NO.", "If you cannot speak: close your eyes once for YES, twice for NO.", "Si no puede hablar: cierre los ojos una vez para SÍ, dos veces para NO.", "Si vous ne pouvez pas parler : fermez les yeux une fois pour OUI, deux fois pour NON.", "إذا لم تستطع الكلام: أغمض عينيك مرة واحدة تعني نعم، ومرتين تعني لا.", "如果您不能说话：闭眼一次表示“是”，闭眼两次表示“不是”。", "話せない場合：「はい」は目を1回閉じてください。「いいえ」は2回閉じてください。"] },
-    { ruoli: 'ISM', tipo: 'sn', t: ["Se non può parlare: stringa la mia mano una volta per SÌ, due volte per NO.", "If you cannot speak: squeeze my hand once for YES, twice for NO.", "Si no puede hablar: apriete mi mano una vez para SÍ, dos veces para NO.", "Si vous ne pouvez pas parler : serrez ma main une fois pour OUI, deux fois pour NON.", "إذا لم تستطع الكلام: اضغط على يدي مرة واحدة تعني نعم، ومرتين تعني لا.", "如果您不能说话：捏我的手一次表示“是”，两次表示“不是”。", "話せない場合：「はい」は私の手を1回握ってください。「いいえ」は2回握ってください。"] },
-    { ruoli: 'ISAM', tipo: 'sn', t: ["Se non può parlare: muova la testa su e giù per SÌ, a destra e sinistra per NO.", "If you cannot speak: nod your head for YES, shake it for NO.", "Si no puede hablar: mueva la cabeza arriba y abajo para SÍ, a los lados para NO.", "Si vous ne pouvez pas parler : hochez la tête pour OUI, secouez-la pour NON.", "إذا لم تستطع الكلام: حرّك رأسك لأعلى ولأسفل تعني نعم، ولليمين واليسار تعني لا.", "如果您不能说话：点头表示“是”，摇头表示“不是”。", "話せない場合：「はい」はうなずいてください。「いいえ」は首を横に振ってください。"] },
+    { ruoli: 'ISAM', t: ["Se non può parlare: chiuda gli occhi una volta per SÌ, due volte per NO.", "If you cannot speak: close your eyes once for YES, twice for NO.", "Si no puede hablar: cierre los ojos una vez para SÍ, dos veces para NO.", "Si vous ne pouvez pas parler : fermez les yeux une fois pour OUI, deux fois pour NON.", "إذا لم تستطع الكلام: أغمض عينيك مرة واحدة تعني نعم، ومرتين تعني لا.", "如果您不能说话：闭眼一次表示“是”，闭眼两次表示“不是”。", "話せない場合：「はい」は目を1回閉じてください。「いいえ」は2回閉じてください。"] },
+    { ruoli: 'ISM', t: ["Se non può parlare: stringa la mia mano una volta per SÌ, due volte per NO.", "If you cannot speak: squeeze my hand once for YES, twice for NO.", "Si no puede hablar: apriete mi mano una vez para SÍ, dos veces para NO.", "Si vous ne pouvez pas parler : serrez ma main une fois pour OUI, deux fois pour NON.", "إذا لم تستطع الكلام: اضغط على يدي مرة واحدة تعني نعم، ومرتين تعني لا.", "如果您不能说话：捏我的手一次表示“是”，两次表示“不是”。", "話せない場合：「はい」は私の手を1回握ってください。「いいえ」は2回握ってください。"] },
+    { ruoli: 'ISAM', t: ["Se non può parlare: muova la testa su e giù per SÌ, a destra e sinistra per NO.", "If you cannot speak: nod your head for YES, shake it for NO.", "Si no puede hablar: mueva la cabeza arriba y abajo para SÍ, a los lados para NO.", "Si vous ne pouvez pas parler : hochez la tête pour OUI, secouez-la pour NON.", "إذا لم تستطع الكلام: حرّك رأسك لأعلى ولأسفل تعني نعم، ولليمين واليسار تعني لا.", "如果您不能说话：点头表示“是”，摇头表示“不是”。", "話せない場合：「はい」はうなずいてください。「いいえ」は首を横に振ってください。"] },
 
     { gruppo: 'Bisogni', ruoli: 'IS' },
     { ruoli: 'IS', tipo: 'sn', t: ["Ha bisogno del bagno?", "Do you need the toilet?", "¿Necesita ir al baño?", "Avez-vous besoin d'aller aux toilettes ?", "هل تريد الذهاب إلى الحمّام؟", "您要上厕所吗？", "トイレに行きたいですか？"] },
@@ -1894,6 +1894,10 @@
     if (f.t && f.t[0] === 'Quanto dolore ha, da 0 a 10?') f.seguiti = {
       dopo: ['Dove le fa male? Me lo indichi.', 'Quando le fa male?', 'Vuole qualcosa per il dolore?']
     };
+    // «Se non può parlare: …» è un'istruzione, non una domanda: sotto compaiono subito le domande da fare.
+    if (f.t && f.t[0].indexOf('Se non può parlare:') === 0) f.seguiti = {
+      subito: ['Ha dolore?', 'Ha bisogno del bagno?', "Vuole dell'acqua?", 'Ha bisogno di qualcosa?']
+    };
     if (f.t && f.t[0] === 'Ha dolore?') f.sulSi = 'Quanto dolore ha, da 0 a 10?';   // Sì → subito la scala del dolore
     if (f.t && f.t[0] === 'Ha dolore?') f.seguiti = {
       no: ['Ha bisogno di qualcosa?', "Vuole dell'acqua?", 'Ha bisogno del bagno?', 'Se sente dolore o qualcosa di strano, suoni il campanello.']
@@ -1921,7 +1925,8 @@
     ['🍵', 'Tè', 'Tea', 'Té', 'Thé', 'شاي', '茶', '紅茶', 'چائے', 'Ceai', 'Çaj', 'ਚਾਹ', 'Чай', 'Чай'],
     ['🌼', 'Camomilla', 'Camomile tea', 'Manzanilla', 'Camomille', 'بابونج', '洋甘菊茶', 'カモミールティー', 'بابونے کی چائے', 'Ceai de mușețel', 'Çaj kamomili', 'ਕੈਮੋਮਾਈਲ ਚਾਹ', 'Ромашковий чай', 'Ромашковый чай']
   ];
-  var TABELLE = { base: TABELLA, bevande: TABELLA_BEVANDE };
+  // Nelle tabelle il paziente indica una cosa chiudendo gli occhi: Sì e No non servono, quindi non compaiono (le righe restano nei dati).
+  var TABELLE = { base: TABELLA.slice(2), bevande: TABELLA_BEVANDE.slice(2) };
   // Scheda "tè, caffè o camomilla" (sempre proposti insieme) + limone, zucchero, dolcificante.
   // Righe: [it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru]
   var CALDE = [TABELLA_BEVANDE[6].slice(1), TABELLA_BEVANDE[5].slice(1), TABELLA_BEVANDE[7].slice(1)];
@@ -3063,6 +3068,7 @@
       r.innerHTML += '<p class="aiuto-tabella"' + attrOp() + '>' + T('aiuto_risposte') + '</p>';
     document.getElementById('g-risposta').style.display = 'none';
     document.getElementById('g-seguiti').innerHTML = '';
+    if (f.seguiti && f.seguiti.subito) mostraSeguiti('subito', true);
     document.getElementById('grande').classList.add('aperto');
     document.getElementById('grande').scrollTop = 0;
     parla();
@@ -3087,14 +3093,15 @@
     risposta(k === 'si' ? SI[op] : NO[op]);
     mostraSeguiti(k);
   }
-  function mostraSeguiti(k) {
+  function mostraSeguiti(k, senzaScorrere) {
     var box = document.getElementById('g-seguiti'), elenco = aperta && aperta.seguiti && aperta.seguiti[k];
     if (!elenco) { box.innerHTML = ''; return; }
     box.innerHTML = '<p class="seguiti-titolo"' + attrOp() + '>' + T('ora_chiedi') + '</p>' + elenco.map(function (it, j) {
       var f = FRASI.filter(function (x) { return x.t && x.t[0] === it; })[0];
+      if (f && k === 'subito' && ruolo && (f.ruoli || '').indexOf(ruolo) === -1) f = null;   // solo domande del proprio ruolo
       return f ? '<button type="button" onclick="apriSeguito(\'' + k + '\',' + j + ')"><b lang="' + info().id + '"' + (info().rtl ? ' dir="rtl"' : '') + '>' + esc(f.t[lingua]) + '</b><small' + attrOp() + '>' + esc(f.t[op]) + '</small></button>' : '';
     }).join('');
-    box.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    if (!senzaScorrere) box.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }
   function apriSeguito(k, j) {
     var it = aperta.seguiti[k][j];
