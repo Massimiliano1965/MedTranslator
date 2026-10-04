@@ -424,6 +424,14 @@
   }
   #menu .menu-voce { background: var(--chip); color: var(--testo); }
   #menu .btn-tema { width: 100%; height: auto; border-radius: 18px; font-size: 34px; line-height: 1; }
+
+  /* Tante lingue scelte: non si schiacciano più. Fino a 4: due file; 5-6: tre per fila, più piccole; 7 o più: una fila che scorre */
+  .lingue.quattro { flex-wrap: wrap; }
+  .lingue.quattro button { flex: 1 1 45%; padding: 11px 6px; font-size: 18px; }
+  .lingue.sei { flex-wrap: wrap; gap: 6px; }
+  .lingue.sei button { flex: 1 1 30%; padding: 9px 4px; font-size: 15px; }
+  .lingue.molte { flex-wrap: nowrap; gap: 6px; }
+  .lingue.molte button { flex: none; padding: 10px 14px; font-size: 16px; }
   @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
 </head>
@@ -2567,6 +2575,8 @@
       var l = TUTTE[n];
       return chip('lingue', k, '<button type="button" class="' + (n === lingua ? 'attiva' : '') + '"' + attrOp() + ' onclick="scegliLingua(' + n + ')">' + NOMI_OP[op][n] + '</button>');
     }).join('') + '<button type="button" class="piu" onclick="apriPazienti()" aria-label="' + esc(T('pz_titolo')) + '">＋</button>';
+    var nl = viste.lingue.length;
+    document.getElementById('lingue').className = 'lingue' + (nl >= 7 ? ' molte' : nl >= 5 ? ' sei' : nl === 4 ? ' quattro' : '');
     // Chi sei: il ruolo scelto nella schermata di benvenuto
     var rs = RUOLI.filter(function (x) { return x[0] === ruolo; })[0];
     var br = document.getElementById('btn-ruolo');
