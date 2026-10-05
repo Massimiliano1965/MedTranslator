@@ -9,6 +9,7 @@ App Cordova/Android. App id: `it.previtali.medtranslator`. Nome: MedTranslator.
 File: `www/index.html` (tutto il programma: frasi, lingue, schermate), `www/fonts/` (font dentro l'app),
 `www/lib/Sortable.min.js` (trascinare i bottoni), `config.xml` (impostazioni dell'app).
 `extra/giorgia.html` = versione per Giorgia (pagina a parte, non fa parte dell'app).
+`extra/controllo-traduzioni.html` = fogli di controllo delle traduzioni per i madrelingua (14 lingue, 178 frasi; le 329 parole del dizionario non incluse). Pagina a parte, non fa parte dell'app.
 In cima a ogni file c'è la dichiarazione di diritti d'autore di Massimiliano Previtali: va mantenuta.
 
 ## Chi ci lavora
