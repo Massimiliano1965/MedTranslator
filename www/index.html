@@ -437,6 +437,18 @@
   #barra-giu .bg-pref.vuota { opacity: .45; }
   #barra-giu .bg-icona { flex: .8 1 0; }
   #barra-giu .btn-voce { color: var(--ruolo, var(--blu)); }
+  /* Guida all'uso: l'app che funziona da sola, con il bottone vero evidenziato */
+  #tour { position: fixed; inset: 0; z-index: 80; }
+  #tour[hidden] { display: none; }
+  #tour-luce { position: fixed; border-radius: 14px; box-shadow: 0 0 0 9999px rgba(8,16,24,0.62), 0 0 0 3px #fff inset; pointer-events: none; transition: all 0.35s ease; }
+  #tour-card { position: fixed; left: 12px; right: 12px; background: var(--carta); color: var(--testo); border-radius: 18px; padding: 14px 16px; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+  #tour-n { font-size: 13px; color: var(--tenue); margin-bottom: 2px; }
+  #tour-tit { font-size: 19px; display: block; }
+  #tour-txt { margin: 6px 0 12px; font-size: 16px; line-height: 1.35; }
+  #tour-bt { display: flex; gap: 8px; align-items: center; }
+  #tour-bt button { border: 0; border-radius: 12px; padding: 11px 14px; font-size: 16px; font-weight: 700; background: var(--chip); color: var(--testo); }
+  #tour-bt #tour-avanti { margin-left: auto; background: var(--blu); color: #fff; }
+  #tour-bt #tour-voce { padding: 10px 12px; }
   #aggiorna { position: fixed; left: 8px; right: 8px; top: calc(8px + env(safe-area-inset-top, 0px)); z-index: 40; display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 14px; border-radius: 16px; background: var(--arg-attivo); color: var(--arg-attivo-testo); box-shadow: 0 4px 16px rgba(0,0,0,.3); font-size: 18px; font-weight: 700; }
   #aggiorna[hidden] { display: none; }
   #aggiorna span { flex: 1; line-height: 1.2; }
@@ -555,6 +567,7 @@
   <div class="arg-testa"><b>⋯</b><button type="button" onclick="chiudiMenu()">✕ <span data-t="chiudi">Chiudi</span></button></div>
   <button type="button" class="btn-ruolo" id="btn-ruolo" onclick="chiudiMenu(); apriBenvenuto(true)"></button>
   <button type="button" class="menu-voce" onclick="chiudiMenu(); apriPazienti()"><span>🌐</span> <span data-t="pz_titolo">Lingue dei pazienti</span></button>
+  <button type="button" class="menu-voce" onclick="chiudiMenu(); avviaTour()"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="vertical-align:-4px"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 8.5l6 3.5-6 3.5z" fill="currentColor"/></svg> <span data-t="tour_guida">Guida all'uso</span></button>
   <button type="button" class="btn-tema" id="btn-tema" onclick="cambiaTema()"></button>
 </div>
 
@@ -585,6 +598,19 @@
   </div>
 </div>
 
+<div id="tour" hidden>
+  <div id="tour-luce"></div>
+  <div id="tour-card" role="dialog" aria-live="polite">
+    <div id="tour-n"></div>
+    <b id="tour-tit"></b>
+    <p id="tour-txt"></p>
+    <div id="tour-bt">
+      <button type="button" id="tour-voce" onclick="tourLeggi()" aria-label="Ascolta"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z" fill="currentColor"/><path d="M15 9a4 4 0 0 1 0 6M17.5 6.5a8 8 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+      <button type="button" id="tour-salta" onclick="chiudiTour()"></button>
+      <button type="button" id="tour-avanti" onclick="tourAvanti()"></button>
+    </div>
+  </div>
+</div>
 <div id="avvio" onclick="chiudiAvvio()" aria-hidden="true"><div id="avvio-logo"></div><div class="avvio-testi"><h1>MedTranslator</h1><p data-t="sotto">Frasi pronte per comunicare con i pazienti</p></div></div>
 <div class="avviso" id="avviso" role="status"></div>
 <div id="grande" role="dialog" aria-modal="true">
@@ -2490,6 +2516,22 @@
   // ---------- Scritte dell'app nella lingua dell'operatore ----------
   // Ogni riga: [it, en, es, fr, ar, zh, ja, ur, ro, sq, pa, uk, ru, bn, fil]. Aggiunte il 29/09/2026: DA FAR CONTROLLARE.
   var UI = {
+    "tour_guida": ["Guida all'uso", "User guide", "Guía de uso", "Guide d'utilisation", "دليل الاستخدام", "使用指南", "使い方ガイド", "استعمال کی گائیڈ", "Ghid de utilizare", "Udhëzues përdorimi", "ਵਰਤੋਂ ਗਾਈਡ", "Посібник", "Руководство", "ব্যবহার নির্দেশিকা", "Gabay sa paggamit"],
+    "tour_avanti": ["Avanti", "Next", "Siguiente", "Suivant", "التالي", "下一步", "次へ", "آگے", "Înainte", "Para", "ਅੱਗੇ", "Далі", "Далее", "পরের", "Susunod"],
+    "tour_fine": ["Fine", "Done", "Listo", "Terminer", "إنهاء", "完成", "完了", "ختم", "Gata", "Mbaro", "ਪੂਰਾ", "Готово", "Готово", "শেষ", "Tapos"],
+    "tour_salta": ["Salta", "Skip", "Omitir", "Passer", "تخطي", "跳过", "スキップ", "چھوڑیں", "Sari peste", "Kalo", "ਛੱਡੋ", "Пропустити", "Пропустить", "বাদ দিন", "Laktawan"],
+    "t0_tit": ["Ti faccio vedere come funziona", "Let me show you how it works", "Te enseño cómo funciona", "Je vous montre comment ça marche", "دعني أريك كيف يعمل", "带你看看怎么用", "使い方をお見せします", "میں آپ کو دکھاتا ہوں کہ یہ کیسے کام کرتا ہے", "Îți arăt cum funcționează", "Të tregoj si funksionon", "ਮੈਂ ਤੁਹਾਨੂੰ ਦਿਖਾਉਂਦਾ ਹਾਂ ਕਿ ਇਹ ਕਿਵੇਂ ਚੱਲਦਾ ਹੈ", "Покажу, як це працює", "Покажу, как это работает", "আমি দেখাচ্ছি এটা কীভাবে কাজ করে", "Ipapakita ko kung paano ito gumagana"],
+    "t0_txt": ["Dura meno di un minuto. L'app lavora da sola: tu guardi.", "It takes under a minute. The app works by itself: you just watch.", "Dura menos de un minuto. La app trabaja sola: tú solo mira.", "Moins d'une minute. L'app travaille toute seule : vous regardez.", "تستغرق أقل من دقيقة. التطبيق يعمل وحده: أنت فقط شاهد.", "不到一分钟。应用会自己操作，你只管看。", "1分もかかりません。アプリが自動で動くので、見ているだけです。", "ایک منٹ سے کم لگے گا۔ ایپ خود چلتی ہے، آپ بس دیکھیں۔", "Durează sub un minut. Aplicația merge singură: tu doar privești.", "Zgjat më pak se një minutë. Aplikacioni punon vetë: ti vetëm shiko.", "ਇੱਕ ਮਿੰਟ ਤੋਂ ਘੱਟ ਲੱਗੇਗਾ। ਐਪ ਆਪਣੇ-ਆਪ ਚੱਲਦੀ ਹੈ, ਤੁਸੀਂ ਸਿਰਫ਼ ਦੇਖੋ।", "Менше хвилини. Застосунок працює сам: ви лише дивитесь.", "Меньше минуты. Приложение работает само: вы просто смотрите.", "এক মিনিটেরও কম সময় লাগবে। অ্যাপ নিজে চলবে, আপনি শুধু দেখুন।", "Wala pang isang minuto. Kusang gumagana ang app: manood ka lang."],
+    "t1_tit": ["Lingua del paziente", "Patient's language", "Idioma del paciente", "Langue du patient", "لغة المريض", "患者的语言", "患者さんの言語", "مریض کی زبان", "Limba pacientului", "Gjuha e pacientit", "ਮਰੀਜ਼ ਦੀ ਭਾਸ਼ਾ", "Мова пацієнта", "Язык пациента", "রোগীর ভাষা", "Wika ng pasyente"],
+    "t1_txt": ["In alto scegli la lingua del paziente: ogni frase compare subito tradotta.", "At the top, pick the patient's language: every phrase appears translated right away.", "Arriba eliges el idioma del paciente: cada frase aparece traducida al instante.", "En haut, choisissez la langue du patient : chaque phrase apparaît aussitôt traduite.", "في الأعلى اختر لغة المريض: تظهر كل جملة مترجمة فورًا.", "在顶部选择患者的语言，每句话会立即显示译文。", "上で患者さんの言語を選ぶと、各フレーズがすぐに翻訳されて表示されます。", "اوپر مریض کی زبان چنیں: ہر جملہ فوراً ترجمہ ہو کر نظر آتا ہے۔", "Sus alegi limba pacientului: fiecare frază apare imediat tradusă.", "Sipër zgjidh gjuhën e pacientit: çdo fjali shfaqet menjëherë e përkthyer.", "ਉੱਪਰ ਮਰੀਜ਼ ਦੀ ਭਾਸ਼ਾ ਚੁਣੋ: ਹਰ ਵਾਕ ਤੁਰੰਤ ਅਨੁਵਾਦ ਹੋ ਕੇ ਦਿਖਦਾ ਹੈ।", "Угорі оберіть мову пацієнта: кожна фраза одразу з'являється перекладеною.", "Вверху выберите язык пациента: каждая фраза сразу появляется в переводе.", "উপরে রোগীর ভাষা বেছে নিন: প্রতিটি বাক্য সঙ্গে সঙ্গে অনূদিত দেখা যায়।", "Sa itaas, piliin ang wika ng pasyente: agad na lilitaw ang bawat parirala na naisalin."],
+    "t2_tit": ["Cerca scrivendo o a voce", "Search by typing or voice", "Busca escribiendo o por voz", "Cherchez en écrivant ou à la voix", "ابحث بالكتابة أو بالصوت", "打字或语音搜索", "入力または音声で検索", "لکھ کر یا آواز سے تلاش کریں", "Caută scriind sau cu vocea", "Kërko duke shkruar ose me zë", "ਲਿਖ ਕੇ ਜਾਂ ਆਵਾਜ਼ ਨਾਲ ਖੋਜੋ", "Шукайте текстом або голосом", "Ищите текстом или голосом", "লিখে বা কথা বলে খুঁজুন", "Maghanap sa pagta-type o gamit ang boses"],
+    "t2_txt": ["Scrivi o detta una parola nella tua lingua: ti propongo le frasi più simili.", "Type or say a word in your language: I suggest the closest phrases.", "Escribe o dicta una palabra en tu idioma: te propongo las frases más parecidas.", "Écrivez ou dites un mot dans votre langue : je propose les phrases les plus proches.", "اكتب أو انطق كلمة بلغتك: أقترح عليك أقرب الجمل.", "用你的语言输入或说出一个词，我会推荐最相近的句子。", "自分の言語で単語を入力または話すと、近いフレーズを提案します。", "اپنی زبان میں کوئی لفظ لکھیں یا بولیں: میں سب سے ملتے جلتے جملے دکھاتا ہوں۔", "Scrie sau spune un cuvânt în limba ta: îți propun cele mai apropiate fraze.", "Shkruaj ose thuaj një fjalë në gjuhën tënde: të propozoj fjalitë më të ngjashme.", "ਆਪਣੀ ਭਾਸ਼ਾ ਵਿੱਚ ਕੋਈ ਸ਼ਬਦ ਲਿਖੋ ਜਾਂ ਬੋਲੋ: ਮੈਂ ਸਭ ਤੋਂ ਮਿਲਦੇ ਵਾਕ ਦਿਖਾਉਂਦਾ ਹਾਂ।", "Напишіть або скажіть слово своєю мовою: я запропоную найближчі фрази.", "Напишите или произнесите слово на своём языке: я предложу самые близкие фразы.", "নিজের ভাষায় একটি শব্দ লিখুন বা বলুন: আমি সবচেয়ে কাছের বাক্যগুলো দেখাব।", "Mag-type o magsabi ng salita sa wika mo: imumungkahi ko ang pinakamalalapit na parirala."],
+    "t3_tit": ["Frase a schermo intero", "Full-screen phrase", "Frase a pantalla completa", "Phrase en plein écran", "الجملة بملء الشاشة", "全屏显示句子", "フレーズを全画面で", "پوری اسکرین پر جملہ", "Fraza pe tot ecranul", "Fjalia në ekran të plotë", "ਪੂਰੀ ਸਕ੍ਰੀਨ 'ਤੇ ਵਾਕ", "Фраза на весь екран", "Фраза на весь экран", "পুরো পর্দায় বাক্য", "Parirala sa buong screen"],
+    "t3_txt": ["Tocca una frase: si apre grande, da mostrare al paziente. Con Ascolta la senti, e sotto vedi come si pronuncia.", "Tap a phrase: it opens large, to show the patient. With Listen you hear it, and below you see how to pronounce it.", "Toca una frase: se abre grande, para enseñarla al paciente. Con Escuchar la oyes, y debajo ves cómo se pronuncia.", "Touchez une phrase : elle s'ouvre en grand, à montrer au patient. Avec Écouter, vous l'entendez, et dessous vous voyez comment la prononcer.", "المس جملة: تُفتح بحجم كبير لتُريها للمريض. بزر الاستماع تسمعها، وتحتها ترى طريقة نطقها.", "点一句话：它会放大显示，方便给患者看。点“收听”能听到发音，下面还有读音提示。", "フレーズをタップすると大きく表示され、患者さんに見せられます。「聞く」で音声が流れ、下に読み方が出ます。", "کسی جملے کو چھوئیں: وہ بڑا کھل جاتا ہے، مریض کو دکھانے کے لیے۔ سنیں سے آواز آتی ہے، نیچے تلفظ نظر آتا ہے۔", "Atinge o frază: se deschide mare, ca s-o arăți pacientului. Cu Ascultă o auzi, iar dedesubt vezi cum se pronunță.", "Prek një fjali: hapet e madhe, për t'ia treguar pacientit. Me Dëgjo e dëgjon, dhe poshtë shikon si shqiptohet.", "ਕਿਸੇ ਵਾਕ ਨੂੰ ਛੂਹੋ: ਉਹ ਵੱਡਾ ਖੁੱਲ੍ਹਦਾ ਹੈ, ਮਰੀਜ਼ ਨੂੰ ਦਿਖਾਉਣ ਲਈ। ਸੁਣੋ ਨਾਲ ਆਵਾਜ਼ ਸੁਣੋ, ਹੇਠਾਂ ਉਚਾਰਨ ਦਿਖਦਾ ਹੈ।", "Торкніться фрази: вона відкривається великою, щоб показати пацієнтові. Кнопкою «Слухати» чуєте її, а внизу бачите вимову.", "Нажмите на фразу: она откроется крупно, чтобы показать пациенту. Кнопкой «Слушать» вы услышите её, а внизу увидите произношение.", "একটি বাক্যে ছুঁলে সেটি বড় হয়ে খোলে, রোগীকে দেখানোর জন্য। শুনুন চাপলে শোনা যায়, নিচে উচ্চারণ দেখা যায়।", "I-tap ang isang parirala: bubukas ito nang malaki para ipakita sa pasyente. Sa Pakinggan maririnig mo, at sa ibaba makikita ang bigkas."],
+    "t4_tit": ["Argomenti, specialità, preferite", "Topics, specialties, favorites", "Temas, especialidades, favoritas", "Thèmes, spécialités, favorites", "المواضيع والتخصصات والمفضلة", "主题、专科、收藏", "トピック・診療科・お気に入り", "موضوعات، شعبے، پسندیدہ", "Subiecte, specialități, favorite", "Tema, specialitete, të preferuara", "ਵਿਸ਼ੇ, ਵਿਸ਼ੇਸ਼ਤਾਵਾਂ, ਪਸੰਦੀਦਾ", "Теми, спеціальності, улюблені", "Темы, специальности, избранное", "বিষয়, বিশেষত্ব, প্রিয়", "Mga paksa, espesyalidad, paborito"],
+    "t4_txt": ["Filtra le frasi per tema o per specialità. Con la stella salvi quelle che usi di più.", "Filter phrases by topic or specialty. With the star you save the ones you use most.", "Filtra las frases por tema o especialidad. Con la estrella guardas las que más usas.", "Filtrez les phrases par thème ou spécialité. Avec l'étoile, vous gardez celles que vous utilisez le plus.", "صفِّ الجمل حسب الموضوع أو التخصص. بالنجمة تحفظ الأكثر استخدامًا.", "按主题或专科筛选句子。点星标可保存常用的句子。", "トピックや診療科でフレーズを絞り込めます。星を付けると、よく使うものを保存できます。", "موضوع یا شعبے کے لحاظ سے جملے چھانٹیں۔ ستارے سے زیادہ استعمال ہونے والے جملے محفوظ کریں۔", "Filtrează frazele după subiect sau specialitate. Cu steluța le salvezi pe cele mai folosite.", "Filtro fjalitë sipas temës ose specialitetit. Me yllin ruan ato që përdor më shpesh.", "ਵਿਸ਼ੇ ਜਾਂ ਵਿਸ਼ੇਸ਼ਤਾ ਮੁਤਾਬਕ ਵਾਕ ਛਾਂਟੋ। ਤਾਰੇ ਨਾਲ ਜ਼ਿਆਦਾ ਵਰਤੇ ਜਾਣ ਵਾਲੇ ਵਾਕ ਸੰਭਾਲੋ।", "Фільтруйте фрази за темою чи спеціальністю. Зіркою зберігаєте ті, що використовуєте найчастіше.", "Фильтруйте фразы по теме или специальности. Звёздочкой сохраняете те, что нужны чаще всего.", "বিষয় বা বিশেষত্ব অনুযায়ী বাক্য ছেঁকে নিন। তারা দিয়ে বেশি ব্যবহৃত বাক্য সংরক্ষণ করুন।", "I-filter ang mga parirala ayon sa paksa o espesyalidad. Sa bituin, mase-save mo ang madalas mong gamitin."],
+    "t5_tit": ["Menu", "Menu", "Menú", "Menu", "القائمة", "菜单", "メニュー", "مینو", "Meniu", "Menyja", "ਮੀਨੂ", "Меню", "Меню", "মেনু", "Menu"],
+    "t5_txt": ["Nel menu cambi lavoro, lingue dei pazienti e tema, e rivedi questa guida quando vuoi.", "In the menu you change your job, patients' languages and theme, and review this guide whenever you like.", "En el menú cambias de trabajo, idiomas de los pacientes y tema, y repasas esta guía cuando quieras.", "Dans le menu, vous changez de métier, les langues des patients et le thème, et revoyez ce guide quand vous voulez.", "من القائمة تغيّر عملك ولغات المرضى والمظهر، وتعيد مشاهدة هذا الدليل متى شئت.", "在菜单里可以更改职业、患者语言和主题，也可随时重看本指南。", "メニューでは、職種・患者さんの言語・テーマを変更でき、このガイドをいつでも見直せます。", "مینو میں آپ پیشہ، مریضوں کی زبانیں اور تھیم بدل سکتے ہیں، اور یہ گائیڈ جب چاہیں دوبارہ دیکھ سکتے ہیں۔", "În meniu schimbi meseria, limbile pacienților și tema și revezi acest ghid oricând.", "Në meny ndryshon punën, gjuhët e pacientëve dhe temën, dhe e shikon sërish këtë udhëzues kur të duash.", "ਮੀਨੂ ਵਿੱਚ ਤੁਸੀਂ ਕੰਮ, ਮਰੀਜ਼ਾਂ ਦੀਆਂ ਭਾਸ਼ਾਵਾਂ ਅਤੇ ਥੀਮ ਬਦਲ ਸਕਦੇ ਹੋ, ਅਤੇ ਇਹ ਗਾਈਡ ਜਦੋਂ ਚਾਹੋ ਦੁਬਾਰਾ ਦੇਖ ਸਕਦੇ ਹੋ।", "У меню змінюєте професію, мови пацієнтів і тему та знову дивитеся цей посібник, коли захочете.", "В меню вы меняете профессию, языки пациентов и тему и пересматриваете это руководство, когда захотите.", "মেনুতে কাজ, রোগীদের ভাষা ও থিম বদলাতে পারেন এবং যখন খুশি এই নির্দেশিকা আবার দেখতে পারেন।", "Sa menu, mapapalitan mo ang trabaho, mga wika ng pasyente at tema, at mapapanood muli ang gabay na ito anumang oras."],
     "pz_titolo": ["Lingue dei pazienti", "Patients' languages", "Idiomas de los pacientes", "Langues des patients", "لغات المرضى", "患者的语言", "患者さんの言語", "مریضوں کی زبانیں", "Limbile pacienților", "Gjuhët e pacientëve", "ਮਰੀਜ਼ਾਂ ਦੀਆਂ ਭਾਸ਼ਾਵਾਂ", "Мови пацієнтів", "Языки пациентов", "রোগীদের ভাষা", "Mga wika ng mga pasyente"],
     "pz_sotto": ["Tocca le lingue dei tuoi pazienti: una, alcune o tutte. Solo queste appariranno in alto.", "Tap your patients' languages: one, some or all. Only these will appear at the top.", "Toca los idiomas de tus pacientes: uno, varios o todos. Solo estos aparecerán arriba.", "Touche les langues de tes patients : une, plusieurs ou toutes. Seules celles-ci apparaîtront en haut.", "اضغط على لغات مرضاك: واحدة أو عدة لغات أو كلها. ستظهر هذه اللغات فقط في الأعلى.", "点选你的患者的语言：一种、几种或全部。只有这些语言会显示在上方。", "患者さんの言語をタップしてください（1つ、複数、またはすべて）。選んだ言語だけが上に表示されます。", "اپنے مریضوں کی زبانوں کو چھوئیں: ایک، کچھ یا سب۔ صرف یہی اوپر نظر آئیں گی۔", "Atinge limbile pacienților tăi: una, câteva sau toate. Doar acestea vor apărea sus.", "Prek gjuhët e pacientëve të tu: një, disa ose të gjitha. Vetëm këto do të shfaqen lart.", "ਆਪਣੇ ਮਰੀਜ਼ਾਂ ਦੀਆਂ ਭਾਸ਼ਾਵਾਂ ਛੂਹੋ: ਇੱਕ, ਕੁਝ ਜਾਂ ਸਾਰੀਆਂ। ਸਿਰਫ਼ ਇਹੀ ਉੱਪਰ ਦਿਖਣਗੀਆਂ।", "Торкнися мов своїх пацієнтів: однієї, кількох або всіх. Лише вони з'являться вгорі.", "Коснись языков своих пациентов: одного, нескольких или всех. Только они появятся вверху.", "তোমার রোগীদের ভাষাগুলো ছোঁও: একটি, কয়েকটি বা সবগুলো। শুধু এগুলোই উপরে দেখাবে।", "Pindutin ang mga wika ng iyong mga pasyente: isa, ilan o lahat. Ang mga ito lang ang lalabas sa itaas."],
     "pz_continua": ["Continua", "Continue", "Continuar", "Continuer", "متابعة", "继续", "続ける", "جاری رکھیں", "Continuă", "Vazhdo", "ਜਾਰੀ ਰੱਖੋ", "Продовжити", "Продолжить", "চালিয়ে যাও", "Magpatuloy"],
@@ -2751,6 +2793,8 @@
     disegna();
     window.scrollTo(0, 0);
     centra('lingue'); centra('gruppi');
+    var visto = false; try { visto = localStorage.getItem('trad_tour_visto') === '1'; } catch (e) {}
+    if (!visto) setTimeout(avviaTour, 700);
   }
   // Porta in vista (al centro della riga) il bottone scelto di lingue o argomenti.
   function centra(id) {
@@ -3432,6 +3476,7 @@
   // alla schermata «Lingue dei pazienti»; da lì esce dall'app.
   document.addEventListener('backbutton', function (e) {
     e.preventDefault();
+    if (tourPasso >= 0) { chiudiTour(); return; }
     if (aperta) chiudi();
     else if (document.getElementById('scelta-ruolo').classList.contains('aperto')) chiudiScelta();
     else if (document.getElementById('argomenti').classList.contains('aperto')) chiudiArgomenti();
@@ -3441,6 +3486,95 @@
     else if (!benvenutoAperto && !pazientiAperto) apriPazienti();                 // dalle frasi torna alle lingue dei pazienti
     else if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
   }, false);
+
+  // ---------- Guida all'uso (si apre da sola la prima volta e dal menu ⋯) ----------
+  // L'app lavora da sola: cambia lingua, cerca, apre una frase, apre gli argomenti. Alla fine rimette tutto com'era.
+  var tourPasso = -1, tourSalvata = null, tourTimer = [];
+  var TOUR_PASSI = [
+    { k: 't0', bers: null },
+    { k: 't1', bers: '#lingue', fa: function () {
+        var altra = pazienti.filter(function (n) { return n !== lingua; })[0];
+        if (altra !== undefined) tourAttendi(900, function () { lingua = altra; disegna(); centra('lingue'); tourPosiziona(); }); } },
+    { k: 't2', bers: '#cerca', fa: function () {
+        document.body.classList.add('cercando'); var c = document.getElementById('cerca-testo'); c.value = ''; testoCerca = '';
+        var parola = 'dolore', n = 0;
+        (function scrivi() {
+          n++; c.value = parola.slice(0, n); cercaFrasi(c.value); tourPosiziona();
+          if (n < parola.length) tourAttendi(220, scrivi);
+        })(); },
+      fine: function () { chiudiCerca(); } },
+    { k: 't3', bers: '#g-testo', fa: function () {
+        var b = document.querySelector('#elenco .frase'); if (b) tourAttendi(500, function () { b.click(); tourPosiziona(); }); },
+      fine: function () { if (aperta) chiudi(); } },
+    { k: 't4', bers: '#argomenti', fa: function () { apriArgomenti(); }, fine: function () { chiudiArgomenti(); } },
+    { k: 't5', bers: '#barra-giu .bg-icona:last-child', extra: function () { return ' ' + T('avviso_resp'); } }
+  ];
+  function tourAttendi(ms, f) { tourTimer.push(setTimeout(f, ms)); }
+  function tourPulisci() { tourTimer.forEach(clearTimeout); tourTimer = []; }
+  function tourPosiziona() {
+    var p = TOUR_PASSI[tourPasso]; if (!p) return;
+    var luce = document.getElementById('tour-luce'), card = document.getElementById('tour-card');
+    var el = p.bers ? document.querySelector(p.bers) : null;
+    if (el) {
+      var r = el.getBoundingClientRect(), pad = 6;
+      luce.style.display = '';
+      luce.style.left = (r.left - pad) + 'px'; luce.style.top = (r.top - pad) + 'px';
+      luce.style.width = (r.width + pad * 2) + 'px'; luce.style.height = (r.height + pad * 2) + 'px';
+      var sotto = (r.top + r.height / 2) > window.innerHeight / 2;
+      card.style.top = sotto ? '14px' : 'auto'; card.style.bottom = sotto ? 'auto' : '14px';
+    } else {
+      luce.style.display = 'none';
+      card.style.top = '25%'; card.style.bottom = 'auto';
+    }
+  }
+  function tourMostra() {
+    var p = TOUR_PASSI[tourPasso];
+    document.getElementById('tour-n').textContent = (tourPasso + 1) + ' / ' + TOUR_PASSI.length;
+    document.getElementById('tour-tit').textContent = T(p.k + '_tit');
+    document.getElementById('tour-txt').textContent = T(p.k + '_txt') + (p.extra ? p.extra() : '');
+    document.getElementById('tour-salta').textContent = T('tour_salta');
+    document.getElementById('tour-avanti').textContent = T(tourPasso === TOUR_PASSI.length - 1 ? 'tour_fine' : 'tour_avanti');
+    document.getElementById('tour-voce').setAttribute('aria-label', T('ascolta'));
+    document.getElementById('tour').hidden = false;
+    tourPosiziona();
+    if (p.fa) p.fa();
+    tourPosiziona();
+  }
+  function tourFinePasso() {
+    tourPulisci();
+    var p = TOUR_PASSI[tourPasso]; if (p && p.fine) { try { p.fine(); } catch (e) {} }
+  }
+  function tourAvanti() {
+    tourFinePasso();
+    if (tourPasso >= TOUR_PASSI.length - 1) { chiudiTour(); return; }
+    tourPasso++; tourMostra();
+  }
+  function tourLeggi() {
+    var testo = document.getElementById('tour-tit').textContent + '. ' + document.getElementById('tour-txt').textContent;
+    var v = infoOp().voce;
+    if (window.TTS && window.TTS.speak) { try { window.TTS.speak({ text: testo, locale: v, rate: 0.9 }, function () {}, function () {}); } catch (e) {} return; }
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(testo); u.lang = v; u.rate = 0.9; speechSynthesis.speak(u);
+  }
+  function avviaTour() {
+    if (tourPasso >= 0) return;
+    tourSalvata = { lingua: lingua };
+    tourPasso = 0; tourMostra();
+  }
+  function chiudiTour() {
+    if (tourPasso < 0) return;
+    tourFinePasso();
+    if (aperta) chiudi();
+    chiudiArgomenti(); chiudiMenu();
+    if (tourSalvata) { lingua = tourSalvata.lingua; tourSalvata = null; }
+    tourPasso = -1;
+    document.getElementById('tour').hidden = true;
+    try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+    try { localStorage.setItem('trad_tour_visto', '1'); } catch (e) {}
+    disegna(); centra('lingue');
+  }
+  window.addEventListener('resize', function () { if (tourPasso >= 0) tourPosiziona(); });
   var apriOriginale = apri;
   apri = function (i) { apriOriginale(i); try { history.pushState({ f: i }, ''); } catch (e) {} };
   var chiudiOriginale = chiudi;
