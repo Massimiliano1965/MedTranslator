@@ -3479,6 +3479,7 @@
     if (tourPasso >= 0) { chiudiTour(); return; }
     if (aperta) chiudi();
     else if (document.getElementById('scelta-ruolo').classList.contains('aperto')) chiudiScelta();
+    else if (document.getElementById('specialita').classList.contains('aperto')) chiudiSpecialita();
     else if (document.getElementById('argomenti').classList.contains('aperto')) chiudiArgomenti();
     else if (document.getElementById('menu').classList.contains('aperto')) chiudiMenu();
     else if (document.body.classList.contains('cercando')) chiudiCerca();
