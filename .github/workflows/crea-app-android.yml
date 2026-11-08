@@ -30,6 +30,9 @@ jobs:
         run: |
           sed -i 's/ version="1\.0\.0"/ version="1.0.${{ github.run_number }}"/' config.xml
           grep -o 'version="[^"]*"' config.xml | head -1
+          # Lo stesso numero dentro l'app: serve al controllo aggiornamento
+          sed -i 's/var BUILD = 0;/var BUILD = ${{ github.run_number }};/' www/index.html
+          grep -c 'var BUILD = ${{ github.run_number }};' www/index.html
       - name: Installa Cordova
         run: npm install -g cordova@12
       - name: Prepara Android, la voce e la ricerca a voce
@@ -63,3 +66,4 @@ jobs:
         run: |
           gh release view apk-di-prova >/dev/null 2>&1 || gh release create apk-di-prova --title "APK di prova" --notes "Ultima versione di MedTranslator costruita da main." --prerelease
           gh release upload apk-di-prova MedTranslator.apk --clobber
+          gh release edit apk-di-prova --title "APK di prova - build ${{ github.run_number }}" --notes "build ${{ github.run_number }}: ultima versione di MedTranslator costruita da main."
